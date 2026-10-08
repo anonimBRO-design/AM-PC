@@ -1,12 +1,10 @@
-/* Alight Motion PC (AM-PC) V1.0 PWA service worker.
-   Network-first navigation keeps deployments fresh while retaining an
+/* Open Motion V5.31 PWA service worker.
+   Network-first navigation keeps GitHub deployments fresh while retaining an
    offline shell. User-imported Blob/File media is never cached here. */
-const CACHE_NAME = 'alight-motion-pc-v103';
+const CACHE_NAME = 'open-motion-pwa-v531';
 const SHELL = [
   './',
   './manifest.webmanifest',
-  './css/theme.css',
-  './css/desktop.css',
   './icons/open-motion-192.png',
   './icons/open-motion-512.png',
   './icons/open-motion-maskable-512.png',
@@ -19,14 +17,14 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(SHELL))
-      .catch(error => console.warn('[Alight Motion PC PWA] shell pre-cache skipped:', error))
+      .catch(error => console.warn('[Open Motion PWA] shell pre-cache skipped:', error))
   );
 });
 
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const names = await caches.keys();
-    await Promise.all(names.filter(name => (name.startsWith('open-motion-pwa-') || name.startsWith('alight-motion-pc-')) && name !== CACHE_NAME)
+    await Promise.all(names.filter(name => name.startsWith('open-motion-pwa-') && name !== CACHE_NAME)
       .map(name => caches.delete(name)));
     await self.clients.claim();
   })());
@@ -58,7 +56,6 @@ self.addEventListener('fetch', event => {
 
   const isPwaAsset =
     url.pathname.endsWith('/manifest.webmanifest') ||
-    url.pathname.includes('/css/') ||
     url.pathname.includes('/icons/');
   if (isPwaAsset) {
     event.respondWith((async () => {

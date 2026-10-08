@@ -20,9 +20,10 @@ function createWindow() {
     height: 900,
     minWidth: 1024,
     minHeight: 680,
-    frame: false, // Frameless for custom Alight Motion Dark Studio titlebar
+    frame: true,
+    autoHideMenuBar: true,
     backgroundColor: '#121316',
-    title: 'Alight Motion PC',
+    title: 'Open Motion Studio',
     icon: iconPath,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
