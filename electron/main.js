@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, session } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -57,6 +57,15 @@ function createWindow() {
 
 // App lifecycle
 app.whenReady().then(() => {
+  session.defaultSession.webRequest.onBeforeSendHeaders(
+    { urls: ['https://resolver.openmotionapp.my.id/*'] },
+    (details, callback) => {
+      details.requestHeaders['Origin'] = 'https://hada45.github.io';
+      details.requestHeaders['Referer'] = 'https://hada45.github.io/Open-Motion/';
+      callback({ requestHeaders: details.requestHeaders });
+    }
+  );
+
   createWindow();
 
   app.on('activate', () => {
