@@ -1,0 +1,1702 @@
+/* ============================================================
+   Alight Motion PC (AM-PC) — Desktop-Exclusive Layout
+   Multi-Panel Docked Studio Architecture for Widescreen PC
+   ============================================================ */
+
+@media (min-width: 860px) {
+  /* 1. Global Editor Widescreen Shell */
+  .editor {
+    display: grid !important;
+    grid-template-rows: 50px minmax(0, 1fr) !important;
+    height: 100vh !important;
+    width: 100vw !important;
+    overflow: hidden !important;
+    background: #0e1015 !important;
+  }
+
+  /* 2. Top Navigation Bar */
+  .editorTop {
+    display: grid !important;
+    grid-template-columns: auto 1fr auto !important;
+    align-items: center !important;
+    padding: 0 16px !important;
+    background: #151821 !important;
+    border-bottom: 1px solid #232734 !important;
+    z-index: 50 !important;
+  }
+
+  .editorTop .topActions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .editorTop .topIcon {
+    width: 36px !important;
+    height: 36px !important;
+    display: grid !important;
+    place-items: center !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    transition: background 0.15s ease !important;
+  }
+
+  .editorTop .topIcon:hover {
+    background: #242938 !important;
+  }
+
+  /* 3. Multi-Panel Docked Editor Main Grid */
+  .editorMain {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 380px !important;
+    grid-template-rows: minmax(0, 1fr) 280px !important;
+    height: 100% !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    background: #0e1015 !important;
+  }
+
+  /* When drawer is closed/hidden, preview area smoothly expands to full width */
+  .editorMain:has(> #drawer.hidden) {
+    grid-template-columns: minmax(0, 1fr) 0px !important;
+  }
+
+  /* 4. Canvas / Viewport Area (Row 1, Column 1 — Top Left/Center) */
+  .previewArea {
+    grid-column: 1 / 2 !important;
+    grid-row: 1 / 2 !important;
+    display: grid !important;
+    grid-template-rows: minmax(0, 1fr) 42px !important;
+    height: 100% !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    min-width: 0 !important;
+    background: #0b0c10 !important;
+    border-right: 1px solid #222633 !important;
+    border-bottom: 1px solid #222633 !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .previewArea .viewport {
+    min-height: 0 !important;
+    min-width: 0 !important;
+    height: 100% !important;
+    width: 100% !important;
+    display: grid !important;
+    place-items: center !important;
+    background: radial-gradient(circle at center, #14161f 0%, #090a0d 100%) !important;
+    overflow: hidden !important;
+    padding: 16px !important;
+  }
+
+  .previewArea .previewTools {
+    height: 42px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 14px !important;
+    gap: 8px !important;
+    background: #141720 !important;
+    border-top: 1px solid #222633 !important;
+    z-index: 10 !important;
+  }
+
+  .previewArea .previewTools button {
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    color: #929db0 !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+  }
+
+  .previewArea .previewTools button:hover {
+    background: #202534 !important;
+    color: #ffffff !important;
+  }
+
+  .previewArea .previewTools button.active {
+    background: rgba(0, 230, 118, 0.15) !important;
+    border-color: rgba(0, 230, 118, 0.4) !important;
+    color: #00e676 !important;
+  }
+
+  /* 5. Right-Side Docked Inspector Panel (Row 1, Column 2 — Top Right) */
+  #drawer {
+    grid-column: 2 / 3 !important;
+    grid-row: 1 / 2 !important;
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    width: 380px !important;
+    height: 100% !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: #161922 !important;
+    border-left: 1px solid #242836 !important;
+    border-bottom: 1px solid #242836 !important;
+    box-shadow: none !important;
+    z-index: 25 !important;
+    overflow: hidden !important;
+    transform: none !important;
+  }
+
+  #drawer.hidden {
+    display: none !important;
+  }
+
+  #drawer .drawerHead {
+    height: 48px !important;
+    min-height: 48px !important;
+    flex: 0 0 48px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 14px !important;
+    background: #191c26 !important;
+    border-bottom: 1px solid #252a38 !important;
+    gap: 8px !important;
+  }
+
+  #drawer .drawerHead b {
+    font-size: 13px !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+  }
+
+  #drawer .drawerHead button {
+    width: 30px !important;
+    height: 30px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+    border: 0 !important;
+    color: #8f9bb0 !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+  }
+
+  #drawer .drawerHead button:hover {
+    color: #ffffff !important;
+    background: #252a3a !important;
+  }
+
+  #drawer .drawerBody {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 14px !important;
+  }
+
+  /* 6 Master Inspector Grid in Right Dock */
+  .inspectorGrid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .insBtn {
+    min-height: 76px !important;
+    padding: 12px 8px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    border-radius: 10px !important;
+    background: #1e222e !important;
+    border: 1px solid #2b3142 !important;
+    color: #c0cadc !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+  }
+
+  .insBtn:hover {
+    border-color: #00e676 !important;
+    color: #ffffff !important;
+    background: #242938 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 14px rgba(0, 230, 118, 0.2) !important;
+  }
+
+  .insBtn span {
+    font-size: 22px !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* 6. Timeline Area (Row 2, Column 1 to 3 — FULL WIDTH ACROSS BOTTOM) */
+  .timelineArea {
+    grid-column: 1 / 3 !important;
+    grid-row: 2 / 3 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    min-width: 0 !important;
+    display: grid !important;
+    grid-template-rows: 40px minmax(0, 1fr) !important;
+    background: #11131a !important;
+    border-top: 1px solid #222634 !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .timelineArea .transport {
+    height: 40px !important;
+    padding: 0 14px !important;
+    background: #161922 !important;
+    border-bottom: 1px solid #222634 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .timelineArea .timelineScroll {
+    grid-row: 2 / 3 !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    overflow: auto !important;
+    background: #0f1117 !important;
+  }
+
+  .timelineArea .bottomTools {
+    display: none !important;
+  }
+
+  .timelineArea .plusBtn {
+    position: absolute !important;
+    right: 20px !important;
+    bottom: 20px !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, #00e676, #00b0ff) !important;
+    color: #0b0e14 !important;
+    border: 0 !important;
+    font-size: 24px !important;
+    font-weight: 800 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 4px 16px rgba(0, 230, 118, 0.4) !important;
+    cursor: pointer !important;
+    z-index: 40 !important;
+    transition: transform 0.15s ease, filter 0.15s ease !important;
+  }
+
+  .timelineArea .plusBtn:hover {
+    transform: scale(1.08) !important;
+    filter: brightness(1.1) !important;
+  }
+
+  /* Add Hub in Right Dock */
+  #drawer.addDrawer .addHubTabs {
+    display: flex !important;
+    overflow-x: auto !important;
+    background: #191c26 !important;
+    border-bottom: 1px solid #252a38 !important;
+    padding: 4px !important;
+    gap: 4px !important;
+  }
+
+  #drawer.addDrawer .addHubTab {
+    flex: 1 1 0 !important;
+    min-width: 52px !important;
+    height: 48px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 9px !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    border-radius: 7px !important;
+    color: #8b96aa !important;
+    cursor: pointer !important;
+    padding: 2px !important;
+    transition: all 0.15s ease !important;
+  }
+
+  #drawer.addDrawer .addHubTab:hover {
+    color: #ffffff !important;
+    background: #222736 !important;
+  }
+
+  #drawer.addDrawer .addHubTab.active {
+    background: rgba(0, 230, 118, 0.12) !important;
+    border-color: rgba(0, 230, 118, 0.35) !important;
+    color: #00e676 !important;
+  }
+
+  #drawer.addDrawer .addHubTab span {
+    font-size: 16px !important;
+    margin-bottom: 2px !important;
+  }
+
+  #drawer.addDrawer .addHubBody {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    padding: 14px !important;
+  }
+
+  #drawer.addDrawer .addHubTitle {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    font-size: 14px !important;
+    margin-bottom: 12px !important;
+    padding-bottom: 8px !important;
+    border-bottom: 1px solid #252a38 !important;
+  }
+
+  #drawer.addDrawer .addHubClose {
+    width: 28px !important;
+    height: 28px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 6px !important;
+    background: #222736 !important;
+    border: 1px solid #32394c !important;
+    color: #adb8cc !important;
+    cursor: pointer !important;
+    font-size: 18px !important;
+    transition: all 0.15s ease !important;
+  }
+
+  #drawer.addDrawer .addHubClose:hover {
+    background: #ff3b69 !important;
+    border-color: #ff3b69 !important;
+    color: #ffffff !important;
+  }
+
+  #drawer.addDrawer .shapeGrid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  #drawer.addDrawer .shapeItem {
+    min-height: 64px !important;
+    border-radius: 10px !important;
+    font-size: 24px !important;
+    background: #1e222e !important;
+    border: 1px solid #2b3142 !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+  }
+
+  #drawer.addDrawer .shapeItem:hover {
+    border-color: #00e676 !important;
+    background: #242938 !important;
+    transform: translateY(-2px) !important;
+  }
+
+  /* Home Widescreen Grid */
+  .simpleHome .homeMain {
+    width: min(1080px, 94%) !important;
+    padding: 32px 24px 100px !important;
+  }
+
+  .simpleHome .projectGrid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+  }
+
+  .simpleHome .projectCard {
+    min-height: 84px !important;
+    padding: 12px !important;
+    grid-template-columns: 68px minmax(0, 1fr) !important;
+  }
+
+  .simpleHome .projectThumb {
+    width: 68px !important;
+    height: 68px !important;
+  }
+}
+
+/* Timeline Beat Marker Line */
+.timelineBeatLine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(255, 45, 117, 0.75);
+  pointer-events: none;
+  z-index: 12;
+}
+
+.timelineBeatMarkerDot {
+  position: absolute;
+  top: 0;
+  left: -4px;
+  width: 10px;
+  height: 10px;
+  background: #ff2d75;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(255, 45, 117, 0.9);
+}
+
+/* ============================================================
+   Desktop Native Shell (.exe) — Custom Dark Titlebar & Controls
+   ============================================================ */
+body.is-electron .editorTop,
+body.is-electron .homeTop {
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+body.is-electron .editorTop button,
+body.is-electron .editorTop input,
+body.is-electron .editorTop select,
+body.is-electron .homeTop button,
+body.is-electron .homeTop input,
+body.is-electron .homeTop select,
+body.is-electron .desktopWinControls,
+body.is-electron .desktopFileMenuWrap {
+  -webkit-app-region: no-drag;
+}
+
+/* Window Control Buttons */
+.desktopWinControls {
+  display: none;
+  align-items: center;
+  margin-left: 8px;
+  gap: 3px;
+  -webkit-app-region: no-drag;
+}
+
+body.is-electron .desktopWinControls {
+  display: flex !important;
+}
+
+body.is-electron #homeInstallBtn {
+  display: none !important;
+}
+
+.winBtn {
+  width: 34px;
+  height: 30px;
+  border: 0;
+  background: transparent;
+  color: #a4acbd;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  padding: 0;
+}
+
+.winBtn:hover {
+  background: #252b3a;
+  color: #ffffff;
+}
+
+.winBtn.winBtnClose:hover {
+  background: #e81123 !important;
+  color: #ffffff !important;
+}
+
+/* Desktop File Menu Dropdown */
+.desktopFileMenuWrap {
+  position: relative;
+  display: inline-block;
+  -webkit-app-region: no-drag;
+}
+
+.desktopFileMenuDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 6px;
+  min-width: 240px;
+  background: #171a25;
+  border: 1px solid #282f42;
+  border-radius: 10px;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.65);
+  z-index: 2000;
+  padding: 6px 0;
+  display: none;
+  backdrop-filter: blur(14px);
+}
+
+.desktopFileMenuDropdown.show {
+  display: block;
+}
+
+.desktopFileMenuItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  color: #d2d8e6;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  user-select: none;
+}
+
+.desktopFileMenuItem:hover {
+  background: #22293b;
+  color: #00e676;
+}
+
+.desktopFileMenuItem kbd {
+  font-size: 11px;
+  color: #727a8f;
+  background: #10131d;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #232836;
+  font-family: inherit;
+}
+
+.desktopFileMenuDivider {
+  height: 1px;
+  background: #242938;
+  margin: 5px 0;
+}
+
+/* ============================================================
+   Alight Motion PC — Modular Effect Stack & Catalog Styling
+   ============================================================ */
+
+/* Effect Catalog Modal */
+.amEffectCatalogSheet {
+  width: min(880px, 92vw) !important;
+  max-height: 85vh !important;
+  background: #141722 !important;
+  border: 1px solid #283044 !important;
+  border-radius: 18px !important;
+  color: #e2e8f0 !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+.amEffectCatalogHead {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 16px 20px !important;
+  border-bottom: 1px solid #242c3e !important;
+  background: #181c2a !important;
+}
+
+.amEffectHeadInfo {
+  flex: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+}
+
+.amEffectHeadInfo h2 {
+  margin: 0 !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+  white-space: nowrap !important;
+}
+
+.amEffectSearchBar {
+  position: relative !important;
+  flex: 1 !important;
+  max-width: 420px !important;
+}
+
+.amEffectSearchBar input {
+  width: 100% !important;
+  height: 36px !important;
+  padding: 0 32px 0 34px !important;
+  background: #0f121b !important;
+  border: 1px solid #2b3347 !important;
+  border-radius: 8px !important;
+  color: #ffffff !important;
+  font-size: 11px !important;
+}
+
+.amEffectSearchBar input:focus {
+  border-color: #00e676 !important;
+}
+
+.amSearchIcon {
+  position: absolute !important;
+  left: 10px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  font-size: 12px !important;
+  pointer-events: none !important;
+  opacity: 0.6 !important;
+}
+
+.amSearchClear {
+  position: absolute !important;
+  right: 8px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #8fa0bb !important;
+  font-size: 16px !important;
+  cursor: pointer !important;
+}
+
+.amCatalogCloseBtn {
+  border: 0 !important;
+  background: transparent !important;
+  color: #a4b3cb !important;
+  font-size: 24px !important;
+  cursor: pointer !important;
+  padding: 0 4px !important;
+  line-height: 1 !important;
+}
+
+.amCatalogCloseBtn:hover {
+  color: #ffffff !important;
+}
+
+/* Category Tabs */
+.amEffectCategoryTabs {
+  display: flex !important;
+  gap: 6px !important;
+  padding: 10px 20px !important;
+  border-bottom: 1px solid #202738 !important;
+  background: #141722 !important;
+  overflow-x: auto !important;
+  scrollbar-width: none !important;
+}
+
+.amEffectCategoryTabs::-webkit-scrollbar {
+  display: none !important;
+}
+
+.amCatTabBtn {
+  border: 1px solid #2a3348 !important;
+  background: #1a1f2d !important;
+  color: #929fb6 !important;
+  padding: 6px 14px !important;
+  border-radius: 20px !important;
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.amCatTabBtn:hover {
+  background: #232a3c !important;
+  color: #ffffff !important;
+}
+
+.amCatTabBtn.active {
+  background: #00e676 !important;
+  border-color: #00e676 !important;
+  color: #0a1f14 !important;
+  font-weight: 800 !important;
+}
+
+/* Effect Grid */
+.amEffectCatalogGrid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
+  gap: 12px !important;
+  padding: 20px !important;
+  overflow-y: auto !important;
+  max-height: calc(85vh - 120px) !important;
+}
+
+.amEffectCardItem {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  padding: 14px !important;
+  background: #191e2b !important;
+  border: 1px solid #262f43 !important;
+  border-radius: 12px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  user-select: none !important;
+}
+
+.amEffectCardItem:hover {
+  background: #202739 !important;
+  border-color: #00e676 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 18px rgba(0, 230, 118, 0.12) !important;
+}
+
+.amEffectCardIcon {
+  font-size: 24px !important;
+  line-height: 1 !important;
+  width: 40px !important;
+  height: 40px !important;
+  display: grid !important;
+  place-items: center !important;
+  background: #11141e !important;
+  border: 1px solid #273045 !important;
+  border-radius: 10px !important;
+  flex-shrink: 0 !important;
+}
+
+.amEffectCardContent {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.amEffectCardTitle {
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  margin-bottom: 3px !important;
+  letter-spacing: 0.1px !important;
+}
+
+.amEffectCardDesc {
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 11px !important;
+  color: #94a3b8 !important;
+  line-height: 1.4 !important;
+}
+
+/* ============================================================
+   Inspector Active Effect Stack UI
+   ============================================================ */
+.amEffectsInspectorWrap {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+
+.amEffectsTopToolbar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 6px !important;
+  margin-bottom: 4px !important;
+}
+
+.amFxToolBtn {
+  border: 1px solid #2b3449 !important;
+  background: #1c2130 !important;
+  color: #b0bcd1 !important;
+  border-radius: 6px !important;
+  padding: 6px 10px !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.12s ease !important;
+}
+
+.amFxToolBtn:hover {
+  background: #252c40 !important;
+  color: #ffffff !important;
+  border-color: #00e676 !important;
+}
+
+/* Preset Chips */
+.amFxPresetChips {
+  display: flex !important;
+  gap: 5px !important;
+  overflow-x: auto !important;
+  padding-bottom: 4px !important;
+  scrollbar-width: none !important;
+}
+
+.amFxPresetChip {
+  border: 1px solid #333d54 !important;
+  background: #181c28 !important;
+  color: #00e676 !important;
+  border-radius: 14px !important;
+  padding: 5px 12px !important;
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  transition: all 0.12s ease !important;
+  letter-spacing: 0.1px !important;
+}
+
+.amFxPresetChip:hover {
+  background: #00e676 !important;
+  color: #091a12 !important;
+}
+
+/* Effect Stack Card */
+.amFxCard {
+  background: #191d2a !important;
+  border: 1px solid #293246 !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
+  transition: border-color 0.15s ease !important;
+}
+
+.amFxCard:hover {
+  border-color: #384560 !important;
+}
+
+.amFxCardHead {
+  display: flex !important;
+  align-items: center !important;
+  padding: 8px 10px !important;
+  background: #1e2434 !important;
+  border-bottom: 1px solid #252d3f !important;
+  gap: 8px !important;
+  user-select: none !important;
+}
+
+.amFxCardToggle {
+  width: 16px !important;
+  height: 16px !important;
+  cursor: pointer !important;
+  accent-color: #00e676 !important;
+}
+
+.amFxCardTitle {
+  flex: 1 !important;
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+  letter-spacing: 0.1px !important;
+}
+
+.amFxCardActions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.amFxIconBtn {
+  border: 0 !important;
+  background: transparent !important;
+  color: #8b99b0 !important;
+  width: 24px !important;
+  height: 24px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  font-size: 12px !important;
+}
+
+.amFxIconBtn:hover {
+  background: #2a3348 !important;
+  color: #ffffff !important;
+}
+
+.amFxIconBtn.delete:hover {
+  background: #e81123 !important;
+  color: #ffffff !important;
+}
+
+.amFxCardBody {
+  padding: 10px 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.amFxParamRow {
+  display: grid !important;
+  grid-template-columns: 95px 1fr 45px 28px !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.amFxParamLabel {
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  color: #cbd5e1 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  letter-spacing: 0.1px !important;
+}
+
+.amFxParamVal {
+  font-family: var(--font-mono, 'JetBrains Mono', Consolas, monospace) !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  color: #f8fafc !important;
+  text-align: right !important;
+  font-variant-numeric: tabular-nums lining-nums !important;
+  letter-spacing: -0.2px !important;
+}
+
+.amFxKfDiamond {
+  width: 26px !important;
+  height: 26px !important;
+  border: 1px solid #36415a !important;
+  background: #1f2537 !important;
+  color: #8090aa !important;
+  border-radius: 6px !important;
+  display: grid !important;
+  place-items: center !important;
+  font-size: 13px !important;
+  cursor: pointer !important;
+  transition: all 0.12s ease !important;
+  padding: 0 !important;
+}
+
+.amFxKfDiamond:hover {
+  border-color: #00e676 !important;
+  color: #00e676 !important;
+}
+
+.amFxKfDiamond.active {
+  background: rgba(0, 230, 118, 0.15) !important;
+  border-color: #00e676 !important;
+  color: #00e676 !important;
+}
+
+/* Big Add Effect Button */
+.amBigAddFxBtn {
+  width: 100% !important;
+  height: 44px !important;
+  margin-top: 8px !important;
+  background: linear-gradient(135deg, #1c2635 0%, #162423 100%) !important;
+  border: 1.5px dashed #00e676 !important;
+  border-radius: 10px !important;
+  color: #00e676 !important;
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.3px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.amBigAddFxBtn:hover {
+  background: #00e676 !important;
+  color: #0a1f14 !important;
+  box-shadow: 0 4px 18px rgba(0, 230, 118, 0.35) !important;
+}
+
+
+
+
+/* ============================================================
+   Alight Motion PC — Preset Hub & AMHub Cloud Explorer Styling
+   ============================================================ */
+
+.homePresetHubBtn {
+  background: linear-gradient(135deg, rgba(0, 230, 118, 0.15) 0%, rgba(0, 242, 254, 0.15) 100%) !important;
+  border: 1px solid rgba(0, 230, 118, 0.4) !important;
+  color: #00e676 !important;
+  font-weight: 700 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  transition: all 0.18s ease !important;
+  cursor: pointer !important;
+}
+
+.homePresetHubBtn:hover {
+  background: linear-gradient(135deg, #00e676 0%, #00f2fe 100%) !important;
+  color: #081512 !important;
+  border-color: #00e676 !important;
+  box-shadow: 0 4px 18px rgba(0, 230, 118, 0.35) !important;
+  transform: translateY(-1px) !important;
+}
+
+.presetHubIconBtn {
+  color: #00e676 !important;
+  position: relative !important;
+}
+
+.presetHubIconBtn:hover {
+  background: rgba(0, 230, 118, 0.15) !important;
+  color: #00f2fe !important;
+  box-shadow: 0 0 14px rgba(0, 230, 118, 0.4) !important;
+}
+
+.amPresetHubSheet {
+  width: min(940px, 94vw) !important;
+  max-height: 88vh !important;
+  background: #12151f !important;
+  border: 1px solid #283046 !important;
+  border-radius: 18px !important;
+  color: #e2e8f0 !important;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.8) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+.amPresetHubHead {
+  padding: 18px 22px 14px 22px !important;
+  background: #161a27 !important;
+  border-bottom: 1px solid #242b3d !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+}
+
+.amPresetHeadInfo {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.amPresetBrandRow {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.amPresetBadge {
+  background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%) !important;
+  color: #ffffff !important;
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.8px !important;
+  padding: 4px 10px !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 10px rgba(255, 75, 43, 0.35) !important;
+}
+
+.amPresetSubBadge {
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #f1f5f9 !important;
+  letter-spacing: 0.2px !important;
+}
+
+.amPresetTagline {
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 11.5px !important;
+  color: #8b99b0 !important;
+  margin: 0 !important;
+}
+
+.amPresetSearchBar {
+  margin-top: 6px !important;
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+.amPresetSearchBar input {
+  width: 100% !important;
+  height: 40px !important;
+  background: #0d1017 !important;
+  border: 1px solid #283147 !important;
+  border-radius: 10px !important;
+  padding: 0 36px 0 38px !important;
+  color: #f8fafc !important;
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 12.5px !important;
+  outline: none !important;
+  transition: all 0.15s ease !important;
+}
+
+.amPresetSearchBar input:focus {
+  border-color: #00e676 !important;
+  box-shadow: 0 0 14px rgba(0, 230, 118, 0.25) !important;
+}
+
+.amPresetSearchBar .amSearchIcon {
+  position: absolute !important;
+  left: 12px !important;
+  font-size: 13px !important;
+  pointer-events: none !important;
+  opacity: 0.7 !important;
+}
+
+.amPresetSearchBar .amSearchClear {
+  position: absolute !important;
+  right: 12px !important;
+  background: transparent !important;
+  border: 0 !important;
+  color: #8090aa !important;
+  font-size: 16px !important;
+  cursor: pointer !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+/* Nav Tabs */
+.amPresetNavTabs {
+  display: flex !important;
+  background: #11141e !important;
+  border-bottom: 1px solid #202738 !important;
+  padding: 0 20px !important;
+  gap: 8px !important;
+}
+
+.amPresetTab {
+  padding: 12px 18px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 2.5px solid transparent !important;
+  color: #8b9bb4 !important;
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.14s ease !important;
+}
+
+.amPresetTab:hover {
+  color: #f1f5f9 !important;
+}
+
+.amPresetTab.active {
+  color: #00e676 !important;
+  border-bottom-color: #00e676 !important;
+  font-weight: 700 !important;
+}
+
+/* Panels */
+.amPresetPanel {
+  padding: 18px 22px !important;
+  overflow-y: auto !important;
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+}
+
+.amPresetPanel.hidden {
+  display: none !important;
+}
+
+/* Filter Chips */
+.amPresetFilterChips {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+
+.amChip {
+  padding: 6px 12px !important;
+  background: #181d2a !important;
+  border: 1px solid #283144 !important;
+  border-radius: 20px !important;
+  color: #94a3b8 !important;
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.12s ease !important;
+}
+
+.amChip:hover {
+  background: #242c3d !important;
+  color: #f8fafc !important;
+}
+
+.amChip.active {
+  background: rgba(0, 230, 118, 0.16) !important;
+  border-color: #00e676 !important;
+  color: #00e676 !important;
+}
+
+/* Grid of Cards */
+.amPresetGrid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)) !important;
+  gap: 16px !important;
+}
+
+.amPresetCard {
+  background: #161a26 !important;
+  border: 1px solid #262e42 !important;
+  border-radius: 14px !important;
+  padding: 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  transition: all 0.18s ease !important;
+  position: relative !important;
+}
+
+.amPresetCard:hover {
+  border-color: #00e676 !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45) !important;
+  transform: translateY(-2px) !important;
+}
+
+.amPresetCardHead {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+}
+
+.amPresetCardTitle {
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #f8fafc !important;
+  line-height: 1.3 !important;
+  margin: 0 !important;
+}
+
+.amPresetCardAuthor {
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 11px !important;
+  color: #8292ab !important;
+}
+
+.amPresetMetaRow {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.amPill {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace) !important;
+  font-size: 10px !important;
+  padding: 2px 7px !important;
+  border-radius: 4px !important;
+  background: #1f2637 !important;
+  color: #94a3b8 !important;
+  border: 1px solid #2f384f !important;
+}
+
+.amPill.accent {
+  background: rgba(0, 230, 118, 0.14) !important;
+  border-color: rgba(0, 230, 118, 0.35) !important;
+  color: #00e676 !important;
+  font-weight: 600 !important;
+}
+
+.amPresetCardDesc {
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 11px !important;
+  color: #8b9bb0 !important;
+  line-height: 1.4 !important;
+  margin: 0 !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+.amPresetFxBadges {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 4px !important;
+}
+
+.amFxBadge {
+  font-size: 9.5px !important;
+  font-weight: 600 !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  background: #1a2233 !important;
+  border: 1px solid #2f3b54 !important;
+  color: #60a5fa !important;
+}
+
+.amPresetCardActions {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  margin-top: auto !important;
+}
+
+.amPresetBtnRow {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 6px !important;
+}
+
+.amBtnPrimary {
+  background: #00e676 !important;
+  color: #081a13 !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  padding: 8px 10px !important;
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  transition: all 0.12s ease !important;
+}
+
+.amBtnPrimary:hover {
+  background: #00ff84 !important;
+  box-shadow: 0 4px 14px rgba(0, 230, 118, 0.4) !important;
+}
+
+.amBtnSecondary {
+  background: #202739 !important;
+  color: #cbd5e1 !important;
+  border: 1px solid #333e59 !important;
+  border-radius: 8px !important;
+  padding: 8px 10px !important;
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  transition: all 0.12s ease !important;
+}
+
+.amBtnSecondary:hover {
+  background: #2b354d !important;
+  color: #ffffff !important;
+  border-color: #435172 !important;
+}
+
+/* Cloud Import Box */
+.amCloudImportBox {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  background: #161a26 !important;
+  border: 1px solid #283147 !important;
+  border-radius: 14px !important;
+  padding: 20px !important;
+}
+
+.amCloudIconRow {
+  display: flex !important;
+  gap: 8px !important;
+}
+
+.amCloudServiceTag {
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  padding: 3px 8px !important;
+  border-radius: 5px !important;
+  background: rgba(0, 242, 254, 0.12) !important;
+  border: 1px solid rgba(0, 242, 254, 0.3) !important;
+  color: #00f2fe !important;
+}
+
+.amCloudLabel {
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #cbd5e1 !important;
+}
+
+.amCloudInputGroup {
+  display: flex !important;
+  gap: 10px !important;
+}
+
+.amCloudInputGroup input {
+  flex: 1 !important;
+  height: 42px !important;
+  background: #0d1017 !important;
+  border: 1px solid #2a344c !important;
+  border-radius: 8px !important;
+  padding: 0 14px !important;
+  color: #ffffff !important;
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 12.5px !important;
+}
+
+.amCloudInputGroup input:focus {
+  border-color: #00e676 !important;
+  outline: none !important;
+}
+
+.amCloudActionBtn {
+  background: linear-gradient(135deg, #00e676 0%, #00b4d8 100%) !important;
+  color: #051a14 !important;
+  font-family: var(--font-main, 'Plus Jakarta Sans', system-ui) !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  padding: 0 18px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  white-space: nowrap !important;
+}
+
+.amCloudActionBtn:hover {
+  box-shadow: 0 4px 16px rgba(0, 230, 118, 0.35) !important;
+  filter: brightness(1.08) !important;
+}
+
+.amCloudHelperText {
+  font-size: 11.5px !important;
+  color: #8b9bb0 !important;
+  line-height: 1.5 !important;
+}
+
+.amRawXmlWrap {
+  margin-top: 10px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.amRawXmlArea {
+  width: 100% !important;
+  height: 120px !important;
+  background: #0b0d14 !important;
+  border: 1px solid #283147 !important;
+  border-radius: 8px !important;
+  color: #38bdf8 !important;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace) !important;
+  font-size: 11px !important;
+  padding: 10px !important;
+  resize: vertical !important;
+}
+
+.amRawXmlActions {
+  display: flex !important;
+  gap: 8px !important;
+}
+
+.amCloudSecondaryBtn {
+  background: #1d2332 !important;
+  color: #94a3b8 !important;
+  border: 1px solid #2d374d !important;
+  border-radius: 8px !important;
+  padding: 0 14px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+}
+
+.amCloudStatus {
+  padding: 10px 14px !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
+.amCloudStatus.success {
+  background: rgba(0, 230, 118, 0.15) !important;
+  border: 1px solid #00e676 !important;
+  color: #00e676 !important;
+}
+
+.amCloudStatus.error {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border: 1px solid #ef4444 !important;
+  color: #f87171 !important;
+}
+
+/* Local Inspector */
+.amLocalDropZone {
+  border: 2px dashed #303a52 !important;
+  border-radius: 14px !important;
+  padding: 36px 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  transition: all 0.18s ease !important;
+  background: rgba(18, 22, 32, 0.5) !important;
+}
+
+.amLocalDropZone:hover, .amLocalDropZone.dragover {
+  border-color: #00e676 !important;
+  background: rgba(0, 230, 118, 0.04) !important;
+}
+
+.amDropIcon {
+  font-size: 32px !important;
+}
+
+.amLocalDropZone h3 {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #f8fafc !important;
+  margin: 0 !important;
+}
+
+.amLocalDropZone p {
+  font-size: 12px !important;
+  color: #8090aa !important;
+  margin: 0 !important;
+}
+
+.amInspectorCard {
+  background: #161a26 !important;
+  border: 1px solid #2a344c !important;
+  border-radius: 14px !important;
+  padding: 18px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+}
+
+.amInspectorHead {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+}
+
+.amInspectorHead h3 {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #f8fafc !important;
+  margin: 0 !important;
+}
+
+.amInspectorMeta {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace) !important;
+  font-size: 12px !important;
+  color: #00e676 !important;
+  margin-top: 2px !important;
+}
+
+.amInspectorActions {
+  display: flex !important;
+  gap: 8px !important;
+}
+
+.amInspectorStats {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 10px !important;
+}
+
+.amStatBox {
+  background: #11141e !important;
+  border: 1px solid #232a3d !important;
+  border-radius: 8px !important;
+  padding: 10px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.amStatNum {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace) !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: #f8fafc !important;
+}
+
+.amStatLabel {
+  font-size: 10.5px !important;
+  color: #7d8ea6 !important;
+}
+
+.amInspectorDetails h4 {
+  font-size: 12px !important;
+  color: #cbd5e1 !important;
+  margin: 12px 0 6px 0 !important;
+}
+
+.amBadgeWrap {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+}
+
+.amLayerInspectList {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  max-height: 180px !important;
+  overflow-y: auto !important;
+}
+
+.amLayerInspectItem {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 6px 10px !important;
+  background: #11141e !important;
+  border-radius: 6px !important;
+  font-size: 11.5px !important;
+  color: #cbd5e1 !important;
+}
+
+/* ============================================================
+   Alight Motion PC — Brand Header & Wordmark Contrast
+   ============================================================ */
+.homeBrand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.homeWordmark {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.brandText,
+.homeWordmark b,
+.simpleHome .homeWordmark b {
+  display: inline-block !important;
+  color: #ffffff !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.01em !important;
+  white-space: nowrap !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6) !important;
+}
+
+.brandBadge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  color: #00e676 !important;
+  background: rgba(0, 230, 118, 0.14) !important;
+  border: 1px solid rgba(0, 230, 118, 0.4) !important;
+  padding: 1px 7px !important;
+  border-radius: 5px !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  line-height: 1.4 !important;
+}

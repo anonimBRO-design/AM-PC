@@ -1,0 +1,1144 @@
+/* ============================================================
+   Alight Motion PC (AM-PC) — Theme & Design Tokens
+   Official Dark Studio Palette & Design System
+   ============================================================ */
+
+:root {
+  /* Alight Motion Core Palette */
+  --bg: #121316;
+  --bg2: #16171c;
+  --panel: #1c1e24;
+  --panel2: #232630;
+  --line: #2a2e38;
+  --text: #ffffff;
+  --muted: #959ca9;
+  
+  /* Signature AM Brand Colors */
+  --accent: #00e676;          /* Electric Green / Lime Mint */
+  --accent2: #33eb91;         /* Lighter Green Accent */
+  --accent-glow: rgba(0, 230, 118, 0.35);
+  --pink: #ff2d75;            /* Iconic Keyframe Diamond Pink */
+  --purple: #8e75ff;
+  --cyan: #00b4d8;
+  --orange: #ff9f43;
+  --danger: #ff5252;
+  --shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  --top: 48px;
+  --radius: 12px;
+
+  /* Overrides for Home & Workspace */
+  --simple-bg: #121316;
+  --simple-surface: #1c1e24;
+  --simple-text: #ffffff;
+  --simple-muted: #8e95a4;
+  --simple-line: #2a2e38;
+  --simple-accent: #00e676;
+}
+
+/* Base resets & typography */
+* {
+  box-sizing: border-box;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --font-main: 'Plus Jakarta Sans', 'Inter', 'Segoe UI Variable Text', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', 'Consolas', 'SF Mono', monospace;
+}
+
+*, *::before, *::after {
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: optimizeLegibility !important;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-main);
+  font-size: 13px;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+}
+
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  user-select: none;
+}
+
+input, select, textarea {
+  outline: none;
+}
+
+/* Custom modern scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #2b303d;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3b4254;
+}
+
+/* ============================================================
+   Alight Motion PC — Home Screen Styling
+   ============================================================ */
+
+.home, .simpleHome {
+  height: 100%;
+  background: var(--bg) !important;
+  color: var(--text) !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.homeTop, .simpleHome .homeTop {
+  height: 56px !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line) !important;
+  background: var(--bg2) !important;
+  padding: 0 18px !important;
+  font-weight: 800;
+}
+
+.homeBrand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.homeBrand .brandText {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+.homeBrand .brandBadge {
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--accent);
+  color: #081a12;
+  letter-spacing: 0.04em;
+}
+
+.homeTopRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.homeTop .rightBtn {
+  border: 1px solid var(--line) !important;
+  background: var(--panel) !important;
+  color: #c7cedd !important;
+  border-radius: 8px !important;
+  padding: 6px 12px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.homeTop .rightBtn:hover {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+  background: rgba(0, 230, 118, 0.08) !important;
+}
+
+.homeTop .rightBtn svg {
+  stroke: currentColor !important;
+}
+
+.simpleHome .homeMain {
+  background: transparent !important;
+}
+
+.simpleHome .sectionKicker {
+  color: var(--accent) !important;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.simpleHome .sectionRow h1 {
+  color: #ffffff !important;
+  font-size: 24px !important;
+  font-weight: 800 !important;
+}
+
+.simpleHome .projectCountBadge {
+  border: 1px solid rgba(0, 230, 118, 0.4) !important;
+  background: rgba(0, 230, 118, 0.12) !important;
+  color: var(--accent) !important;
+}
+
+.simpleHome .projectSort {
+  background: var(--panel) !important;
+  border: 1px solid var(--line) !important;
+  color: #a0a7b6 !important;
+}
+
+.simpleHome .projectSort svg {
+  stroke: #a0a7b6 !important;
+}
+
+.simpleHome .projectSort select {
+  color: #ffffff !important;
+}
+
+/* Alight Motion Project Cards */
+.simpleHome .projectCard {
+  background: var(--panel) !important;
+  border: 1px solid var(--line) !important;
+  color: #ffffff !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3) !important;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease !important;
+}
+
+.simpleHome .projectCard:hover {
+  border-color: rgba(0, 230, 118, 0.5) !important;
+  background: #20242e !important;
+  transform: translateY(-1px);
+}
+
+.simpleHome .projectCard:active {
+  transform: scale(0.99) !important;
+}
+
+.simpleHome .projectCard.projectSelected {
+  border-color: var(--accent) !important;
+  background: #192a23 !important;
+  box-shadow: 0 0 0 1px var(--accent) !important;
+}
+
+.simpleHome .projectThumb {
+  background: linear-gradient(145deg, #18221e, #10151c) !important;
+  border: 1px solid #2e3544 !important;
+}
+
+.simpleHome .projectMeta b {
+  color: #ffffff !important;
+  font-size: 13px !important;
+}
+
+.simpleHome .projectMeta span {
+  color: var(--muted) !important;
+  font-size: 10px !important;
+}
+
+.simpleHome .projectArrow {
+  color: var(--accent) !important;
+}
+
+/* Big Vibrant Alight Motion FAB (+) */
+.fabHome {
+  background: var(--accent) !important;
+  color: #061911 !important;
+  border: 4px solid var(--bg) !important;
+  box-shadow: 0 8px 24px var(--accent-glow) !important;
+  font-weight: 900;
+  transition: transform 0.18s ease, box-shadow 0.18s ease !important;
+}
+
+.fabHome:hover {
+  transform: translateX(-50%) scale(1.06) !important;
+  box-shadow: 0 10px 30px rgba(0, 230, 118, 0.55) !important;
+}
+
+.fabHome:active {
+  transform: translateX(-50%) scale(0.96) !important;
+}
+
+/* ============================================================
+   Alight Motion PC — Modal Proyek Baru (Dark Sheet)
+   ============================================================ */
+
+.modalShade {
+  background: rgba(0, 0, 0, 0.72) !important;
+  backdrop-filter: blur(8px);
+}
+
+.modal {
+  background: var(--panel) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 18px 18px 0 0 !important;
+  box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.5) !important;
+}
+
+@media (min-width: 760px) {
+  .modal {
+    border-radius: 18px !important;
+  }
+}
+
+.modalHead {
+  color: #ffffff !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 12px;
+}
+
+.modalHead button {
+  color: #8f96a5 !important;
+}
+.modalHead button:hover {
+  color: #ffffff !important;
+}
+
+.seg {
+  background: #14161d !important;
+  border: 1px solid var(--line) !important;
+}
+
+.seg button {
+  color: #8e95a4 !important;
+}
+
+.seg button.active {
+  background: var(--panel2) !important;
+  color: var(--accent) !important;
+}
+
+.aspectGrid {
+  gap: 10px !important;
+}
+
+.aspect {
+  background: #161821 !important;
+  border: 1px solid var(--line) !important;
+  color: #9299a8 !important;
+  border-radius: 10px !important;
+  font-weight: 700;
+  transition: all 0.15s ease;
+}
+
+.aspect:hover {
+  border-color: rgba(0, 230, 118, 0.4);
+  color: #ffffff;
+}
+
+.aspect.active {
+  border: 2px solid var(--accent) !important;
+  background: rgba(0, 230, 118, 0.1) !important;
+  color: var(--accent) !important;
+  box-shadow: 0 0 14px rgba(0, 230, 118, 0.2);
+}
+
+.settingRow select, .settingRow input, #newName {
+  background: #161821 !important;
+  border: 1px solid var(--line) !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+}
+
+.settingRow select:focus, .settingRow input:focus, #newName:focus {
+  border-color: var(--accent) !important;
+}
+
+.settingRow label {
+  color: #b0b7c6;
+  font-weight: 600;
+}
+
+.createBtn {
+  background: var(--accent) !important;
+  color: #061911 !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.05em;
+  font-size: 13px !important;
+  height: 44px !important;
+  box-shadow: 0 6px 20px var(--accent-glow) !important;
+  transition: all 0.15s ease;
+}
+
+.createBtn:hover {
+  background: #1cf085 !important;
+  box-shadow: 0 8px 24px rgba(0, 230, 118, 0.5) !important;
+}
+
+/* ============================================================
+   Alight Motion PC — Editor Workspace Styling
+   ============================================================ */
+
+.editor {
+  background: var(--bg) !important;
+}
+
+.editorTop {
+  height: var(--top);
+  background: var(--bg2) !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+.editorTitle {
+  color: #ffffff !important;
+  font-weight: 700;
+}
+
+.editorTitle small {
+  color: var(--muted) !important;
+}
+
+.topIcon {
+  color: #aab2c3 !important;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.topIcon:hover {
+  color: #ffffff !important;
+  background: var(--panel2) !important;
+}
+
+.previewArea {
+  background: var(--bg) !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+.viewport {
+  background: #0d0e11 !important;
+}
+
+.axisBadge {
+  background: rgba(22, 24, 32, 0.88) !important;
+  border: 1px solid var(--line) !important;
+  color: #cbd2e0 !important;
+}
+
+.previewTools {
+  background: var(--bg2) !important;
+  border-top: 1px solid var(--line) !important;
+}
+
+.previewTools button {
+  color: #9aa2b4 !important;
+}
+
+.previewTools button:hover {
+  color: #ffffff !important;
+}
+
+.previewTools button.active {
+  color: var(--accent) !important;
+  background: rgba(0, 230, 118, 0.12) !important;
+}
+
+/* Timeline & Transport */
+.timelineArea {
+  background: #14151a !important;
+}
+
+.transport {
+  background: var(--panel) !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+.transport button {
+  color: #a2aab9 !important;
+}
+
+.transport button:hover {
+  color: #ffffff !important;
+}
+
+.transport button.active {
+  color: var(--accent) !important;
+  background: rgba(0, 230, 118, 0.12) !important;
+}
+
+.ruler {
+  background: #101115 !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+.rTick {
+  border-left: 1px solid #232733 !important;
+  color: #727a8c !important;
+}
+
+.trackHead {
+  background: #181a20 !important;
+  border-right: 1px solid var(--line) !important;
+  border-bottom: 1px solid #22252e !important;
+}
+
+.trackHead.sel {
+  background: #242936 !important;
+}
+
+.trackLane {
+  border-bottom: 1px solid #22252e !important;
+}
+
+/* Keyframes & Clips */
+.kf {
+  background: var(--pink) !important;
+  border: 1px solid #ff9dbd !important;
+  box-shadow: 0 0 6px rgba(255, 45, 117, 0.6) !important;
+}
+
+.bottomTools {
+  background: var(--bg2) !important;
+  border-top: 1px solid var(--line) !important;
+}
+
+.bottomTools button {
+  color: #8c94a4 !important;
+}
+
+.bottomTools button:hover {
+  color: #ffffff !important;
+}
+
+.bottomTools button.active {
+  color: var(--accent) !important;
+}
+
+.plusBtn {
+  border-color: var(--accent) !important;
+  background: #18221d !important;
+  color: var(--accent) !important;
+  box-shadow: 0 4px 18px rgba(0, 230, 118, 0.35) !important;
+}
+
+.drawer {
+  background: var(--panel) !important;
+  border-top: 1px solid var(--line) !important;
+  box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.45) !important;
+}
+
+.drawerHead {
+  border-bottom: 1px solid var(--line) !important;
+}
+
+.insBtn {
+  background: #232631 !important;
+  border: 1px solid #2f3444 !important;
+  color: #cdd4e3 !important;
+  border-radius: 9px !important;
+  transition: all 0.15s ease;
+}
+
+.insBtn:hover {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+  background: #1c2b24 !important;
+}
+
+/* Alight Motion Canonical 6 Master Tiles */
+.am6TileGrid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 10px !important;
+  margin-top: 8px !important;
+}
+
+.amTile {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  padding: 12px 14px !important;
+  min-height: 74px !important;
+  background: #1b1d24 !important;
+  border: 1px solid #282c38 !important;
+  border-radius: 10px !important;
+  text-align: left !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.amTile:hover {
+  border-color: var(--accent) !important;
+  background: #1d2522 !important;
+  transform: translateY(-1px);
+}
+
+.amTile .insIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.amTile .insIconWrap svg {
+  stroke: var(--accent);
+}
+
+.amTile .insTitle {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  line-height: 1.2 !important;
+}
+
+.amTile .insSub {
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  color: #7b8396 !important;
+  margin-top: 2px !important;
+}
+
+.amStudioSecondaryRow {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)) !important;
+  gap: 8px !important;
+  margin-top: 10px !important;
+}
+
+.amStudioSecondaryRow .amTile {
+  min-height: 60px !important;
+  padding: 8px 10px !important;
+  background: #16181f !important;
+  border-color: #242733 !important;
+}
+
+.amDeleteBtn {
+  background: rgba(255, 45, 117, 0.12) !important;
+  border: 1px solid rgba(255, 45, 117, 0.3) !important;
+  color: #ff4d88 !important;
+  border-radius: 8px !important;
+  font-weight: 800 !important;
+  transition: all 0.15s ease;
+}
+
+.amDeleteBtn:hover {
+  background: rgba(255, 45, 117, 0.22) !important;
+  border-color: #ff2d75 !important;
+  color: #ffffff !important;
+}
+
+/* Timeline Beat Markers */
+.timelineBeatMarkers {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 28;
+}
+
+.timelineBeatMarker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.timelineBeatMarkerPin {
+  position: absolute;
+  top: 0;
+  left: -5px;
+  width: 10px;
+  height: 14px;
+  background: #ff2d75;
+  clip-path: polygon(0 0, 100% 0, 100% 65%, 50% 100%, 0 65%);
+  box-shadow: 0 0 8px rgba(255, 45, 117, 0.85);
+  transition: transform 0.1s ease;
+}
+
+.timelineBeatMarker:hover .timelineBeatMarkerPin {
+  transform: scale(1.25);
+}
+
+.timelineBeatMarkerLine {
+  position: absolute;
+  top: 14px;
+  left: -1px;
+  width: 2px;
+  height: 4000px;
+  background: rgba(255, 45, 117, 0.7);
+  box-shadow: 0 0 5px rgba(255, 45, 117, 0.45);
+  pointer-events: none;
+}
+
+.beatMarkerBtn {
+  color: #ff2d75 !important;
+}
+
+.beatMarkerBtn:hover {
+  background: rgba(255, 45, 117, 0.15) !important;
+}
+
+/* Alight Motion Curve Studio Bar */
+.amCurveLaunchBtn {
+  background: rgba(0, 230, 118, 0.1) !important;
+  border-color: rgba(0, 230, 118, 0.3) !important;
+  color: var(--accent) !important;
+}
+
+.amCurveLaunchBtn:hover {
+  background: rgba(0, 230, 118, 0.2) !important;
+  border-color: var(--accent) !important;
+}
+
+.amCurveStudioBar {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  padding: 14px !important;
+  background: #151821 !important;
+  border-top: 1px solid var(--line) !important;
+}
+
+.amCurvePresets {
+  display: grid !important;
+  grid-template-columns: repeat(5, 1fr) !important;
+  gap: 6px !important;
+}
+
+.amCurveBtn {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  padding: 8px 4px !important;
+  background: #1e222e !important;
+  border: 1px solid #2b3142 !important;
+  border-radius: 8px !important;
+  color: #adb7c9 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.amCurveBtn:hover {
+  border-color: var(--accent) !important;
+  color: #ffffff !important;
+  background: #232938 !important;
+  transform: translateY(-1px);
+}
+
+.amCurveBtn.active {
+  border-color: var(--accent) !important;
+  background: rgba(0, 230, 118, 0.15) !important;
+  color: var(--accent) !important;
+  box-shadow: 0 0 10px rgba(0, 230, 118, 0.2) !important;
+}
+
+.amCurveBtn svg {
+  stroke: currentColor;
+}
+
+.amCurveBtn span {
+  font-size: 10px !important;
+  font-weight: 700 !important;
+}
+
+.amCurveActions {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 8px !important;
+}
+
+.amCurveToolBtn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 7px 10px !important;
+  background: #1c202a !important;
+  border: 1px solid #2a3040 !important;
+  border-radius: 7px !important;
+  color: #c0c8d8 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.amCurveToolBtn:hover {
+  border-color: var(--accent) !important;
+  color: #ffffff !important;
+  background: #252b3a !important;
+}
+
+/* ==========================================================================
+   ALIGHT MOTION PC — DARK STUDIO EXPORT MODAL (3-TAB STUDIO)
+   ========================================================================== */
+
+.amExportModal {
+  background: #121316 !important;
+  color: #f0f4fc !important;
+  z-index: 99999 !important;
+}
+
+.amExportTop {
+  background: #181a20 !important;
+  border-bottom: 1px solid #262a36 !important;
+  height: 54px !important;
+  display: grid !important;
+  grid-template-columns: 48px 1fr 48px !important;
+  align-items: center !important;
+  padding: 0 12px !important;
+}
+
+.amExportTop b {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  letter-spacing: 0.3px !important;
+}
+
+.amExportCloseBtn {
+  font-size: 24px !important;
+  color: #8f9bb3 !important;
+  background: transparent !important;
+  border: 0 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 6px !important;
+  transition: all 0.15s ease !important;
+}
+
+.amExportCloseBtn:hover {
+  color: #ff3b69 !important;
+  background: rgba(255, 59, 105, 0.12) !important;
+}
+
+.amExportTabsBar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: #16181f !important;
+  border-bottom: 1px solid #242836 !important;
+  padding: 8px 16px !important;
+}
+
+.amExportTabBtn {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 8px 16px !important;
+  border-radius: 8px !important;
+  border: 1px solid transparent !important;
+  background: transparent !important;
+  color: #8b96aa !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.amExportTabBtn:hover {
+  color: #ffffff !important;
+  background: #202430 !important;
+}
+
+.amExportTabBtn.active {
+  background: rgba(0, 230, 118, 0.12) !important;
+  border-color: rgba(0, 230, 118, 0.4) !important;
+  color: #00e676 !important;
+  box-shadow: 0 0 12px rgba(0, 230, 118, 0.15) !important;
+}
+
+.amTabIco {
+  font-size: 14px !important;
+}
+
+.amExportBody {
+  background: #121316 !important;
+  padding: 16px 20px !important;
+  overflow-y: auto !important;
+  flex: 1 !important;
+}
+
+.amExportPane {
+  display: none !important;
+}
+
+.amExportPane.active {
+  display: block !important;
+  animation: amFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@keyframes amFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.amExportModal .spaceRow,
+.amExportModal .estRow {
+  display: flex !important;
+  justify-content: space-between !important;
+  padding: 10px 4px !important;
+  border-bottom: 1px solid #232733 !important;
+  color: #9aa5b8 !important;
+  font-size: 12px !important;
+}
+
+.amExportModal .spaceRow b,
+.amExportModal .estRow b {
+  color: #ffffff !important;
+}
+
+.amExportModal .amCard {
+  background: #181b24 !important;
+  border: 1px solid #262b3a !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+  margin: 12px 0 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+.amExportModal label {
+  color: #9aa5b8 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  display: block !important;
+  margin-bottom: 6px !important;
+}
+
+.amExportModal select {
+  width: 100% !important;
+  height: 38px !important;
+  background: #111318 !important;
+  border: 1px solid #2b3142 !important;
+  border-radius: 8px !important;
+  color: #ffffff !important;
+  padding: 0 12px !important;
+  font-size: 13px !important;
+  outline: none !important;
+}
+
+.amExportModal select:focus {
+  border-color: #00e676 !important;
+  box-shadow: 0 0 8px rgba(0, 230, 118, 0.25) !important;
+}
+
+.amExportModal .codecSeg {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(105px, 1fr)) !important;
+  background: #111318 !important;
+  border: 1px solid #262b3a !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+
+.amExportModal .codecSeg button {
+  height: 36px !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #8b96aa !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.amExportModal .codecSeg button.active {
+  background: #1e2433 !important;
+  color: #00e676 !important;
+  border-bottom: 2px solid #00e676 !important;
+}
+
+.amExportModal .exportEngineSeg {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.amExportModal .exportEngineSeg button {
+  min-height: 52px !important;
+  border: 1px solid #262b3a !important;
+  border-radius: 9px !important;
+  background: #111318 !important;
+  color: #c4cede !important;
+  padding: 8px 10px !important;
+  font-weight: 700 !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.amExportModal .exportEngineSeg button small {
+  display: block !important;
+  margin-top: 3px !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  color: #7b8697 !important;
+}
+
+.amExportModal .exportEngineSeg button.active {
+  background: rgba(0, 230, 118, 0.1) !important;
+  border-color: #00e676 !important;
+  color: #00e676 !important;
+}
+
+.amExportModal .exportEngineSeg button.active small {
+  color: #85ebbf !important;
+}
+
+.amExportModal .progress {
+  height: 6px !important;
+  border-radius: 4px !important;
+  background: #232733 !important;
+  overflow: hidden !important;
+}
+
+.amExportModal .progress i {
+  display: block !important;
+  height: 100% !important;
+  width: 0% !important;
+  background: linear-gradient(90deg, #00e676, #00b0ff) !important;
+  box-shadow: 0 0 10px rgba(0, 230, 118, 0.6) !important;
+}
+
+.amExportFoot {
+  padding: 12px 16px !important;
+  background: #181a20 !important;
+  border-top: 1px solid #262a36 !important;
+}
+
+.amActionBtnPrimary {
+  width: 100% !important;
+  height: 44px !important;
+  border: 0 !important;
+  background: linear-gradient(135deg, #00e676 0%, #00b0ff 100%) !important;
+  color: #0a0e14 !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.3px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 4px 14px rgba(0, 230, 118, 0.3) !important;
+}
+
+.amActionBtnPrimary:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 18px rgba(0, 230, 118, 0.45) !important;
+  filter: brightness(1.08) !important;
+}
+
+/* PRESET XML & PACKAGE TAB CARDS */
+.amPresetBanner {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 14px !important;
+  background: #181b24 !important;
+  border: 1px solid #282f40 !important;
+  border-radius: 12px !important;
+  padding: 16px 18px !important;
+  margin-bottom: 16px !important;
+}
+
+.amPresetIcon {
+  font-size: 24px !important;
+  line-height: 1 !important;
+  padding: 8px !important;
+  background: rgba(0, 230, 118, 0.1) !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(0, 230, 118, 0.2) !important;
+}
+
+.amPresetBanner b {
+  font-size: 14px !important;
+  color: #ffffff !important;
+  display: block !important;
+  margin-bottom: 4px !important;
+}
+
+.amPresetBanner p {
+  font-size: 12px !important;
+  color: #9aa5b8 !important;
+  line-height: 1.45 !important;
+  margin: 0 !important;
+}
+
+.amPresetActionsGrid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
+  gap: 14px !important;
+}
+
+.amPresetActionCard {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  text-align: left !important;
+  background: #181b24 !important;
+  border: 1px solid #272d3e !important;
+  border-radius: 12px !important;
+  padding: 18px 20px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+.amPresetActionCard:hover {
+  transform: translateY(-2px) !important;
+  border-color: #00e676 !important;
+  background: #1e2432 !important;
+  box-shadow: 0 8px 22px rgba(0, 230, 118, 0.15) !important;
+}
+
+.amCardIcon {
+  font-size: 26px !important;
+  margin-bottom: 10px !important;
+}
+
+.amPresetActionCard b {
+  font-size: 14px !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  display: block !important;
+}
+
+.amPresetActionCard small {
+  font-size: 11px !important;
+  color: #8b97ab !important;
+  line-height: 1.4 !important;
+  margin-top: 5px !important;
+  display: block !important;
+}
+
+/* Layer Actions Popup — Extract Audio */
+.layerActionMenuIcon.extractAudio::before,
+.layerActionMenuIcon.extractAudio::after {
+  display: none !important;
+}
+
+.layerActionMenuIcon.extractAudio {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 16px !important;
+  background: rgba(0, 230, 118, 0.12) !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(0, 230, 118, 0.3) !important;
+}
+
+

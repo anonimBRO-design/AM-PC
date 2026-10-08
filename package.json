@@ -1,0 +1,48 @@
+{
+  "name": "alight-motion-pc",
+  "version": "1.0.0",
+  "description": "Alight Motion PC — Native Desktop Motion Graphics & Visual Effects Editor",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "web": "node scratch/server.js",
+    "build:portable": "node scripts/build-portable.js"
+  },
+  "keywords": [
+    "alight-motion",
+    "motion-graphics",
+    "video-editor",
+    "animation",
+    "vfx"
+  ],
+  "author": "Alight Motion PC Team",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "33.4.11",
+    "rcedit": "^5.0.2"
+  },
+  "build": {
+    "appId": "com.alightmotion.pc",
+    "productName": "Alight Motion PC",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "icons/alight-motion.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Alight Motion PC"
+    },
+    "portable": {
+      "artifactName": "Alight-Motion-PC-Portable-${version}.exe"
+    }
+  }
+}
