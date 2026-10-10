@@ -253,3 +253,15 @@ mengulangi cara berpikir yang sama.
   - IndexedDB database: `'open-motion-studio-v4'`, object store: `'projects'` & `'assets'`.
 - **Diperiksa:** 10 Okt 2026, Antigravity
 - **Akibat:** Skrip kustom luar (seperti thumbnail generator) harus mengambil `model` dan `renderer` via `window.omsTimelinePreRender`. Proyek tersimpan dapat dibaca langsung melalui IndexedDB browser tanpa perlu menunggu method internal.
+
+### F-15 · Perilaku Mobile Focus Session & Long-Press Timer pada Desktop
+
+- **Fakta:**
+  1. Open Motion mengaktifkan `startSelectedLayerFocusSession()` di `EditorSplitController` yang didesain untuk layar sentuh ponsel portrait. Di desktop, sesi ini mengaktifkan kelas `.timelineArea.omsSelectedLayerFocus`, memaksa tinggi `#tracks` ke 29px, menyembunyikan track lain (`display: none !important`), dan memaksa `sc.scrollTop = 0` (timeline meloncat ke atas).
+  2. Klik kiri mouse pada track header di `TimelineController.prototype.layerSelectionPointerDown` memasang timer 360ms `selectLayerByLongPress`. Jika mouse ditahan lebih dari 360ms, aplikasi mengira gesture "tekan lama" ponsel, sehingga masuk mode multi-select dan mengosongkan Inspector.
+  3. Drawer multi-select (`#drawer.multiSelectDrawer`) bawaan Open Motion hanya menyediakan alat grup/mask/hapus, sama sekali tidak ada opsi relink media.
+- **Bukti:**
+  - `index.html:23622` (`startSelectedLayerFocusSession`), `index.html:15041` (`setTimeout(activate, Math.max(360, this.longPressMs))`), `index.html:19013` (relink button hanya di-generate di single selection).
+  - Skrip `electron/desktop-engine.js` berhasil menetralkan `canStartSelectedLayerFocusSession()`, menonaktifkan timer mouse non-modifier, dan menyuntikkan kartu `.amMultiRelinkCard` ke `#drawer.multiSelectDrawer`.
+- **Diperiksa:** 10 Okt 2026, Antigravity
+- **Akibat:** Seluruh penyesuaian UX desktop untuk timeline and drawer multi-select wajib ditempatkan di `electron/desktop-engine.js` dan `css/desktop.css` tanpa mengubah `index.html`.

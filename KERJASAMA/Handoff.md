@@ -10,11 +10,11 @@ Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
 
 ## Sedang apa
 
-**Idle.** Masalah dialog info / catatan eksperimental ("info ny hilang lagi") telah diperbaiki secara tuntas. Dialog Info kini muncul saat aplikasi pertama kali dibuka dengan animasi Container Transform Morphing, dapat ditutup secara bersih, dan tombol `INFO` pada top bar beranda berfungsi 100% untuk membuka kembali dialog Info kapan saja dengan animasi mekar dari koordinat tombol tersebut.
+**Idle.** Masalah tautkan ulang media pada multi-selection ("itu tautkan ulang gaada pas kita pilih layer banyak") dan loncatan timeline/kolaps track ("pas pencet salah satu layar malah keatas sendiri") telah diperbaiki secara tuntas. Kini saat memilih banyak layer, drawer kanan menampilkan kartu "Tautkan Ulang Media" lengkap dengan daftar media, tombol relink per-media, tombol cari otomatis, dan tombol batalkan pilihan. Klik mouse pada timeline kini stabil tanpa loncat ke atas atau salah masuk mode multi-select.
 
 | Agent | Status |
 |---|---|
-| **Antigravity** | Selesai — Pemulihan total Dialog Info & tombol INFO top bar, animasi morphing dua arah, fix z-index 100000, build fresh |
+| **Antigravity** | Selesai — Implementasi Multi-Select Media Relinker, netralisasi timeline focus session jump, proteksi mouse click long-press, build & rilis terverifikasi |
 | **Claude Code** | Selesai — audit, verifikasi, buat sistem kerja sama |
 
 ---
@@ -39,6 +39,9 @@ dibungkus jadi aplikasi desktop Windows.
 | AM Finder | ✅ Tombol `AMFINDER` aktif di top bar (modal in-app, tetap di dalam exe) |
 | AM Hub | ✅ Tombol `AMHUB` aktif di top bar (modal in-app, tetap di dalam exe) |
 | Web Modal UX | ✅ **Draggable** (dapat digeser bebas), **Maximize/Restore**, dan **Split View 50:50** dengan divider resizer |
+| Multi-Select Relink | ✅ **Tautkan Ulang Media** hadir di drawer kanan saat multi-select layer, per-media link button, batch auto-relink, dan tombol "Batalkan Pilihan" |
+| Timeline Stability | ✅ **Anti-Jump & Anti-Focus Collapse** aktif (klik layer tidak lagi loncat ke atas atau mengkolaps track lain ke 29px) |
+| Mouse Selection | ✅ **Anti-LongPress Mouse** aktif (klik biasa mouse tidak memicu timer 360ms multi-select sentuh ponsel) |
 | CSS Desktop | ✅ Aktif disuntikkan via Electron `insertCSS` (lihat [[Fakta]] F-03) |
 | Inspector Dock | ✅ Docked rapi di panel kanan atas 400px, 2-kolom compact |
 | Build `.exe` | ✅ Ada di `release/Alight-Motion-PC-win-x64/` (file release tersinkronisasi) |
@@ -113,3 +116,4 @@ git commit -m "sync: index.html ke upstream"
 | 10 Okt 2026 | Antigravity | Implementasi global Android Touch Ripple + Adaptive Micro-Press di seluruh elemen aplikasi |
 | 10 Okt 2026 | Antigravity | Implementasi Container Transform Modal Morph Engine |
 | 10 Okt 2026 | Antigravity | Fix modal backdrop freeze, restore tombol PROYEK BARU, dan perluas Morph Engine ke seluruh popup aplikasi |
+| 10 Okt 2026 | Antigravity | Multi-Select Media Relinker, netralisasi timeline focus session jump, dan proteksi mouse long-press |

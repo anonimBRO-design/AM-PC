@@ -261,6 +261,49 @@ Buka modal "Proyek Baru", klik tombol close `×` berulang-ulang dalam beberapa s
 
 ---
 
+## 10. `require('fs')` atau `require('path')` di dalam `preload.js` saat sandbox aktif
+
+**Gejala:** Preload script gagal dimuat sama sekali (`Unable to load preload script: Error: module not found: fs`). Seluruh bridge desktop dan styling di preload mati total.
+
+**Kejadian:** 10 Oktober 2026, Antigravity.
+
+**Sebab:**
+Dalam Electron, jika `sandbox: false` belum disetel pada `webPreferences` (default adalah sandboxed saat `nodeIntegration: false`), modul inti Node seperti `fs` dan `path` dilarang di-require di dalam `preload.js`. Hanya modul bawaan `electron` yang tersedia di renderer sandboxed.
+
+**Perbaikan:**
+1. Pastikan `sandbox: false` disetel di `webPreferences` pada `electron/main.js`.
+2. Jangan mengandalkan file reading runtime kompleks jika bisa diinjeksikan langsung atau dipisah ke modul script terpisah yang dieksekusi di main world.
+
+**Cara memverifikasi:**
+Jalankan browser window Electron dengan mendengarkan `console-message`. Pastikan tidak ada pesan merah `Unable to load preload script: Error: module not found: fs`.
+
+---
+
+## 11. Kesalahan interpolasi template literal bersarang saat injeksi kode ke DOM
+
+**Gejala:** Script yang diinjeksi via `script.textContent = \`(${function() { ... }.toString()})()\`` mengalami `ReferenceError` atau syntax error di runtime.
+
+**Kejadian:** 10 Oktober 2026, Antigravity.
+
+**Sebab:**
+Ketika fungsi pembungkus diubah ke string di dalam template literal Node:
+```javascript
+script.textContent = `
+  (${function() {
+     const html = `<div class="${isMissing ? 'a' : 'b'}">...</div>`;
+  }.toString()})();
+`;
+```
+Ekspresi `${isMissing ? ...}` dievaluasi oleh engine Node pada saat pembentukan string di preload (di mana variabel `isMissing` belum ada), bukan saat dieksekusi di browser renderer.
+
+**Perbaikan:**
+Pisahkan script client browser ke file mandiri (seperti `electron/desktop-engine.js`), lalu baca isinya dengan `fs.readFileSync` atau suntikkan via `mainWindow.webContents.executeJavaScript`. Ini menghindari escaping syntax dan membuat kode memiliki syntax highlighting utuh.
+
+**Cara memverifikasi:**
+Suntikkan script dan periksa apakah `window.__amDesktopEngineInitialized` bernilai true dan script dieksekusi tanpa syntax error di console browser.
+
+---
+
 ## Cara menambah jebakan baru
 
 Kalau kamu menemukan hal yang bikin rugi, tambahkan di sini dengan format:

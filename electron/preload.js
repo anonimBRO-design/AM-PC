@@ -1,4 +1,6 @@
 const { contextBridge, ipcRenderer } = require('electron');
+const fs = require('fs');
+const path = require('path');
 
 contextBridge.exposeInMainWorld('desktopAPI', {
   isElectron: true,
@@ -902,7 +904,26 @@ window.addEventListener('DOMContentLoaded', () => {
     `;
     (document.head || document.documentElement).appendChild(script);
   };
-  injectThumbnailEngine();
+    injectThumbnailEngine();
+
+  // 5b. Desktop Engine: Anti-Jump Timeline, Anti-LongPress Mouse, & Multi-Select Media Relinker
+  const injectDesktopEngine = () => {
+    if (document.getElementById('am-desktop-engine')) return;
+
+    try {
+      const enginePath = path.join(__dirname, 'desktop-engine.js');
+      if (fs.existsSync(enginePath)) {
+        const code = fs.readFileSync(enginePath, 'utf8');
+        const script = document.createElement('script');
+        script.id = 'am-desktop-engine';
+        script.textContent = code;
+        (document.head || document.documentElement).appendChild(script);
+      }
+    } catch (err) {
+      console.error('[AM-PC] Failed to inject desktop engine:', err);
+    }
+  };
+  injectDesktopEngine();
 
   // 6. Global Android Touch Ripple & Micro-Press Engine
   const initRippleEngine = () => {
@@ -1167,6 +1188,7 @@ window.addEventListener('DOMContentLoaded', () => {
       updateNotice();
       mountActionButtons();
       injectThumbnailEngine();
+      injectDesktopEngine();
       initUniversalPopupEngine();
     });
     observer.observe(appContainer, { childList: true, subtree: true });

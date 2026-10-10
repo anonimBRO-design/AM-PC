@@ -211,6 +211,268 @@
     grid-template-rows: 40px minmax(0, 1fr) !important;
   }
 
+  /* Desktop Multi-Select Drawer Overrides: Full height in right dock, scrollable body */
+  #drawer.multiSelectDrawer,
+  #drawer.multiSelectDrawer:not(.addDrawer) {
+    position: absolute !important;
+    right: 0 !important;
+    top: 38px !important;
+    bottom: 280px !important;
+    left: auto !important;
+    width: 400px !important;
+    min-width: 400px !important;
+    max-width: 400px !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  #drawer.multiSelectDrawer:not(.addDrawer) > .drawerHead {
+    flex: 0 0 42px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    padding: 0 12px !important;
+  }
+
+  #drawer.multiSelectDrawer:not(.addDrawer) > .drawerHead b,
+  #drawer.multiSelectDrawer:not(.addDrawer) > .drawerHead h2 {
+    font-size: 13px !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+  }
+
+  #drawer.multiSelectDrawer:not(.addDrawer) > .drawerHead button {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 16px !important;
+  }
+
+  #drawer.multiSelectDrawer .multiSelectBody,
+  #drawer.multiSelectDrawer:not(.addDrawer) > .multiSelectBody {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    padding: 12px !important;
+  }
+
+  /* Multi-Select Media Relinker UI */
+  .amMultiRelinkWrap {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-top: 6px;
+  }
+
+  .amMultiActionRow {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .amMultiCancelBtn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px 12px;
+    border-radius: 9px;
+    background: #1e2230;
+    border: 1px solid #2e3549;
+    color: #cad3e5;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .amMultiCancelBtn:hover {
+    background: #2a3044;
+    border-color: #3f4963;
+    color: #ffffff;
+  }
+
+  .amMultiRelinkCard {
+    background: #181c28;
+    border: 1px solid #2a3144;
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .amMultiRelinkCard.has-missing {
+    border-color: rgba(255, 171, 0, 0.45);
+    background: linear-gradient(180deg, rgba(255, 171, 0, 0.05), #181c28 25%);
+  }
+
+  .amMultiRelinkHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .amMultiRelinkTitle {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #00e676;
+    font-size: 12px;
+  }
+
+  .amMultiRelinkTitle b {
+    color: #ffffff;
+  }
+
+  .amMultiRelinkBadge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 7px;
+    border-radius: 6px;
+  }
+
+  .amMultiRelinkBadge.badge-warn {
+    background: rgba(255, 171, 0, 0.16);
+    color: #ffb300;
+    border: 1px solid rgba(255, 171, 0, 0.35);
+  }
+
+  .amMultiRelinkBadge.badge-ok {
+    background: rgba(0, 230, 118, 0.12);
+    color: #00e676;
+    border: 1px solid rgba(0, 230, 118, 0.25);
+  }
+
+  .amMultiRelinkDesc {
+    margin: 0;
+    font-size: 10.5px;
+    color: #929bb0;
+    line-height: 1.45;
+  }
+
+  .amMultiMediaList {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 220px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  .amMultiMediaItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px;
+    background: #141622;
+    border: 1px solid #242938;
+    border-radius: 8px;
+    gap: 8px;
+  }
+
+  .amMultiMediaItem.is-missing {
+    border-color: rgba(255, 171, 0, 0.35);
+    background: rgba(255, 171, 0, 0.04);
+  }
+
+  .amMultiMediaInfo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .amMediaTypeTag {
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    padding: 2px 5px;
+    border-radius: 4px;
+    background: #252b3d;
+    color: #8da0bf;
+    flex-shrink: 0;
+  }
+
+  .amMediaName {
+    font-size: 11px;
+    color: #e4eaf5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .amMediaRelinkBtn {
+    flex-shrink: 0;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: rgba(0, 230, 118, 0.12);
+    border: 1px solid rgba(0, 230, 118, 0.35);
+    color: #00e676;
+    font-size: 10.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .amMediaRelinkBtn:hover {
+    background: #00e676;
+    color: #0c1017;
+  }
+
+  .amMultiMediaItem.is-missing .amMediaRelinkBtn {
+    background: #ffab00;
+    border-color: #ffab00;
+    color: #0f121a;
+  }
+
+  .amRelinkAutoAllBtn {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #202636;
+    border: 1px solid #333d54;
+    color: #d0d9eb;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .amRelinkAutoAllBtn:hover {
+    background: #2a3248;
+    border-color: #00e676;
+    color: #00e676;
+  }
+
+  /* Timeline Desktop Anti-Jump / Anti-Collapse Overrides */
+  .timelineArea.omsSelectedLayerFocus #tracks {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .timelineArea.omsSelectedLayerFocus #timelineScroll {
+    overflow-y: auto !important;
+  }
+
+  .timelineArea.omsSelectedLayerFocus #tracks .track {
+    display: grid !important;
+  }
+
   #drawer .drawerHead {
     height: 42px !important;
     min-height: 42px !important;

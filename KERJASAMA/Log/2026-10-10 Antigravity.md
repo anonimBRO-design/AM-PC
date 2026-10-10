@@ -345,3 +345,54 @@ Mengaktifkan kembali 2.846 baris CSS kustom (`css/theme.css` dan `css/desktop.cs
 - **Build**:
   - `node scripts/build-portable.js` dijalankan dan portable executable `release/Alight-Motion-PC-win-x64/Alight Motion PC.exe` diperbarui.
 
+---
+
+### 20. Implementasi Fitur "Tautkan Ulang Media" Multi-Layer & Netralisasi Timeline Jump / Mouse Long-Press (20:30)
+
+- **Masalah yang Dilaporkan User**:
+  1. *"ini gaada opsi tautkan ulang?"* dan *"itu tautkan ulang gaada pas kita pilih layer banyak"* — Saat beberapa layer dipilih sekaligus (multi-select), opsi "Tautkan Ulang" (Media Relink) hilang dari layar, padahal user butuh menautkan kembali media yang hilang/terputus pada proyek.
+  2. *"terus pas pencet salah satu layar malah keatas sendiri"* — Saat mengklik layer di timeline desktop, timeline tiba-tiba loncat/scroll sendiri ke paling atas (`scrollTop = 0`), track lain menghilang/kolaps, dan layer berubah menjadi mode seleksi banyak (multi-select) tanpa sengaja.
+- **Akar Masalah (*Root Cause*)**:
+  1. *Relink Hilang Saat Multi-Select*:
+     - Open Motion bawaan hanya merender tombol relink di dalam `openInspectorRoot` saat 1 layer media dipilih. Begitu multi-select aktif, Open Motion mengganti tampilan drawer dengan `drawerShell(`${layers.length} Layer Dipilih`, ...)` yang hanya menyediakan grup/mask/hapus/sembunyi/kunci/opasitas, sama sekali tidak ada opsi relink media.
+     - Selain itu, di `index.html` CSS bawaan membatasi tinggi `#drawer.multiSelectDrawer` menjadi 76px–84px di bawah layar, sehingga konten drawer multi-select terhimpit.
+  2. *Timeline Loncat ke Atas & Kolaps*:
+     - Bawaan Open Motion memiliki kebijakan mobile portrait `startSelectedLayerFocusSession()`. Ketika dijalankan, ini memasang kelas `.timelineArea.omsSelectedLayerFocus`, memaksa tinggi `#tracks` menjadi 29px (hanya muat 1 track), menyembunyikan semua track lain (`display: none !important`), dan memaksa `timelineScroll.scrollTop = 0`.
+  3. *Klik Mouse Biasa Menjadi Multi-Select*:
+     - Pada `TimelineController.prototype.layerSelectionPointerDown`, left-click mouse (`e.pointerType === 'mouse'`) tetap dipasangi timer 360ms (`selectLayerByLongPress`). Jika user menekan mouse sedikit lambat di PC (360ms), sistem menganggapnya gesture sentuh "tekan lama" ponsel, sehingga masuk mode multi-select dan mengosongkan Inspector.
+- **Solusi yang Diterapkan**:
+  1. **Modul Bersih `electron/desktop-engine.js`**:
+     - Memisahkan seluruh injeksi client-side ke file JavaScript mandiri `electron/desktop-engine.js` untuk menghindari isu isolasi preload dan syntax string interpolation escaping.
+     - Di `electron/preload.js` dan `electron/main.js`, modul `desktop-engine.js` dimuat dan dieksekusi secara otomatis ke main world DOM.
+  2. **Netralisasi Timeline Jump & Focus Collapse**:
+     - Pada `EditorSplitController.prototype`, metode `canStartSelectedLayerFocusSession()`, `selectedLayerFocusEligible()`, dan `startSelectedLayerFocusSession()` dinetralisir agar mengembalikan `false` dan membersihkan focus session.
+     - Pada `EditorSplitLayoutPolicy.prototype`, `automaticFocusEligible()` dan `focusSessionEligible()` disetel `() => false`.
+     - Ditambahkan heartbeat pencegah dan CSS override di `css/desktop.css`: `.timelineArea.omsSelectedLayerFocus #tracks { height: auto !important; }` dan `#tracks .track { display: grid !important; }`.
+  3. **Proteksi Klik Mouse (Anti-Accidental Multi-Select)**:
+     - `TimelineController.prototype.layerSelectionPointerDown` diproteksi: jika `e.pointerType === 'mouse'` dan user TIDAK menekan tombol modifikasi (`Ctrl`, `Meta`, `Shift`), timer long-press 360ms dibatalkan. Klik biasa hanya melakukan seleksi normal layer.
+     - `UIController.prototype.selectLayerByLongPress` diproteksi: diabaikan jika event berasal dari pointer mouse tanpa tombol modifikasi.
+  4. **Kartu "Tautkan Ulang Media" di Multi-Select Drawer (`#drawer.multiSelectDrawer`)**:
+     - Di `css/desktop.css`: `#drawer.multiSelectDrawer` di-dock di sisi kanan desktop selebar 400px dengan tinggi penuh yang fleksibel dan scrollable.
+     - Saat multi-select aktif, kartu `.amMultiRelinkCard` dirender ke dalam `.multiSelectBody`:
+       - Mendeteksi seluruh layer bertipe media (`image`, `video`, `audio`) yang terpilih.
+       - Badge status otomatis menandai media yang sumbernya hilang (`⚠ N Perlu Ditautkan`) atau terdeteksi.
+       - Tombol per-media "Tautkan" / "Ganti" langsung memanggil `window.openMediaRelinkMenu(layer)` bawaan Open Motion.
+       - Tombol "↻ Cari Otomatis Semua Media" (`#amRelinkAutoAllBtn`) untuk pemulihan otomatis satu klik.
+       - Tombol aksi "✕ Batalkan Pilihan ({N} Layer)" (`#amMultiCancelBtn`) yang memanggil `ui.finishLayerMultiSelection({ announce: true })`.
+       - Shortcut global tombol `Escape` untuk keluar dari multi-select kapan saja.
+- **Verifikasi**:
+  - Diuji secara otomatis dengan headless runner Electron:
+    - `engineScriptInjected: true`
+    - `inEditor: true`
+    - `focusSessionDisarmed: true`
+    - `mouseLongPressDisarmed: true`
+    - `multiSelectDrawer.drawerWidth: '400px'`
+    - `relinkWrapExists: true`
+    - `cancelBtnExists: true`
+    - `mediaButtonsCount: 1`
+    - `afterCancel.multiSelectMode: false` dan `selectedCount: 0`.
+- **Rilis**:
+  - Seluruh berkas yang dimodifikasi (`css/desktop.css`, `electron/preload.js`, `electron/desktop-engine.js`, `electron/main.js`) telah disinkronkan ke bundle aplikasi `release/Alight-Motion-PC-win-x64/resources/app/`.
+  - Berkas `index.html` tetap 100% identik dengan upstream hash `8816e9f9b03ce058e1543f136e17fabff0a89093`.
+
+

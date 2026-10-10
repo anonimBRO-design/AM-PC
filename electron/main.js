@@ -57,8 +57,14 @@ function createWindow() {
         const desktopCss = fs.readFileSync(desktopCssPath, 'utf8');
         await mainWindow.webContents.insertCSS(desktopCss);
       }
+
+      const desktopEnginePath = path.join(__dirname, 'desktop-engine.js');
+      if (fs.existsSync(desktopEnginePath)) {
+        const engineCode = fs.readFileSync(desktopEnginePath, 'utf8');
+        await mainWindow.webContents.executeJavaScript(engineCode);
+      }
     } catch (err) {
-      console.error('[Electron] Gagal menyuntikkan CSS kustom:', err);
+      console.error('[Electron] Gagal menyuntikkan CSS/engine kustom:', err);
     }
   });
 
