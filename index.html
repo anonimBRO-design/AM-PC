@@ -1967,6 +1967,8 @@ input[type=range]{accent-color:var(--accent)}
 .projectThumb:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px);background-size:17px 17px;transform:perspective(120px) rotateX(32deg) scale(1.18);opacity:.42}
 .projectThumb:after{content:"";position:absolute;left:50%;top:50%;width:42%;height:42%;inset:auto;border:1px solid hsla(var(--thumb-hue,163),72%,70%,.8);border-radius:4px;transform:translate(-50%,-50%) rotate(-11deg);box-shadow:13px -8px 0 -10px hsla(var(--thumb-hue,163),72%,70%,.55),-12px 10px 0 -10px hsla(var(--thumb-hue,163),72%,70%,.45)}
 .projectThumbBadge{position:absolute;left:8px;top:8px;z-index:2;padding:3px 5px;border:1px solid rgba(255,255,255,.12);border-radius:5px;background:rgba(7,10,15,.66);color:#a7b6bd;font-size:5px;font-weight:800;letter-spacing:.08em;backdrop-filter:blur(5px)}
+.projectThumbImg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1}
+.projectThumb.hasThumb:before,.projectThumb.hasThumb:after,.projectThumb:has(.projectThumbImg):before,.projectThumb:has(.projectThumbImg):after{display:none}
 .projectMeta{position:relative;padding:10px 10px 11px;min-width:0}
 .projectMeta b{display:block;margin:0;color:#eef3f5;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .projectMetaLine{display:flex;align-items:center;justify-content:space-between;gap:5px;margin-top:7px}
@@ -16827,22 +16829,34 @@ class OMSPersistentStore{
     });
     return this.dbPromise
   }
-  projectMeta(project){return{id:project.id,name:project.name,width:+project.width||0,height:+project.height||0,fps:+project.fps||30,updated:+project.updated||Date.now(),created:+project.created||Date.now()}}
+  captureProjectThumbnail(project=model?.project){
+    if(!project||typeof renderer==='undefined'||!renderer?.canvas)return project?.thumb||'';
+    try{
+      const tc=document.createElement('canvas'),tw=160,th=Math.round(tw/(project.width/project.height||1.6));
+      tc.width=tw;tc.height=Math.max(60,Math.min(160,th));
+      tc.getContext('2d').drawImage(renderer.canvas,0,0,tc.width,tc.height);
+      const url=tc.toDataURL('image/webp',0.82);
+      if(url&&url.length>100)project.thumb=url;
+      return project.thumb||''
+    }catch(e){return project?.thumb||''}
+  }
+  projectMeta(project){return{id:project.id,name:project.name,width:+project.width||0,height:+project.height||0,fps:+project.fps||30,updated:+project.updated||Date.now(),created:+project.created||Date.now(),thumb:project.thumb||''}}
   readLocalIndex(){
     const all=[];
-    for(const key of ['oms4_project_index','oms3_projects']){try{const arr=JSON.parse(localStorage.getItem(key)||'[]');if(Array.isArray(arr))all.push(...arr)}catch(e){}}
+    for(const key of ['oms4_project_index','oms3_projects']){try{const arr=JSON.parse(localStorage.getItem(key)||'[]');if(Array.isArray(arr))all.push(...arr)}catch(e){}
+    }
     const map=new Map();for(const p of all)if(p?.id){const old=map.get(p.id);if(!old||(+p.updated||0)>(+old.updated||0))map.set(p.id,p)}return[...map.values()]
   }
   writeLocalIndex(meta){try{const arr=this.readLocalIndex().filter(x=>x.id!==meta.id);arr.push(meta);localStorage.setItem('oms4_project_index',JSON.stringify(arr))}catch(e){}}
   saveLiteSync(snapshot=null){
     if(!snapshot&&!model.project)return false;
-    try{if(!snapshot){model.project.updated=Date.now();mediaAssets.captureLayers(model.layers)}const data=snapshot||model.serialize({includeMedia:false}),meta=this.projectMeta(data.project);localStorage.setItem('oms4_lite_'+meta.id,JSON.stringify(data));this.writeLocalIndex(meta);return true}
+    try{if(!snapshot){model.project.updated=Date.now();this.captureProjectThumbnail(model.project);mediaAssets.captureLayers(model.layers)}const data=snapshot||model.serialize({includeMedia:false}),meta=this.projectMeta(data.project);localStorage.setItem('oms4_lite_'+meta.id,JSON.stringify(data));this.writeLocalIndex(meta);return true}
     catch(e){console.warn('Emergency local save gagal:',e);return false}
   }
   async saveCurrent({notify=false}={}){
     if(!model.project)return false;
     const task=async()=>{
-      model.project.updated=Date.now();mediaAssets.captureLayers(model.layers);
+      model.project.updated=Date.now();this.captureProjectThumbnail(model.project);mediaAssets.captureLayers(model.layers);
       const data=model.serialize({includeMedia:false}),meta=this.projectMeta(model.project),assetRecords=[];
       for(const layer of model.layers){if(!mediaAssets.isMedia(layer)||!layer.dataUrl)continue;const id=mediaAssets.captureLayer(layer);if(id&&!this.knownAssets.has(id))assetRecords.push({id,dataUrl:layer.dataUrl,type:layer.type,name:layer.name||'',updated:Date.now()})}
       try{
@@ -16867,6 +16881,7 @@ class OMSPersistentStore{
     return null
   }
   async listProjects(){
+    await this.writeQueue.catch(()=>{});
     const merged=new Map();
     try{const db=await this.open(),tx=db.transaction('projects','readonly'),rows=await this.request(tx.objectStore('projects').getAll());await this.txDone(tx);for(const row of rows||[])if(row?.meta?.id)merged.set(row.meta.id,row.meta)}catch(e){}
     for(const meta of this.readLocalIndex()){if(!meta?.id)continue;const old=merged.get(meta.id);if(!old||(+meta.updated||0)>(+old.updated||0))merged.set(meta.id,meta)}
@@ -23076,7 +23091,8 @@ class UIController{
     metas.forEach((p,index)=>{
       const d=document.createElement('article'),hash=String(p.id||p.name||index).split('').reduce((n,ch)=>(n*31+ch.charCodeAt(0))>>>0,7);
       d.className='projectCard';d.dataset.projectId=p.id;d.tabIndex=0;d.setAttribute('role','button');d.setAttribute('aria-label',homeTr('openProject').replace('{name}',p.name||homeTr('untitled')));d.style.setProperty('--thumb-hue',String(150+hash%105));
-      d.innerHTML=`<div class="projectThumb"><span class="projectThumbBadge">SCENE 4</span></div><div class="projectMeta"><span class="projectArrow" aria-hidden="true">↗</span><span class="projectSelectMark" aria-hidden="true">✓</span><b>${esc(p.name||homeTr('untitled'))}</b><div class="projectMetaLine"><span>${Number(p.width)||0}×${Number(p.height)||0} · ${Number(p.fps)||30} FPS</span><span class="projectDate">${dateLabel(p.updated)}</span></div></div>`;
+      const thumbImg=p.thumb?`<img class="projectThumbImg" src="${p.thumb}" alt="Thumbnail">`:'';
+      d.innerHTML=`<div class="projectThumb ${p.thumb?'hasThumb':''}">${thumbImg}<span class="projectThumbBadge">SCENE 4</span></div><div class="projectMeta"><span class="projectArrow" aria-hidden="true">↗</span><span class="projectSelectMark" aria-hidden="true">✓</span><b>${esc(p.name||homeTr('untitled'))}</b><div class="projectMetaLine"><span>${Number(p.width)||0}×${Number(p.height)||0} · ${Number(p.fps)||30} FPS</span><span class="projectDate">${dateLabel(p.updated)}</span></div></div>`;
       this.bindProjectCardLongPress(d,p);
       const open=e=>{if(e&&e.isTrusted===false)return;this.loadLocal(p.id,{userInitiated:true})};
       d.onclick=e=>{
@@ -34171,7 +34187,7 @@ scheduleWholeAppLanguage();
     if(!model.project)return Promise.resolve(false);
     // Freeze this caller's scene and immutable media handles at enqueue time.
     // Opening another project while IndexedDB is busy must not redirect a save.
-    model.project.updated=Date.now();mediaAssets.captureLayers(model.layers);
+    model.project.updated=Date.now();this.captureProjectThumbnail(model.project);mediaAssets.captureLayers(model.layers);
     const data=JSON.parse(JSON.stringify(model.serialize({includeMedia:false,captureMedia:false}))),meta=this.projectMeta(data.project);
     const mediaLayers=model.layers.filter(isMedia).map(l=>({assetId:l.assetId,type:l.type,name:l.name||'',dataUrl:l.dataUrl,blob:mediaAssets.blobs.get(l.assetId)}));
     const byId=new Map(mediaLayers.filter(l=>l.assetId).map(l=>[l.assetId,l])),ids=[...byId.keys()];
