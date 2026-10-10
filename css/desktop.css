@@ -5,7 +5,7 @@
 
 @media (min-width: 860px) {
   /* 1. Global Editor Widescreen Shell */
-  .editor {
+  .editor:not(.hidden) {
     display: grid !important;
     grid-template-rows: 50px minmax(0, 1fr) !important;
     height: 100vh !important;
@@ -48,7 +48,7 @@
   /* 3. Multi-Panel Docked Editor Main Grid */
   .editorMain {
     display: grid !important;
-    grid-template-columns: minmax(0, 1fr) 380px !important;
+    grid-template-columns: 1fr 0px !important;
     grid-template-rows: minmax(0, 1fr) 280px !important;
     height: 100% !important;
     width: 100% !important;
@@ -56,11 +56,12 @@
     min-width: 0 !important;
     overflow: hidden !important;
     background: #0e1015 !important;
+    transition: grid-template-columns 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
 
-  /* When drawer is closed/hidden, preview area smoothly expands to full width */
-  .editorMain:has(> #drawer.hidden) {
-    grid-template-columns: minmax(0, 1fr) 0px !important;
+  /* When drawer is open (not hidden), smoothly reserve 400px on the right for docked inspector */
+  .editorMain:has(#drawer:not(.hidden)) {
+    grid-template-columns: minmax(0, 1fr) 400px !important;
   }
 
   /* 4. Canvas / Viewport Area (Row 1, Column 1 — Top Left/Center) */
@@ -129,7 +130,8 @@
   }
 
   /* 5. Right-Side Docked Inspector Panel (Row 1, Column 2 — Top Right) */
-  #drawer {
+  /* Direct grid child inside .editorMain */
+  .editorMain > #drawer {
     grid-column: 2 / 3 !important;
     grid-row: 1 / 2 !important;
     position: relative !important;
@@ -137,35 +139,87 @@
     right: auto !important;
     top: auto !important;
     bottom: auto !important;
-    width: 380px !important;
+    width: 400px !important;
+    min-width: 400px !important;
+    max-width: 400px !important;
     height: 100% !important;
-    max-height: none !important;
+    max-height: 100% !important;
     min-height: 0 !important;
-    min-width: 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    background: #161922 !important;
-    border-left: 1px solid #242836 !important;
-    border-bottom: 1px solid #242836 !important;
+    background: #141720 !important;
+    border-left: 1px solid #232836 !important;
+    border-top: 0 !important;
+    border-bottom: 1px solid #232836 !important;
     box-shadow: none !important;
     z-index: 25 !important;
     overflow: hidden !important;
     transform: none !important;
   }
 
+  /* Fallback fixed position if still inside .timelineArea */
+  .timelineArea > #drawer,
+  html:not(.omsMobileLandscapeDesktop) .timelineArea > #drawer,
+  html:not(.omsMobileLandscapeDesktop) .timelineArea > #drawer:not(.hidden),
+  html:not(.omsMobileLandscapeDesktop) .timelineArea > #drawer.addDrawer,
+  body.is-electron .timelineArea > #drawer,
+  #drawer {
+    position: fixed !important;
+    top: 50px !important;
+    right: 0 !important;
+    bottom: 280px !important;
+    left: auto !important;
+    width: 400px !important;
+    min-width: 400px !important;
+    max-width: 400px !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: #141720 !important;
+    border-left: 1px solid #232836 !important;
+    border-top: 0 !important;
+    border-bottom: 1px solid #232836 !important;
+    box-shadow: -6px 0 24px rgba(0, 0, 0, 0.45) !important;
+    z-index: 9999 !important;
+    overflow: hidden !important;
+    transform: none !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    align-self: auto !important;
+  }
+
+  /* Support when topBar is collapsed */
+  .editor.topBarCollapsed #drawer,
+  html:not(.omsMobileLandscapeDesktop) .editor.topBarCollapsed .timelineArea > #drawer {
+    top: 0 !important;
+  }
+
+  /* When drawer is hidden */
+  html .timelineArea > #drawer.hidden,
+  html:not(.omsMobileLandscapeDesktop) .timelineArea > #drawer.hidden,
   #drawer.hidden {
     display: none !important;
   }
 
+  /* Reset timeline rows on desktop so it never reserves a 3rd bottom row for drawer */
+  html:not(.omsMobileLandscapeDesktop) .timelineArea,
+  html:not(.omsMobileLandscapeDesktop) .timelineArea:has(> #drawer.addDrawer:not(.hidden)),
+  html:not(.omsMobileLandscapeDesktop) .timelineArea:has(> #drawer:not(.hidden):not(.addDrawer)),
+  .timelineArea {
+    grid-template-rows: 40px minmax(0, 1fr) !important;
+  }
+
   #drawer .drawerHead {
-    height: 48px !important;
-    min-height: 48px !important;
-    flex: 0 0 48px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    flex: 0 0 42px !important;
     display: flex !important;
     align-items: center !important;
-    padding: 0 14px !important;
-    background: #191c26 !important;
-    border-bottom: 1px solid #252a38 !important;
+    padding: 0 12px !important;
+    background: #171a24 !important;
+    border-bottom: 1px solid #222735 !important;
     gap: 8px !important;
   }
 
@@ -176,8 +230,8 @@
   }
 
   #drawer .drawerHead button {
-    width: 30px !important;
-    height: 30px !important;
+    width: 28px !important;
+    height: 28px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -191,7 +245,7 @@
 
   #drawer .drawerHead button:hover {
     color: #ffffff !important;
-    background: #252a3a !important;
+    background: #232938 !important;
   }
 
   #drawer .drawerBody {
@@ -199,30 +253,105 @@
     min-height: 0 !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    padding: 14px !important;
+    padding: 10px 12px 14px !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #2b3142 transparent !important;
   }
 
-  /* 6 Master Inspector Grid in Right Dock */
+  #drawer .drawerBody::-webkit-scrollbar {
+    width: 5px !important;
+  }
+
+  #drawer .drawerBody::-webkit-scrollbar-thumb {
+    background: #2b3142 !important;
+    border-radius: 4px !important;
+  }
+
+  /* Compact Layer Header & Title */
+  #drawer .propTitle {
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    margin: 0 0 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  /* Compact & Non-Clipped Quick Tools Bar */
+  #drawer .mediaQuickBar,
+  #drawer .layerQuickBar {
+    display: grid !important;
+    gap: 5px !important;
+    margin: 4px 0 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  #drawer .layerQuickBar {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  #drawer .mediaQuickBar:not(.layerQuickBar) {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+
+  #drawer .mediaQuickBtn {
+    height: 44px !important;
+    min-width: 0 !important;
+    padding: 4px 2px !important;
+    border-radius: 7px !important;
+    background: #1a1e28 !important;
+    border: 1px solid #282f40 !important;
+    gap: 2px !important;
+    box-sizing: border-box !important;
+    transition: all 0.15s ease !important;
+  }
+
+  #drawer .mediaQuickBtn:hover {
+    border-color: #00e676 !important;
+    background: #222938 !important;
+  }
+
+  #drawer .mediaQuickBtn .mqIcon {
+    font-size: 15px !important;
+    min-height: 15px !important;
+    line-height: 1 !important;
+  }
+
+  #drawer .mediaQuickBtn .mqLabel {
+    font-size: 8.5px !important;
+    font-weight: 600 !important;
+    color: #9aa6bc !important;
+  }
+
+  #drawer .mediaQuickBtn .mqValue {
+    font-size: 7.5px !important;
+    color: #00e676 !important;
+  }
+
+  /* Compact Desktop Inspector Grid */
   .inspectorGrid {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
+    gap: 7px !important;
   }
 
   .insBtn {
-    min-height: 76px !important;
-    padding: 12px 8px !important;
+    min-height: 48px !important;
+    max-height: 52px !important;
+    padding: 6px 12px !important;
     display: flex !important;
-    flex-direction: column !important;
+    flex-direction: row !important;
     align-items: center !important;
-    justify-content: center !important;
-    gap: 6px !important;
-    font-size: 11px !important;
-    font-weight: 700 !important;
-    border-radius: 10px !important;
-    background: #1e222e !important;
-    border: 1px solid #2b3142 !important;
-    color: #c0cadc !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    background: #1a1e2a !important;
+    border: 1px solid #272d3e !important;
+    color: #cfd6e4 !important;
     cursor: pointer !important;
     transition: all 0.15s ease !important;
   }
@@ -230,14 +359,51 @@
   .insBtn:hover {
     border-color: #00e676 !important;
     color: #ffffff !important;
-    background: #242938 !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 4px 14px rgba(0, 230, 118, 0.2) !important;
+    background: #222838 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 3px 12px rgba(0, 230, 118, 0.15) !important;
   }
 
   .insBtn span {
-    font-size: 22px !important;
+    font-size: 17px !important;
+    min-width: 22px !important;
+    text-align: center !important;
     margin-bottom: 0 !important;
+    color: #00e676 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Compact Refined Delete Button */
+  #deleteLayer,
+  #deleteLayer.createBtn {
+    width: 100% !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.04em !important;
+    border-radius: 7px !important;
+    background: rgba(255, 45, 117, 0.12) !important;
+    color: #ff5277 !important;
+    border: 1px solid rgba(255, 45, 117, 0.28) !important;
+    box-shadow: none !important;
+    margin-top: 10px !important;
+    margin-bottom: 4px !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  #deleteLayer:hover,
+  #deleteLayer.createBtn:hover {
+    background: rgba(255, 45, 117, 0.25) !important;
+    border-color: #ff5277 !important;
+    color: #ffffff !important;
+    box-shadow: 0 3px 12px rgba(255, 45, 117, 0.25) !important;
   }
 
   /* 6. Timeline Area (Row 2, Column 1 to 3 — FULL WIDTH ACROSS BOTTOM) */
@@ -1700,3 +1866,939 @@ body.is-electron #homeInstallBtn {
   text-transform: uppercase !important;
   line-height: 1.4 !important;
 }
+
+/* Ensure hidden utility class always takes absolute precedence */
+.hidden,
+[hidden],
+.editor.hidden,
+.home.hidden {
+  display: none !important;
+}
+
+/* ============================================================
+   Alight Motion PC (AM-PC) — Typography: Inter Modern Clear Font
+   ============================================================ */
+html, body, .app, .home, .editor, button, input, select, textarea {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+/* Official AM Header Brand & Wordmark */
+.homeBrand,
+.simpleHome .homeBrand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  height: 38px !important;
+}
+
+.homeMark,
+.simpleHome .homeMark {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  max-width: 34px !important;
+  flex: 0 0 34px !important;
+  border-radius: 9px !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  filter: none !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.homeMark img,
+.simpleHome .homeMark img {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  border-radius: 9px !important;
+  object-fit: cover !important;
+  display: block !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45) !important;
+}
+
+.homeWordmark,
+.simpleHome .homeWordmark {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+.homeWordmark b,
+.simpleHome .homeWordmark b {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+  color: #ffffff !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1 !important;
+}
+
+/* ============================================================
+   Alight Motion PC — Experimental Notice Modal Polish
+   ============================================================ */
+.experimentalNoticeCard {
+  background: #141722 !important;
+  border: 1px solid #283044 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.85) !important;
+  color: #d1d8e6 !important;
+}
+
+.experimentalNoticeEyebrow {
+  background: rgba(0, 230, 118, 0.14) !important;
+  color: #00e676 !important;
+  border: 1px solid rgba(0, 230, 118, 0.35) !important;
+  font-weight: 800 !important;
+  border-radius: 5px !important;
+  padding: 2px 8px !important;
+  letter-spacing: 0.05em !important;
+}
+
+#experimentalNoticeTitle {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 19px !important;
+}
+
+#experimentalNoticeIntro {
+  color: #929bb0 !important;
+}
+
+.experimentalNoticeBody h3 {
+  color: #00e676 !important;
+  font-weight: 700 !important;
+}
+
+.experimentalNoticeBody strong {
+  color: #ffffff !important;
+}
+
+.experimentalNoticeCallout {
+  background: rgba(0, 229, 255, 0.08) !important;
+  border-left: 3px solid #00e5ff !important;
+  color: #b8f4ff !important;
+}
+
+#experimentalNoticeAccept {
+  background: #00e676 !important;
+  color: #081a11 !important;
+  font-weight: 800 !important;
+  border-radius: 10px !important;
+  transition: all 0.15s ease !important;
+  box-shadow: 0 2px 10px rgba(0, 230, 118, 0.25) !important;
+}
+
+#experimentalNoticeAccept:hover {
+  background: #00ff84 !important;
+  box-shadow: 0 4px 18px rgba(0, 230, 118, 0.45) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ============================================================
+   AM Finder & AM Hub Top Bar Buttons
+   ============================================================ */
+#homeAMFinder,
+#homeAMHub,
+#homeAMNoticeBtn {
+  border: 1px solid #283042 !important;
+  background: #1c202c !important;
+  color: #c7cedd !important;
+  border-radius: 8px !important;
+  padding: 6px 12px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+#homeAMFinder:hover {
+  background: #242c3d !important;
+  border-color: #00e5ff !important;
+  color: #00e5ff !important;
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.25) !important;
+}
+
+#homeAMHub:hover {
+  background: #242c3d !important;
+  border-color: #00e676 !important;
+  color: #00e676 !important;
+  box-shadow: 0 0 10px rgba(0, 230, 118, 0.25) !important;
+}
+
+#homeAMNoticeBtn:hover {
+  background: #242c3d !important;
+  border-color: #6fe1bd !important;
+  color: #6fe1bd !important;
+  box-shadow: 0 0 10px rgba(111, 225, 189, 0.25) !important;
+}
+
+#homeAMFinder svg,
+#homeAMHub svg,
+#homeAMNoticeBtn svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+/* ============================================================
+   Alight Motion PC — In-App Web Modal (AM Finder & AM Hub)
+   - Draggable Window Header
+   - Maximize / Restore Mode
+   - Side-by-Side Split Screen with AM Hub
+   - Stays completely inside the .exe application
+   ============================================================ */
+.amWebModal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 100000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.amWebModal.hidden {
+  display: none !important;
+}
+
+.amWebModalBackdrop {
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(8, 10, 15, 0.78) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+/* Modal Card */
+.amWebModalCard {
+  position: relative !important;
+  z-index: 10 !important;
+  width: min(1200px, 94vw) !important;
+  height: min(840px, 88vh) !important;
+  background: #12141a !important;
+  border: 1px solid #283042 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.8) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1), height 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.15s ease !important;
+}
+
+/* Split screen default width is wider for dual browsing */
+.amWebModalCard.mode-split:not(.is-maximized) {
+  width: min(1560px, 96vw) !important;
+  height: min(880px, 92vh) !important;
+}
+
+/* Maximized Window State */
+.amWebModalCard.is-maximized {
+  position: fixed !important;
+  inset: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  border-radius: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  transform: none !important;
+}
+
+/* Draggable Header */
+.amWebModalHead {
+  height: 48px !important;
+  min-height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 14px !important;
+  background: #171a23 !important;
+  border-bottom: 1px solid #232838 !important;
+  user-select: none !important;
+  cursor: grab !important;
+  gap: 12px !important;
+}
+
+.amWebModalHead.is-dragging {
+  cursor: grabbing !important;
+}
+
+.amWebModalCard.is-maximized .amWebModalHead {
+  cursor: default !important;
+}
+
+.amWebModalHeadInfo {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-width: 0 !important;
+  flex: 0 1 auto !important;
+}
+
+.amWebModalBadge {
+  font-size: 9px !important;
+  font-weight: 800 !important;
+  padding: 2px 7px !important;
+  border-radius: 5px !important;
+  background: rgba(0, 229, 255, 0.14) !important;
+  color: #00e5ff !important;
+  border: 1px solid rgba(0, 229, 255, 0.35) !important;
+  letter-spacing: 0.05em !important;
+  white-space: nowrap !important;
+}
+
+.amWebModalBadge.amBadgeFinder {
+  background: rgba(0, 229, 255, 0.14) !important;
+  color: #00e5ff !important;
+  border-color: rgba(0, 229, 255, 0.35) !important;
+}
+
+.amWebModalBadge.amBadgeHub {
+  background: rgba(0, 230, 118, 0.14) !important;
+  color: #00e676 !important;
+  border-color: rgba(0, 230, 118, 0.35) !important;
+}
+
+.amWebModalBadge.amBadgeSplit {
+  background: rgba(179, 136, 255, 0.16) !important;
+  color: #d1b3ff !important;
+  border-color: rgba(179, 136, 255, 0.4) !important;
+}
+
+.amWebModalTitle {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.amWebModalUrl {
+  font-size: 11px !important;
+  color: #7b869e !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Center Tabs Switcher */
+.amWebTabs {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  background: #11131b !important;
+  border: 1px solid #232838 !important;
+  padding: 3px !important;
+  border-radius: 8px !important;
+  cursor: default !important;
+}
+
+.amWebTabBtn {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 4px 10px !important;
+  height: 28px !important;
+  border-radius: 6px !important;
+  background: transparent !important;
+  border: 0 !important;
+  color: #8c98ad !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  white-space: nowrap !important;
+}
+
+.amWebTabBtn svg {
+  width: 13px !important;
+  height: 13px !important;
+}
+
+.amWebTabBtn:hover {
+  color: #ffffff !important;
+  background: #1c212e !important;
+}
+
+.amWebTabBtn.active {
+  background: #232a3a !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35) !important;
+}
+
+.amWebTabBtn#amWebTabFinder.active {
+  color: #00e5ff !important;
+  border-bottom: 2px solid #00e5ff !important;
+}
+
+.amWebTabBtn#amWebTabHub.active {
+  color: #00e676 !important;
+  border-bottom: 2px solid #00e676 !important;
+}
+
+.amWebTabBtn.amWebTabSplit.active {
+  background: linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(179, 136, 255, 0.15)) !important;
+  color: #00e5ff !important;
+  border-bottom: 2px solid #00e5ff !important;
+}
+
+/* Head Action Buttons (Reload, Maximize, Close) */
+.amWebModalHeadActions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex: 0 0 auto !important;
+}
+
+.amWebHeadBtn {
+  width: 32px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 8px !important;
+  background: #1f2432 !important;
+  border: 1px solid #2b3348 !important;
+  color: #a6b2c9 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.amWebHeadBtn:hover {
+  color: #ffffff !important;
+  background: #2a3348 !important;
+}
+
+.amWebCloseBtn:hover {
+  background: #e81123 !important;
+  border-color: #e81123 !important;
+  color: #ffffff !important;
+}
+
+.amWebHeadBtn svg {
+  width: 15px !important;
+  height: 15px !important;
+}
+
+/* Modal Body Layout */
+.amWebModalBody {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  background: #0d0f14 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Panes */
+.amWebPane {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  min-width: 0 !important;
+  position: relative !important;
+  background: #0d0f14 !important;
+}
+
+.amWebPaneFrameWrap {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  position: relative !important;
+}
+
+.amWebPaneFrameWrap iframe {
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  display: block !important;
+}
+
+/* Subpane bar (Only shown in Split View) */
+.amWebPaneBar {
+  display: none !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 10px !important;
+  background: #141722 !important;
+  border-bottom: 1px solid #232838 !important;
+  font-size: 11px !important;
+}
+
+.amWebPaneLabel {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.amWebPaneBadge {
+  font-size: 8.5px !important;
+  font-weight: 800 !important;
+  padding: 1px 5px !important;
+  border-radius: 4px !important;
+  letter-spacing: 0.04em !important;
+}
+
+.amWebPaneBadge.amBadgeFinder {
+  background: rgba(0, 229, 255, 0.16) !important;
+  color: #00e5ff !important;
+}
+
+.amWebPaneBadge.amBadgeHub {
+  background: rgba(0, 230, 118, 0.16) !important;
+  color: #00e676 !important;
+}
+
+.amWebPaneLabel b {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+.amWebPaneUrl {
+  color: #6d788e !important;
+  font-size: 10px !important;
+}
+
+.amWebPaneReloadBtn {
+  width: 22px !important;
+  height: 22px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+  border: 0 !important;
+  color: #8c98ad !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.amWebPaneReloadBtn:hover {
+  color: #ffffff !important;
+  background: #222838 !important;
+}
+
+.amWebPaneReloadBtn svg {
+  width: 12px !important;
+  height: 12px !important;
+}
+
+/* Mode-dependent Pane Visibility */
+/* Mode: Finder Single */
+.amWebModalCard.mode-finder #amWebPaneFinder {
+  display: flex !important;
+  flex: 1 1 100% !important;
+  width: 100% !important;
+}
+.amWebModalCard.mode-finder #amWebPaneHub {
+  display: none !important;
+}
+.amWebModalCard.mode-finder #amWebSplitDivider {
+  display: none !important;
+}
+
+/* Mode: Hub Single */
+.amWebModalCard.mode-hub #amWebPaneHub {
+  display: flex !important;
+  flex: 1 1 100% !important;
+  width: 100% !important;
+}
+.amWebModalCard.mode-hub #amWebPaneFinder {
+  display: none !important;
+}
+.amWebModalCard.mode-hub #amWebSplitDivider {
+  display: none !important;
+}
+
+/* Mode: Split Screen */
+.amWebModalCard.mode-split #amWebPaneFinder {
+  display: flex !important;
+  flex: 1 1 50% !important;
+  min-width: 250px !important;
+}
+
+.amWebModalCard.mode-split #amWebPaneHub {
+  display: flex !important;
+  flex: 1 1 50% !important;
+  min-width: 250px !important;
+}
+
+.amWebModalCard.mode-split #amWebSplitDivider {
+  display: flex !important;
+}
+
+.amWebModalCard.mode-split .amWebPaneBar {
+  display: flex !important;
+}
+
+/* Draggable Split Divider */
+.amWebSplitDivider {
+  width: 8px !important;
+  flex: 0 0 8px !important;
+  background: #181c26 !important;
+  border-left: 1px solid #232838 !important;
+  border-right: 1px solid #232838 !important;
+  cursor: col-resize !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  z-index: 10 !important;
+  transition: background 0.15s ease !important;
+}
+
+.amWebSplitDivider:hover,
+.amWebSplitDivider.is-resizing {
+  background: #00e5ff !important;
+}
+
+.amWebDividerHandle {
+  width: 2px !important;
+  height: 28px !important;
+  background: #3e485e !important;
+  border-radius: 2px !important;
+  transition: background 0.15s ease !important;
+}
+
+.amWebSplitDivider:hover .amWebDividerHandle,
+.amWebSplitDivider.is-resizing .amWebDividerHandle {
+  background: #ffffff !important;
+}
+
+/* Dragging & Resizing Pointer Events Protection */
+body.am-modal-dragging iframe,
+body.am-split-resizing iframe {
+  pointer-events: none !important;
+}
+
+body.am-modal-dragging,
+body.am-split-resizing {
+  user-select: none !important;
+}
+
+/* ============================================================
+   Alight Motion PC — Real Project Thumbnails Auto-Sampled at 1s
+   ============================================================ */
+.simpleHome .projectThumb.has-thumb,
+.projectThumb.has-thumb {
+  background: #0e111a !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.5) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.simpleHome .projectThumb.has-thumb:before,
+.simpleHome .projectThumb.has-thumb:after,
+.projectThumb.has-thumb:before,
+.projectThumb.has-thumb:after,
+.projectThumb.has-thumb .projectThumbBadge {
+  display: none !important;
+}
+
+.projectThumbImg {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: inherit !important;
+  z-index: 2 !important;
+  display: block !important;
+  pointer-events: none !important;
+  transition: opacity 0.2s ease !important;
+}
+
+.projectCard:hover .projectThumb.has-thumb {
+  border-color: #00e676 !important;
+  box-shadow: 0 0 14px rgba(0, 230, 118, 0.35) !important;
+}
+
+/* ============================================================
+   Alight Motion PC — Android Touch Ripple & Micro-Press Engine
+   ============================================================ */
+button,
+.topIcon,
+.rightBtn,
+.projectCard,
+.homeTab,
+.assetTabs button,
+.shapeItem,
+.toolBtn,
+.transport button,
+.amWebHeadBtn,
+.amWebTabBtn,
+.projectSelectionAction,
+.fabHome,
+.createBtn,
+.experimentalNoticeAccept,
+[role="button"] {
+  position: relative !important;
+  overflow: hidden !important;
+  transition: transform 0.12s cubic-bezier(0.2, 0, 0, 1),
+              filter 0.12s ease,
+              box-shadow 0.15s ease !important;
+}
+
+button:hover,
+.topIcon:hover,
+.rightBtn:hover,
+.projectCard:hover,
+.fabHome:hover,
+.amWebHeadBtn:hover,
+.amWebTabBtn:hover {
+  filter: brightness(1.08) !important;
+}
+
+button:active,
+.topIcon:active,
+.rightBtn:active,
+.projectCard:active,
+.homeTab:active,
+.assetTabs button:active,
+.shapeItem:active,
+.toolBtn:active,
+.transport button:active,
+.amWebHeadBtn:active,
+.amWebTabBtn:active,
+.projectSelectionAction:active,
+.fabHome:active,
+.createBtn:active,
+.experimentalNoticeAccept:active,
+[role="button"]:active {
+  transform: scale(0.97) !important;
+  filter: brightness(0.94) !important;
+  transition: transform 0.05s ease, filter 0.05s ease !important;
+}
+
+/* Touch Ripple Wave */
+.am-ripple-wave {
+  position: absolute !important;
+  border-radius: 50% !important;
+  transform: scale(0) !important;
+  animation: amRippleWaveAnim 0.52s cubic-bezier(0.2, 0.8, 0.4, 1) forwards !important;
+  background: rgba(255, 255, 255, 0.28) !important;
+  pointer-events: none !important;
+  z-index: 99 !important;
+}
+
+.am-ripple-wave.am-ripple-dark {
+  background: rgba(0, 0, 0, 0.22) !important;
+}
+
+.am-ripple-wave.am-ripple-accent {
+  background: rgba(0, 230, 118, 0.35) !important;
+}
+
+@keyframes amRippleWaveAnim {
+  0% {
+    transform: scale(0);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+
+/* ============================================================
+   Alight Motion PC — Universal Container Transform Popup Morph Engine
+   Morphing Scale-Up from Trigger Coordinates & Reverse Shrink for All Popups
+   ============================================================ */
+
+/* 1. Modal Shades: when hidden, MUST be display: none (No block / freeze) */
+.modalShade.hidden,
+.languageModal.hidden,
+.layerActionsShade.hidden,
+.exportResultPreview.hidden,
+#experimentalNotice[aria-hidden="true"],
+.amWebModal.hidden,
+.amDialog:not([open]) {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* 2. Only when NOT hidden, show with grid / backdrop blur */
+.modalShade:not(.hidden),
+.languageModal:not(.hidden),
+.layerActionsShade:not(.hidden),
+#experimentalNotice:not([aria-hidden="true"]) {
+  display: grid !important;
+  place-items: center !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 100000 !important;
+  background: rgba(8, 10, 16, 0.68) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+
+/* 4. Desktop "PROYEK BARU" Button Visibility Guarantee */
+@media (min-width: 900px) {
+  .simpleHome .sectionRowActions #newProjectFab {
+    display: inline-flex !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+}
+
+/* 5. Modal dialog cards base styling polish */
+.modalShade .modal,
+.languageModal .languageSheet,
+.layerActionsShade #layerActionsPopup,
+.experimentalNoticeCard,
+.amWebModalCard {
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6),
+              0 2px 8px rgba(0, 0, 0, 0.25),
+              0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+  border-radius: 20px !important;
+  will-change: transform, opacity !important;
+}
+
+/* 6. Close Buttons ("×") Touch Polish */
+.modalHead #closeNew,
+.languageClose,
+#layerActionsClose,
+.cameraOrbitShortcutClose,
+.cameraLensShortcutClose {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease !important;
+}
+
+.modalHead #closeNew:hover,
+.languageClose:hover,
+#layerActionsClose:hover {
+  background: rgba(0, 0, 0, 0.08) !important;
+}
+
+.modalHead #closeNew:active,
+.languageClose:active,
+#layerActionsClose:active {
+  transform: scale(0.9) !important;
+}
+
+/* 7. Entrance State (am-morph-open) */
+.modalShade.am-morph-open,
+.languageModal.am-morph-open,
+.layerActionsShade.am-morph-open,
+.experimentalNotice.am-morph-open,
+.amWebModal.am-morph-open {
+  animation: amModalBackdropIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.modalShade.am-morph-open .modal,
+.languageModal.am-morph-open .languageSheet,
+.layerActionsShade.am-morph-open #layerActionsPopup,
+.experimentalNotice.am-morph-open .experimentalNoticeCard,
+.amWebModal.am-morph-open .amWebModalCard {
+  animation: amModalMorphIn 0.28s cubic-bezier(0.34, 1.35, 0.64, 1) forwards !important;
+  will-change: transform, opacity !important;
+}
+
+/* 8. Exit State (am-morph-close) */
+.modalShade.am-morph-close,
+.languageModal.am-morph-close,
+.layerActionsShade.am-morph-close,
+.experimentalNotice.am-morph-close,
+.amWebModal.am-morph-close {
+  animation: amModalBackdropOut 0.22s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  pointer-events: none !important;
+}
+
+.modalShade.am-morph-close .modal,
+.languageModal.am-morph-close .languageSheet,
+.layerActionsShade.am-morph-close #layerActionsPopup,
+.experimentalNotice.am-morph-close .experimentalNoticeCard,
+.amWebModal.am-morph-close .amWebModalCard {
+  animation: amModalMorphOut 0.22s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  pointer-events: none !important;
+  will-change: transform, opacity !important;
+}
+
+/* Keyframes */
+@keyframes amModalBackdropIn {
+  0% {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+}
+
+@keyframes amModalBackdropOut {
+  0% {
+    opacity: 1;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  100% {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
+}
+
+@keyframes amModalMorphIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.18);
+    filter: brightness(1.15);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes amModalMorphOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  30% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.18);
+    filter: brightness(0.95);
+  }
+}
+
+
+
+
+

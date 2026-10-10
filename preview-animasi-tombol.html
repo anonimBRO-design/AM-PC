@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preview Animasi Tombol — Alight Motion PC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0f16;
+      --card-bg: #141724;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --am-green: #00e676;
+      --am-cyan: #00e5ff;
+      --am-pink: #ff2d75;
+      --text-main: #f0f3fa;
+      --text-muted: #8c96ac;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: var(--font);
+      min-height: 100vh;
+      padding: 36px 20px 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      text-align: center;
+      max-width: 780px;
+      margin-bottom: 36px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: rgba(0, 230, 118, 0.12);
+      border: 1px solid rgba(0, 230, 118, 0.3);
+      border-radius: 999px;
+      color: var(--am-green);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #ffffff 40%, #8be8c4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 22px;
+      width: 100%;
+      max-width: 1120px;
+    }
+
+    .preview-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 24px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: relative;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3);
+      transition: border-color 0.2s ease;
+    }
+
+    .preview-card:hover {
+      border-color: rgba(255, 255, 255, 0.16);
+    }
+
+    .card-head {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 14px;
+    }
+
+    .card-tag {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--am-cyan);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 750;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    .card-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .interactive-zone {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 18px 14px;
+      background: rgba(0, 0, 0, 0.26);
+      border-radius: 14px;
+      border: 1px dashed rgba(255, 255, 255, 0.07);
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Common Button Base */
+    button {
+      outline: none;
+      border: none;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 700;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* UI Components */
+    .btn-primary {
+      height: 42px;
+      padding: 0 20px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, #00e676, #00c853);
+      color: #0b1e14;
+      font-size: 13px;
+      box-shadow: 0 4px 14px rgba(0, 230, 118, 0.25);
+    }
+
+    .btn-secondary {
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 10px;
+      background: #202534;
+      border: 1px solid #333a4f;
+      color: #cbd4e6;
+      font-size: 12.5px;
+    }
+
+    .btn-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 11px;
+      background: #202534;
+      border: 1px solid #333a4f;
+      color: #d8e0f0;
+    }
+
+    .btn-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .btn-fab {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00e5ff, #00b0ff);
+      color: #042233;
+      box-shadow: 0 6px 18px rgba(0, 229, 255, 0.3);
+    }
+
+    .btn-fab svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .btn-danger {
+      height: 38px;
+      padding: 0 14px;
+      border-radius: 9px;
+      background: rgba(255, 45, 117, 0.12);
+      border: 1px solid rgba(255, 45, 117, 0.3);
+      color: #ff5277;
+      font-size: 12px;
+    }
+
+    .mini-card {
+      width: 100%;
+      padding: 12px 14px;
+      background: #181c2b;
+      border: 1px solid #283046;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .mini-thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #1f433a, #0b1513);
+      border: 1px solid rgba(0, 230, 118, 0.3);
+      display: grid;
+      place-items: center;
+      color: var(--am-green);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .mini-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+    }
+
+    .mini-meta b {
+      font-size: 13px;
+      color: #ffffff;
+    }
+
+    .mini-meta span {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ============================================================
+       STYLE 1: TACTILE MICRO-BOUNCE (ALIGHT MOTION SIGNATURE)
+       ============================================================ */
+    .style-bounce button,
+    .style-bounce .mini-card {
+      transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  filter 0.15s ease,
+                  box-shadow 0.2s ease;
+    }
+
+    .style-bounce button:hover,
+    .style-bounce .mini-card:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1.5px);
+    }
+
+    .style-bounce button:active,
+    .style-bounce .mini-card:active {
+      transform: scale(0.92) translateY(0);
+      filter: brightness(0.94);
+      transition: transform 0.08s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ============================================================
+       STYLE 2: SMOOTH PRESS & AM NEON GLOW
+       ============================================================ */
+    .style-glow button,
+    .style-glow .mini-card {
+      transition: transform 0.16s ease,
+                  box-shadow 0.2s ease,
+                  border-color 0.2s ease,
+                  filter 0.15s ease;
+    }
+
+    .style-glow button:hover,
+    .style-glow .mini-card:hover {
+      box-shadow: 0 0 16px rgba(0, 230, 118, 0.35);
+      border-color: rgba(0, 230, 118, 0.5);
+    }
+
+    .style-glow button:active,
+    .style-glow .mini-card:active {
+      transform: scale(0.95);
+      box-shadow: 0 0 24px rgba(0, 229, 255, 0.6), inset 0 0 10px rgba(0, 229, 255, 0.2);
+      border-color: #00e5ff;
+      filter: brightness(1.15);
+    }
+
+    /* ============================================================
+       STYLE 3: TOUCH / RIPPLE WAVE (MOBILE MATERIAL INK)
+       ============================================================ */
+    .style-ripple button,
+    .style-ripple .mini-card {
+      position: relative;
+      overflow: hidden;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    .style-ripple button:active,
+    .style-ripple .mini-card:active {
+      transform: scale(0.97);
+    }
+
+    .ripple-wave {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      animation: rippleAnim 0.55s cubic-bezier(0.2, 0.8, 0.4, 1);
+      background: rgba(255, 255, 255, 0.35);
+      pointer-events: none;
+    }
+
+    @keyframes rippleAnim {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    /* ============================================================
+       STYLE 4: SNAPPY MINIMALIST DESKTOP CLICK
+       ============================================================ */
+    .style-snappy button,
+    .style-snappy .mini-card {
+      transition: transform 0.08s ease, filter 0.08s ease, background 0.1s ease;
+    }
+
+    .style-snappy button:hover,
+    .style-snappy .mini-card:hover {
+      filter: brightness(1.1);
+    }
+
+    .style-snappy button:active,
+    .style-snappy .mini-card:active {
+      transform: scale(0.97) translateY(1px);
+      filter: brightness(0.9);
+    }
+
+    /* Status Bar */
+    .footer-feedback {
+      margin-top: 36px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 16px 24px;
+      max-width: 680px;
+      width: 100%;
+    }
+
+    .footer-feedback b {
+      color: #ffffff;
+      font-size: 14px;
+    }
+
+    .footer-feedback p {
+      color: var(--text-muted);
+      font-size: 12.5px;
+      margin-top: 4px;
+    }
+
+    .tag-picked {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 6px 14px;
+      background: #00e676;
+      color: #0a1f14;
+      font-weight: 800;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="badge">Alight Motion PC — Design Lab</div>
+    <h1>Uji Coba 4 Gaya Animasi Tombol</h1>
+    <p class="subtitle">Klik dan tahan setiap tombol di bawah untuk merasakan respon tekanan (press/click feedback) dan pantulan saat dilepas.</p>
+  </header>
+
+  <main class="grid">
+
+    <!-- Card 1: Tactile Micro-Bounce -->
+    <section class="preview-card style-bounce">
+      <div class="card-head">
+        <span class="card-tag">Gaya 1 (Khas Mobile AM)</span>
+        <h2 class="card-title">Tactile Micro-Bounce</h2>
+        <p class="card-desc">Saat ditekan mengecil ke <code>scale(0.92)</code>, saat dilepas membal lembut dengan transisi spring <em>cubic-bezier</em> khas aplikasi Alight Motion.</p>
+      </div>
+
+      <div class="interactive-zone">
+        <div class="row">
+          <button class="btn-primary" type="button">Simpan Proyek</button>
+          <button class="btn-fab" type="button" title="Buat Baru">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <button class="btn-icon" type="button" title="Play">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>
+          <button class="btn-danger" type="button">Hapus</button>
+        </div>
+        <div class="row">
+          <button class="btn-secondary" type="button">AMFINDER</button>
+          <button class="btn-secondary" type="button">AMHUB</button>
+          <button class="btn-secondary" type="button">INFO</button>
+        </div>
+        <div class="mini-card" tabindex="0">
+          <div class="mini-thumb">1.0s</div>
+          <div class="mini-meta">
+            <b>Preset Jedag Jedug AM</b>
+            <span>1080 × 1920 · 60 FPS</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Card 2: Smooth Press & Glow -->
+    <section class="preview-card style-glow">
+      <div class="card-head">
+        <span class="card-tag">Gaya 2 (Modern Cyberpunk)</span>
+        <h2 class="card-title">Smooth Press & Neon Glow</h2>
+        <p class="card-desc">Sedikit menekan <code>scale(0.95)</code> disertai efek pendaran cahaya neon cyan & hijau Alight Motion saat tombol ditekan.</p>
+      </div>
+
+      <div class="interactive-zone">
+        <div class="row">
+          <button class="btn-primary" type="button">Simpan Proyek</button>
+          <button class="btn-fab" type="button" title="Buat Baru">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <button class="btn-icon" type="button" title="Play">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>
+          <button class="btn-danger" type="button">Hapus</button>
+        </div>
+        <div class="row">
+          <button class="btn-secondary" type="button">AMFINDER</button>
+          <button class="btn-secondary" type="button">AMHUB</button>
+          <button class="btn-secondary" type="button">INFO</button>
+        </div>
+        <div class="mini-card" tabindex="0">
+          <div class="mini-thumb">1.0s</div>
+          <div class="mini-meta">
+            <b>Preset Jedag Jedug AM</b>
+            <span>1080 × 1920 · 60 FPS</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Card 3: Touch / Ripple Wave -->
+    <section class="preview-card style-ripple">
+      <div class="card-head">
+        <span class="card-tag">Gaya 3 (Touch / Material Ink)</span>
+        <h2 class="card-title">Android Touch Ripple</h2>
+        <p class="card-desc">Gelombang lingkaran memancar meluas dari titik koordinat kursor mouse yang diklik (efek khas Android touch ink).</p>
+      </div>
+
+      <div class="interactive-zone">
+        <div class="row">
+          <button class="btn-primary ripple-target" type="button">Simpan Proyek</button>
+          <button class="btn-fab ripple-target" type="button" title="Buat Baru">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <button class="btn-icon ripple-target" type="button" title="Play">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>
+          <button class="btn-danger ripple-target" type="button">Hapus</button>
+        </div>
+        <div class="row">
+          <button class="btn-secondary ripple-target" type="button">AMFINDER</button>
+          <button class="btn-secondary ripple-target" type="button">AMHUB</button>
+          <button class="btn-secondary ripple-target" type="button">INFO</button>
+        </div>
+        <div class="mini-card ripple-target" tabindex="0">
+          <div class="mini-thumb">1.0s</div>
+          <div class="mini-meta">
+            <b>Preset Jedag Jedug AM</b>
+            <span>1080 × 1920 · 60 FPS</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Card 4: Snappy Minimalist Desktop Click -->
+    <section class="preview-card style-snappy">
+      <div class="card-head">
+        <span class="card-tag">Gaya 4 (Desktop Native)</span>
+        <h2 class="card-title">Snappy Desktop Click</h2>
+        <p class="card-desc">Animasi klik kilat <code>scale(0.97) translateY(1px)</code> tanpa pantulan, sangat responsif dan ringan untuk editing cepat di PC.</p>
+      </div>
+
+      <div class="interactive-zone">
+        <div class="row">
+          <button class="btn-primary" type="button">Simpan Proyek</button>
+          <button class="btn-fab" type="button" title="Buat Baru">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <button class="btn-icon" type="button" title="Play">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>
+          <button class="btn-danger" type="button">Hapus</button>
+        </div>
+        <div class="row">
+          <button class="btn-secondary" type="button">AMFINDER</button>
+          <button class="btn-secondary" type="button">AMHUB</button>
+          <button class="btn-secondary" type="button">INFO</button>
+        </div>
+        <div class="mini-card" tabindex="0">
+          <div class="mini-thumb">1.0s</div>
+          <div class="mini-meta">
+            <b>Preset Jedag Jedug AM</b>
+            <span>1080 × 1920 · 60 FPS</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer-feedback">
+    <b>Sudah mencoba semuanya?</b>
+    <p>Beri tahu di chat gaya mana yang paling kamu sukai (Gaya 1, 2, 3, atau 4), atau kombinasi (misal Gaya 1 Micro-Bounce + sedikit Neon Glow).</p>
+  </footer>
+
+  <script>
+    // Ripple effect implementation for Style 3
+    document.querySelectorAll('.style-ripple .ripple-target').forEach(el => {
+      el.addEventListener('mousedown', function(e) {
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple-wave';
+        ripple.style.width = ripple.style.height = `${size}px`;
+        ripple.style.left = `${x}px`;
+        ripple.style.top = `${y}px`;
+
+        this.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 600);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -23,7 +23,7 @@ function createWindow() {
     frame: true,
     autoHideMenuBar: true,
     backgroundColor: '#121316',
-    title: 'Open Motion Studio',
+    title: 'Alight Motion PC',
     icon: iconPath,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -34,9 +34,34 @@ function createWindow() {
     }
   });
 
+  // Keep window title strictly as 'Alight Motion PC' (remove 'Single HTML' from index.html title)
+  mainWindow.on('page-title-updated', (event) => {
+    event.preventDefault();
+  });
+
   mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
     console.log(`[Renderer ${level}] ${message} (${sourceId}:${line})`);
   });
+
+  // Inject Alight Motion PC Custom CSS Theme & Desktop Widescreen Layout
+  mainWindow.webContents.on('dom-ready', async () => {
+    try {
+      const themeCssPath = path.join(__dirname, '../css/theme.css');
+      const desktopCssPath = path.join(__dirname, '../css/desktop.css');
+
+      if (fs.existsSync(themeCssPath)) {
+        const themeCss = fs.readFileSync(themeCssPath, 'utf8');
+        await mainWindow.webContents.insertCSS(themeCss);
+      }
+      if (fs.existsSync(desktopCssPath)) {
+        const desktopCss = fs.readFileSync(desktopCssPath, 'utf8');
+        await mainWindow.webContents.insertCSS(desktopCss);
+      }
+    } catch (err) {
+      console.error('[Electron] Gagal menyuntikkan CSS kustom:', err);
+    }
+  });
+
 
   mainWindow.loadFile(path.join(__dirname, '../index.html'));
 
@@ -63,6 +88,19 @@ app.whenReady().then(() => {
       details.requestHeaders['Origin'] = 'https://hada45.github.io';
       details.requestHeaders['Referer'] = 'https://hada45.github.io/Open-Motion/';
       callback({ requestHeaders: details.requestHeaders });
+    }
+  );
+
+  // Allow in-app embedding of AM Finder and AM Hub by stripping restrictive iframe headers
+  session.defaultSession.webRequest.onHeadersReceived(
+    { urls: ['*://*.amfinder.web.id/*', '*://amfinder.web.id/*', '*://*.anonimbro.my.id/*', '*://amhub.anonimbro.my.id/*'] },
+    (details, callback) => {
+      const responseHeaders = { ...details.responseHeaders };
+      delete responseHeaders['x-frame-options'];
+      delete responseHeaders['X-Frame-Options'];
+      delete responseHeaders['content-security-policy'];
+      delete responseHeaders['Content-Security-Policy'];
+      callback({ responseHeaders });
     }
   );
 

@@ -13,7 +13,16 @@ console.log('====================================================\n');
 // 1. Ensure clean target directory
 if (fs.existsSync(targetDir)) {
   console.log('Removing old build...');
-  fs.rmSync(targetDir, { recursive: true, force: true });
+  try {
+    fs.rmSync(targetDir, { recursive: true, force: true });
+  } catch (err) {
+    if (err.code === 'EPERM' || err.code === 'EBUSY') {
+      console.error('\n⚠️ Gagal menghapus folder build lama karena aplikasi sedang berjalan!');
+      console.error('Silakan tutup aplikasi "Alight Motion PC" terlebih dahulu lalu jalankan skrip build kembali.\n');
+      process.exit(1);
+    }
+    throw err;
+  }
 }
 fs.mkdirSync(targetDir, { recursive: true });
 

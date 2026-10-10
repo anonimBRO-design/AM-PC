@@ -4,3 +4,4 @@ dist/
 scratch/
 .system_generated/
 *.log
+.rig/
