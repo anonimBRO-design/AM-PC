@@ -52,22 +52,22 @@ dibungkus jadi aplikasi desktop Windows.
 
 ## Yang sudah dikerjakan
 
-### Antigravity (10 Okt 2026 - Bagian 9: Pemulihan Dialog Info & Tombol INFO Top Bar)
+### Antigravity (10 Okt 2026 - Bagian 10: Multi-Select Media Relinker, Anti-Jump Timeline & Mouse Protection)
+- **Multi-Select Media Relinker**: Menambahkan kartu "Tautkan Ulang Media" di drawer kanan saat multi-selection mencakup layer media hilang. Menyediakan link file picker per layer, batch relink (menemukan file berdasar nama di folder yang sama), dan tombol "Batalkan Pilihan".
+- **Anti-Jump & Anti-Focus Collapse**: Menetralkan `omsFocusTrackActive` dan scroll focus jump saat layer diklik, sehingga track timeline tidak mengkolaps ke 29px atau melompat ke atas.
+- **Mouse Anti-LongPress**: Membedakan klik mouse biasa dengan touch long-press agar tidak memicu selection mode secara tidak sengaja.
+- **Commit & Sync**: Tersimpan di branch `main` (`baed0db`), siap pakai di AM-PC desktop.
 
-- **Akar Masalah Hilangnya Info**:
-  - Ditemukan aturan deadlock di `css/desktop.css` yang memaksa `#experimentalNotice` menjadi `opacity: 0 !important; pointer-events: none !important;` jika kelas `.am-morph-open` belum terpasang. Karena pada pemuatan awal elemen notice belum diberi kelas tersebut oleh MutationObserver, dialog secara fisik ada di DOM tetapi 100% kasat mata (transparan).
-  - Tombol `#homeAMNoticeBtn` pada top bar hanya menghapus `aria-hidden` tanpa memanggil `openNoticeModal`, sehingga tidak memicu animasi mekar maupun penentuan titik koordinat asal.
-  - Nilai `z-index` modal shades di `desktop.css` sempat hanya bernilai 100, berisiko tertutup komponen editor seperti `#drawer` (`z-index: 9999`).
-- **Perbaikan yang Dilakukan**:
-  1. Menghapus aturan `opacity: 0 !important` pemblokir pada `#experimentalNotice`.
-  2. Menaikkan `z-index` seluruh modal shades dan `#experimentalNotice` menjadi `100000 !important`.
-  3. Memperbaiki fungsi `openNoticeModal(triggerEl)` di `electron/preload.js` untuk secara dinamis mengambil titik tengah trigger (baik dari tombol `INFO` maupun tengah viewport), menyetel `transformOrigin` kartu notifikasi, membersihkan inline style `display`, dan memicu kelas `.am-morph-open`.
-  4. Menghubungkan tombol `INFO` pada top bar beranda (`#homeAMNoticeBtn.onclick = () => openNoticeModal(noticeBtn)`).
-  5. Memastikan siklus penutupan notice di `setupPopup` mencatat `am_notice_dismissed_session` di `sessionStorage` dan mendispatch event `oms:experimental-notice-accepted`.
-- **Verifikasi Komprehensif**:
-  - Berhasil diuji melalui 6 tahap otomatis: startup muncul mulus (`opacity: 1`, `display: grid`), dismiss menyusut dan tersembunyi (`display: none`, `aria-hidden: true`), klik tombol `INFO` mekar kembali dari koordinat tombol `INFO`, dismiss ulang aman, dan modal "Proyek Baru" tetap terbuka/tutup tanpa freeze.
-- **Sinkronisasi & Rebuild**:
-  - `node scripts/build-portable.js` dijalankan: portable executable di `release/Alight-Motion-PC-win-x64/Alight Motion PC.exe` berhasil diperbarui.
+### Antigravity (10 Okt 2026 - Bagian 11: Kontribusi Upstream PR — Project Thumbnails)
+- **Branch Khusus PR**: Dibuat branch `feat/project-thumbnails` langsung dari `upstream/main` tanpa file desktop apa pun.
+- **Fitur Thumbnail Otomatis**:
+  - `OMSPersistentStore.captureProjectThumbnail()`: Mengambil snapshot WebP ringan (160px width, kualitas 0.82) dari canvas render saat autosave / save project.
+  - Tersimpan di `project.thumb` dan `meta.thumb` (IndexedDB + localStorage index).
+  - Tampil di beranda pada kartu proyek (`<img class="projectThumbImg">`) dengan styling responsive cover.
+  - Kompatibel penuh dan fallback rapi jika thumbnail belum ada.
+  - Menghindari race condition dengan `await this.writeQueue` pada `listProjects()`.
+- **Status PR Branch**: Berhasil diuji via Electron test runner dan sudah di-push ke remote `origin feat/project-thumbnails`. Ready to PR to `Hada45/Open-Motion`.
+- **Posisi Workspace**: Workspace saat ini telah dikembalikan ke branch `main`.
 
 ---
 
