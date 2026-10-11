@@ -362,6 +362,34 @@ Suntikkan script dan periksa apakah `window.__amDesktopEngineInitialized` bernil
 
 ---
 
+## 17. `inputImg` di-chain per pass — efek multi-pass membunuh konten jadi hitam (AM-Native-Desktop)
+
+**Gejala:** semua layer yang punya efek tampil HITAM OPAK (0,0,0,255); layer tanpa efek normal.
+**Kejadian:** proyek "Negoro angin" hasil impor ulang — kanvas hitam total.
+**Sebab:** `applyEffectPasses` meng-update `curIn` ke output pass sebelumnya. Model AM: `inputImg`/`content` = input **asli** efek di **semua** pass; buffer antar-pass dibaca eksplisit via param (`downImg`/`hblur`/`vblur`). Fallback `gaussianblur` saat `strength<=0` (`texture2DCv(inputImg.texture, ...)`) jadi membaca buffer kosong → (0,0,0,0).
+**Perbaikan:** jangan chain `curIn` per pass (selalu = input asli efek).
+**Cara memverifikasi:** probe `readPixels` per-pass — pass0 copy ✓ (55,49,49); pass1 hblur dulu (0,0,0,0) → sesudah fix semua pass lolos konten.
+
+---
+
+## 18. Param `srcType:"comp"` (lift/copybg) diikat buffer kosong (AM-Native-Desktop)
+
+**Gejala:** efek `lift` (copybg) menghasilkan hitam di layer transisi full-frame (shape 541×1.99=1080 / 200×9.6=1920).
+**Sebab:** `lift` = Copy Background — shader `mix(texture2DCv(comp.texture,...) * texColor.a, texColor, fill)` butuh `comp` = komposit kanvas **di bawah** layer; kode mengikat buffer kosong.
+**Perbaikan:** salin komposit kanvas ke `_compScene` (`copyTexImage2D` dari FBO null) sebelum loop efek; binding tekstur mengikuti `srcType` (content→input asli, comp→compScene, buffer→buf_<id>).
+**Cara memverifikasi:** `[dbg-chain]` Layer 23 #lift px=55,49,49 (foto) — bukan hitam.
+
+---
+
+## 19. Spam tombol panah (seek) → GPU process crash `exit_code=34` (AM-Native-Desktop)
+
+**Gejala:** setelah ~420 dispatch ArrowLeft/ArrowRight berturut-turut di skrip headless: `GPU process exited unexpectedly: exit_code=34` → context lost → semua piksel nol (seolah bug render).
+**Sebab:** seek bertubi-tubi membanjiri GPU process; context WebGL hilang.
+**Perbaikan:** hook `__amDebugSeek(t)` di `studio-ui.ts` (seek langsung via renderer) + `scratch/preview-negoro10.js`. Hindari spam event keyboard.
+**Cara memverifikasi:** `CTX-LOST: 0` di log run; nilai balik seek = nilai yang diminta.
+
+---
+
 ## Cara menambah jebakan baru
 
 Kalau kamu menemukan hal yang bikin rugi, tambahkan di sini dengan format:
