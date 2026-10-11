@@ -280,6 +280,71 @@ window.addEventListener('DOMContentLoaded', () => {
   };
   updateNotice();
 
+  // 1c. Penyelarasan Branding & Nama Diagnostik Alight Motion PC
+  const polishDiagnosticsAndTexts = () => {
+    // 1. Modal Diagnostik
+    const modal = document.getElementById('omsDiagnosticsHubModal');
+    if (modal) {
+      const titleEl = modal.querySelector('b');
+      if (titleEl && titleEl.textContent.includes('Open Motion')) {
+        titleEl.textContent = titleEl.textContent.replace(/Open Motion/gi, 'Alight Motion PC');
+      }
+
+      const walker = document.createTreeWalker(modal, NodeFilter.SHOW_TEXT, null);
+      let textNode;
+      while ((textNode = walker.nextNode())) {
+        if (textNode.nodeValue && /Open Motion/i.test(textNode.nodeValue)) {
+          textNode.nodeValue = textNode.nodeValue.replace(/Open Motion/gi, 'Alight Motion');
+        }
+      }
+    }
+
+    // 2. Teks di Drawer / Project & Environment
+    const drawer = document.getElementById('drawer');
+    if (drawer) {
+      const walker = document.createTreeWalker(drawer, NodeFilter.SHOW_TEXT, null);
+      let textNode;
+      while ((textNode = walker.nextNode())) {
+        if (textNode.nodeValue && /Open Motion/i.test(textNode.nodeValue)) {
+          textNode.nodeValue = textNode.nodeValue.replace(/Open Motion/gi, 'Alight Motion');
+        }
+      }
+    }
+  };
+  polishDiagnosticsAndTexts();
+
+  // Hook omsDiagnostics.openPanel agar modal langsung di-rebrand seketika saat dibuka
+  const hookDiagnosticsOpen = () => {
+    try {
+      if (window.omsDiagnostics && !window.omsDiagnostics.__amHooked) {
+        window.omsDiagnostics.__amHooked = true;
+        const originalOpen = window.omsDiagnostics.openPanel;
+        window.omsDiagnostics.openPanel = function(...args) {
+          const res = originalOpen.apply(this, args);
+          try { polishDiagnosticsAndTexts(); } catch (e) {}
+          return res;
+        };
+      }
+    } catch (e) {}
+  };
+  hookDiagnosticsOpen();
+  setTimeout(hookDiagnosticsOpen, 500);
+  setTimeout(hookDiagnosticsOpen, 1500);
+
+  // Monitor penambahan modal ke document.body
+  try {
+    const bodyModalObserver = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        for (const node of m.addedNodes) {
+          if (node.id === 'omsDiagnosticsHubModal' || (node.querySelector && node.querySelector('#omsDiagnosticsHubModal'))) {
+            polishDiagnosticsAndTexts();
+          }
+        }
+      }
+    });
+    bodyModalObserver.observe(document.body, { childList: true });
+  } catch (e) {}
+
   // 2. Dock Inspector (#drawer) into .editorMain for widescreen layout
   const dockDrawer = () => {
     const drawer = document.getElementById('drawer');
@@ -1350,6 +1415,8 @@ window.addEventListener('DOMContentLoaded', () => {
       injectThumbnailEngine();
       injectDesktopEngine();
       initUniversalPopupEngine();
+      polishDiagnosticsAndTexts();
+      hookDiagnosticsOpen();
     };
 
     const observer = new MutationObserver(() => {

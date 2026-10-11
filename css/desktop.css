@@ -2364,7 +2364,332 @@ button:active,
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25) !important;
 }
 
+/* ============================================================
+   Alight Motion PC — Modal Diagnostik Dark Theme & Polish
+   ============================================================ */
+#omsDiagnosticsHubModal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 100001 !important;
+  background: rgba(8, 12, 18, 0.85) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 24px 16px !important;
+}
 
+#omsDiagnosticsHubModal > div {
+  width: min(760px, 100%) !important;
+  max-height: 88vh !important;
+  max-height: 88dvh !important;
+  overflow-y: auto !important;
+  background: #121820 !important;
+  color: #e2e8f0 !important;
+  border: 1px solid #233042 !important;
+  border-radius: 16px !important;
+  padding: 20px 22px !important;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.06) !important;
+}
 
+#omsDiagnosticsHubModal > div::-webkit-scrollbar {
+  width: 7px;
+}
+#omsDiagnosticsHubModal > div::-webkit-scrollbar-track {
+  background: transparent;
+}
+#omsDiagnosticsHubModal > div::-webkit-scrollbar-thumb {
+  background: #2a374a;
+  border-radius: 4px;
+}
+#omsDiagnosticsHubModal > div::-webkit-scrollbar-thumb:hover {
+  background: #394b65;
+}
 
+/* Modal Header Bar */
+#omsDiagnosticsHubModal > div > div:first-child {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin-bottom: 14px !important;
+  padding-bottom: 12px !important;
+  border-bottom: 1px solid #1e2838 !important;
+}
+
+#omsDiagnosticsHubModal > div > div:first-child b {
+  font-size: 0 !important;
+  line-height: 0 !important;
+  visibility: hidden !important;
+  display: inline-block !important;
+}
+
+#omsDiagnosticsHubModal > div > div:first-child b::before {
+  content: 'Diagnostik Alight Motion PC' !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  letter-spacing: -0.2px !important;
+  visibility: visible !important;
+  line-height: 1.2 !important;
+  display: inline-block !important;
+}
+
+#omsDiagState {
+  font-size: 11px !important;
+  color: #8b9bb4 !important;
+  margin-top: 3px !important;
+}
+
+#omsDiagClose {
+  border: 0 !important;
+  background: transparent !important;
+  color: #8b9bb4 !important;
+  font-size: 24px !important;
+  line-height: 1 !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+  display: grid !important;
+  place-items: center !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+#omsDiagClose:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Diagnostic Sections Cards (Suara & Preview, Freeze Preview, Memori) */
+#omsDiagAudioV207,
+#omsDiagPreviewV205,
+#omsDiagMemoryV198 {
+  border: 1px solid #233042 !important;
+  border-radius: 12px !important;
+  padding: 14px !important;
+  margin: 12px 0 !important;
+  background: #161e28 !important;
+  color: #e2e8f0 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+#omsDiagAudioV207 h3,
+#omsDiagPreviewV205 h3,
+#omsDiagMemoryV198 h3 {
+  margin: 0 0 6px !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  color: var(--accent, #00e676) !important;
+  letter-spacing: -0.1px !important;
+}
+
+#omsDiagAudioV207 p,
+#omsDiagPreviewV205 p,
+#omsDiagMemoryV198 p,
+#omsDiagMemoryV198 details {
+  font-size: 12px !important;
+  line-height: 1.55 !important;
+  margin: 6px 0 !important;
+  color: #94a3b8 !important;
+}
+
+#omsDiagPreviewSyncPolicy {
+  color: #73e2bd !important;
+  font-weight: 500 !important;
+}
+
+#omsDiagAudioV207 small,
+#omsDiagPreviewV205 small,
+#omsDiagMemoryV198 small,
+#omsDiagMemoryV198 .omsDiagMemoryPrivacy {
+  display: block !important;
+  font-size: 11px !important;
+  line-height: 1.5 !important;
+  color: #64748b !important;
+  margin-top: 8px !important;
+}
+
+#omsDiagAudioSummary,
+#omsDiagPreviewSummary {
+  font-size: 11.5px !important;
+  color: #cbd5e1 !important;
+  margin: 8px 0 4px !important;
+  font-weight: 500 !important;
+}
+
+/* Cards with inline white background (Master Diagnostik, Kategori List, Auto Error) */
+#omsDiagnosticsHubModal div[style*="background:#fff"],
+#omsDiagnosticsHubModal label[style*="background:#fff"],
+#omsDiagnosticsHubModal div[style*="background: #fff"],
+#omsDiagnosticsHubModal label[style*="background: #fff"] {
+  background: #161e28 !important;
+  border: 1px solid #233042 !important;
+  border-radius: 12px !important;
+  color: #e2e8f0 !important;
+}
+
+#omsDiagnosticsHubModal label {
+  color: #e2e8f0 !important;
+}
+
+#omsDiagnosticsHubModal label span b {
+  color: #f1f5f9 !important;
+}
+
+#omsDiagnosticsHubModal label small,
+#omsDiagnosticsHubModal div[style*="color:#717685"] {
+  color: #8b9bb4 !important;
+}
+
+#omsDiagnosticsHubModal label[style*="border-bottom:1px solid #e2e4ea"],
+#omsDiagnosticsHubModal label[style*="border-bottom: 1px solid #e2e4ea"] {
+  border-bottom: 1px solid #1e2838 !important;
+}
+
+/* Buttons */
+.omsDiagMemoryActions {
+  display: flex !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  margin: 10px 0 !important;
+}
+
+#omsDiagAudioV207 button,
+#omsDiagPreviewV205 button,
+#omsDiagMemoryV198 button,
+#omsDiagCopy,
+#omsDiagSnapshot,
+#omsDiagClear {
+  padding: 9px 13px !important;
+  border-radius: 8px !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.2px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Primary Highlight Action Buttons (REKAM AUDIO + PREVIEW, UJI PREVIEW, UJI RAM, SALIN AKTIF) */
+#omsDiagAudioTest,
+#omsDiagPreviewTest,
+#omsDiagMemoryV198 #omsDiagRamTest,
+#omsDiagCopy {
+  background: #18221d !important;
+  border: 1.5px solid var(--accent, #00e676) !important;
+  color: var(--accent, #00e676) !important;
+  -webkit-text-fill-color: var(--accent, #00e676) !important;
+  box-shadow: 0 2px 10px rgba(0, 230, 118, 0.18) !important;
+}
+
+#omsDiagAudioTest:hover,
+#omsDiagPreviewTest:hover,
+#omsDiagMemoryV198 #omsDiagRamTest:hover,
+#omsDiagCopy:hover {
+  background: #1d2c25 !important;
+  box-shadow: 0 4px 16px rgba(0, 230, 118, 0.35) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Secondary Action Buttons (CATAT GANGGUAN AUDIO, UJI VIDEO, TANDAI AWAL, UNDUH LAPORAN, SNAPSHOT, BERSIHKAN) */
+#omsDiagAudioMark,
+#omsDiagMemoryV198 button:not(#omsDiagRamTest),
+#omsDiagSnapshot,
+#omsDiagClear {
+  background: #202b3a !important;
+  border: 1px solid #2f3e54 !important;
+  color: #e2e8f0 !important;
+  -webkit-text-fill-color: #e2e8f0 !important;
+}
+
+#omsDiagAudioMark:hover,
+#omsDiagMemoryV198 button:not(#omsDiagRamTest):hover,
+#omsDiagSnapshot:hover,
+#omsDiagClear:hover {
+  background: #29374a !important;
+  border-color: #3f526d !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  transform: translateY(-1px) !important;
+}
+
+#omsDiagAudioMark:disabled,
+#omsDiagnosticsHubModal button:disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Memory Summary Rows Table */
+#omsDiagMemorySummary {
+  margin: 10px 0 !important;
+  border: 1px solid #233042 !important;
+  border-radius: 9px !important;
+  overflow: hidden !important;
+  background: #121820 !important;
+}
+
+#omsDiagMemoryV198 .omsDiagMemoryRow {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 10px !important;
+  padding: 8px 12px !important;
+  border-bottom: 1px solid #1c2635 !important;
+  font-size: 11.5px !important;
+  line-height: 1.4 !important;
+  color: #cbd5e1 !important;
+}
+
+#omsDiagMemoryV198 .omsDiagMemoryRow:last-child {
+  border-bottom: none !important;
+}
+
+#omsDiagMemoryV198 .omsDiagMemoryRow span {
+  color: #8b9bb4 !important;
+  font-weight: 500 !important;
+}
+
+#omsDiagMemoryV198 .omsDiagMemoryRow strong {
+  text-align: right !important;
+  color: #f1f5f9 !important;
+  font-weight: 700 !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+}
+
+/* Details summary */
+#omsDiagMemoryV198 summary {
+  color: #8b9bb4 !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+  padding: 4px 0 !important;
+}
+#omsDiagMemoryV198 summary:hover {
+  color: #ffffff !important;
+}
+
+#omsDiagMemoryV198 ul {
+  color: #8b9bb4 !important;
+}
+
+/* Pre Log */
+#omsDiagLog {
+  background: #0b0e14 !important;
+  border: 1px solid #233042 !important;
+  color: #7ee787 !important;
+  border-radius: 9px !important;
+  padding: 12px !important;
+}
+
+/* Checkbox Inputs */
+#omsDiagnosticsHubModal input[type="checkbox"] {
+  accent-color: var(--accent, #00e676) !important;
+  width: 16px !important;
+  height: 16px !important;
+  cursor: pointer !important;
+}
 
