@@ -24,7 +24,7 @@ Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
   - ✅ Fix bug parser param `bundle-effects.js`: tag `choice`/`hue-disc`/`float` + dedupe id duplikat (18 efek) → shader pass-rate 148 → 162/269.
   - ✅ `src/engine/media-manager.ts` (467 baris, texImage2D loader; `webgl2-renderer.ts` tidak disentuh — **butuh wiring dari Antigravity**). Commit `7373cb1`.
   - ✅ Batch test shader: `npm run verify:shaders` → laporan `scratch/shader-batch-report.json`; sisa 107 gagal + resep fix ada di [[Log/2026-10-11 Hermes]].
-  - ⏳ Remote GitHub: usulan `anonimBRO-design/AM-Native-Desktop` — menunggu keputusan user.
+  - 🔶 Remote GitHub: `origin` **sudah di-set** ke `anonimBRO-design/AM-Native-Desktop`; push tertunda — repo belum dibuat di GitHub (tugas user) + kredensial tidak tersedia di sesi non-tty. Retry `git push -u origin main` setelah repo ada.
 
 | Agent | Status | Fokus Area |
 |---|---|---|
