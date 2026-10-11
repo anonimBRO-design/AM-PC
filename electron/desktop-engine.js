@@ -125,6 +125,52 @@
     }
   }
 
+  // 2b. Preserve Multi-Select Mode during Timeline Navigation & Pan
+  function preserveMultiSelectDuringTimelineNavigation() {
+    if (typeof TimelineController !== 'undefined' && TimelineController.prototype) {
+      if (!TimelineController.prototype._amPatchedMultiSelectNav) {
+        TimelineController.prototype._amPatchedMultiSelectNav = true;
+
+        // Cegah clearTimelineLayerSelection merusak mode multi-select saat mengklik atau menyeret timeline kosong
+        const origClearSelection = TimelineController.prototype.clearTimelineLayerSelection;
+        TimelineController.prototype.clearTimelineLayerSelection = function() {
+          const ui = getUI();
+          if (ui?.layerMultiSelectMode) {
+            // Mode multi-select aktif: jangan batalkan multi-selection atau menutup drawer
+            const model = getModel();
+            if (model?.selected) {
+              model.selected = null;
+              this.rebuild?.();
+              const renderer = window.renderer || window.omsRenderer;
+              renderer?.render?.();
+            }
+            return;
+          }
+          return origClearSelection.apply(this, arguments);
+        };
+
+        // Izinkan emptyPan berjalan pada area kosong trackLane saat mode multi-select aktif
+        // sehingga user bisa menggeser (pan) timeline kiri-kanan dengan klik kiri mouse tanpa keluar dari mode
+        const origIsEmptyTarget = TimelineController.prototype.isEmptyTimelineTarget;
+        TimelineController.prototype.isEmptyTimelineTarget = function(target) {
+          if (!target) return false;
+          if (origIsEmptyTarget.call(this, target)) return true;
+
+          const ui = getUI();
+          if (ui?.layerMultiSelectMode && target.classList?.contains('trackLane')) {
+            const row = target.closest?.('.track');
+            const layerId = row?.dataset?.layerId;
+            // Jika layer bukan bagian dari multi-reorder aktif, lane kosong aman dipakai untuk pan
+            if (!layerId || !ui.layerMultiSelectedIds?.has?.(layerId)) {
+              return true;
+            }
+          }
+          return false;
+        };
+      }
+    }
+  }
+
   // 3. Multi-Select Media Relinker UI & Controls
   function isMediaLayer(layer) {
     return layer && ['image', 'video', 'audio'].includes(layer.type);
@@ -800,6 +846,7 @@
   const runPatches = () => {
     disarmFocusSession();
     disarmMouseLongPress();
+    preserveMultiSelectDuringTimelineNavigation();
     hookDrawerAndMulti();
     patchAdjustmentLayers();
     setupTimelineWheelNavigation();

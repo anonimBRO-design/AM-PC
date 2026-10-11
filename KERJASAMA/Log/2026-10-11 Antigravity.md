@@ -66,3 +66,21 @@
    - **Langkah 3 & 4 (`desktop-engine.js` — Commit `88658c7`)**:
      - Menambahkan penanganan roda mouse (`wheel`) di `#timelineScroll`: scroll vertikal mouse otomatis menggeser timeline horizontal (`scrollLeft += deltaY`), dan `Ctrl + Wheel` meneruskan ke fungsi zoom bawaan `timeline.onZoomWheel(e)`. Gesture pan trackpad (`deltaX`) dan zoom ruler native tetap dijaga.
      - Membatasi *scope* pencarian kartu efek `.effectCard` agar hanya memeriksa di dalam `#drawer` saat terlihat, bukan memindai satu dokumen penuh.
+
+6. **Penyesuaian Navigasi Mouse Wheel Timeline (Sesi 5 — Commit `cc135f0`)**:
+   - Pengguna meminta agar scroll wheel biasa tetap menggulir daftar track vertikal (atas-bawah) untuk melihat layer T1..T30.
+   - Mengubah navigasi wheel di `desktop-engine.js`:
+     - Roda mouse biasa: native vertical scroll (atas-bawah) tanpa interupsi.
+     - `Shift + Wheel`: pan horizontal timeline (kiri-kanan waktu) dengan rasio mulus 1x.
+     - `Ctrl + Wheel`: zoom timeline (diteruskan ke `timeline.onZoomWheel(e)`).
+
+7. **Fix Pembatalan Mode Multi-Select saat Menggeser/Mengklik Timeline (Sesi 6)**:
+   - **Masalah**: Saat mode multi-select aktif, menggeser timeline kiri-kanan dengan klik kiri mouse menyebabkan aplikasi keluar dari mode multi-select dan drawer tertutup.
+   - **Root Cause**:
+     - `lane.onclick`, `sc.onclick`, dan `emptyPan` memanggil `TimelineController.prototype.clearTimelineLayerSelection()`.
+     - Fungsi tersebut secara tanpa syarat memanggil `ui?.clearLayerMultiSelection?.()` dan `ui?.closeDrawer?.()`, mereset `layerMultiSelectMode = false`.
+     - Selain itu, `isEmptyTimelineTarget` mengembalikan `false` untuk `.trackLane`, sehingga seret pan kiri-kanan pada lane yang belum terpilih tidak merespons, dan saat mouse dilepas, `lane.onclick` memicu pembatalan mode.
+   - **Solusi di `electron/desktop-engine.js`**:
+     - Mem-patch `TimelineController.prototype.clearTimelineLayerSelection`: jika `ui?.layerMultiSelectMode` aktif, operasi dibatalkan sehingga layer terpilih dan drawer tetap terjaga aman.
+     - Mem-patch `TimelineController.prototype.isEmptyTimelineTarget`: saat `ui?.layerMultiSelectMode` aktif, area kosong `.trackLane` diizinkan sebagai target pan sehingga seret kiri-kanan mouse dapat menggeser timeline secara mulus.
+   - **Sinkronisasi**: Berkas disinkronkan ke `release/alight-motion-pc-win-x64/resources/app/electron/desktop-engine.js`.

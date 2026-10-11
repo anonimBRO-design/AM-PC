@@ -32,12 +32,21 @@ Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
 
 ---
 
-### Update Terbaru (11 Okt 2026 17:30)
-- **Fix Re-seeding Proyek Kosong (Commit `8a2285a`)**:
-  - `ProjectStore.getAllProjects()` sebelumnya memaksa fallback ke `getDefaultInitialProjects()` bila `parsed.length === 0`.
-  - Sekarang ditambahkan flag `SEEDED_KEY` (`am_native_desktop_seed_initialized`), sehingga ketika pengguna menghapus semua proyek, array kosong `[]` dihormati dan layar menampilkan empty-state dengan benar tanpa me-reinkarnasi kartu proyek demo ("Preset Jedag Jedug" & "Smooth Motion").
-- **Cursor Uninstalled**:
-  - Uninstaller resmi Cursor (`unins000.exe`) telah dijalankan dan selesai. Direktori `D:\cursor` dan shortcut Start Menu bersih. Hermes tetap berjalan aktif.
+### Update Terbaru (11 Okt 2026 18:45) — AM-PC Editor
+- **Fix Pembatalan Mode Multi-Select saat Menggeser/Mengklik Timeline**:
+  - Mengatasi issue user keluar dari mode multi-select ketika menggeser timeline kiri-kanan dengan klik kiri mouse.
+  - Mem-patch `TimelineController.prototype.clearTimelineLayerSelection` agar membatalkan penghapusan multi-selection saat `ui.layerMultiSelectMode` aktif.
+  - Mem-patch `TimelineController.prototype.isEmptyTimelineTarget` agar area kosong `.trackLane` diizinkan untuk pan horizontal timeline saat mode multi-select aktif.
+- **Navigasi Roda Mouse Timeline (Commit `cc135f0`)**:
+  - Roda mouse biasa: scroll vertikal native (atas-bawah) untuk melihat daftar layer/track.
+  - `Shift + Wheel`: pan horizontal timeline (kiri-kanan waktu) dengan pergerakan 1x mulus.
+  - `Ctrl + Wheel`: zoom timeline (diteruskan ke engine zoom native `timeline.onZoomWheel`).
+- **Optimasi Playback & DOM AM-PC (Commit `f1c0a10`, `5010357`, `88658c7`)**:
+  - Throttled MutationObserver di `preload.js` (250ms) untuk menghentikan 7 pemanggilan DOM traversal per-frame saat playback.
+  - `backgroundThrottling: false` di `main.js`.
+  - Scoped query `.effectCard` di `desktop-engine.js`.
+- **Tipografi & Font UI Home (Commit `740220f`)**:
+  - Font Plus Jakarta Sans + perbesaran kicker (11px), judul (26px), FAB proyek baru (13px), dropdown urutkan (13px), dan tombol bahasa (12px).
 
 ## Kondisi proyek
 
