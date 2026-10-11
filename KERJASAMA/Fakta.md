@@ -1,4 +1,4 @@
-﻿# Fakta Terverifikasi
+# Fakta Terverifikasi
 
 > **File ini DITAMBAH, jangan dihapus.** Isinya fakta yang sudah dicek dengan
 > bukti, supaya agent berikutnya tidak perlu bongkar ulang — dan tidak salah
@@ -48,16 +48,16 @@ tulis di [[Handoff]] sebagai "belum pasti".
 
 ## AM-PC
 
-### F-01 · `index.html` sudah versi terbaru
+### F-01 · `index.html` sudah versi terbaru (V5.238)
 
-- **Fakta:** `index.html` di repo ini sama persis dengan upstream `Hada45/Open-Motion`
+- **Fakta:** `index.html` di repo ini sama persis dengan upstream `Hada45/Open-Motion` versi V5.238 (fitur Motion 2D/3D Tracking, Text Animator 130 presets, dan thumbnail proyek).
 - **Bukti:**
   ```
-  git rev-parse HEAD:index.html          → 8816e9f9b03ce058e1543f136e17fabff0a89093
-  git rev-parse upstream/main:index.html → 8816e9f9b03ce058e1543f136e17fabff0a89093
+  git rev-parse HEAD:index.html          → 5c602db41fe5cde3ba39d9363f1e3a1ece9a14e5
+  git rev-parse upstream/main:index.html → 5c602db41fe5cde3ba39d9363f1e3a1ece9a14e5
   ```
-- **Diperiksa:** 9 Okt 2026, Claude Code
-- **Akibat:** **JANGAN sync ulang.** Sudah terbaru. Kalau ada yang bilang
+- **Diperiksa:** 11 Okt 2026 23:20, Antigravity
+- **Akibat:** **JANGAN sync ulang.** Sudah versi rilis terbaru V5.238. Kalau ada yang bilang
   "ketinggalan", cek hash dulu.
 
 ### F-02 · Modif Antigravity sengaja dipisah dari `index.html`

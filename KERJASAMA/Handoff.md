@@ -32,7 +32,20 @@ Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
 
 ---
 
-### Update Terbaru (11 Okt 2026 22:10) — AM-PC Editor
+### Update Terbaru (11 Okt 2026 23:25) — Sinkronisasi Upstream Open-Motion V5.238
+- **Pembaruan Inti Upstream V5.238 (Hada45/Open-Motion)**:
+  - Fitur Motion Tracking 2D (Point, Two Points, Planar, Corner Pin, Stabilizer) dan Camera 3D Tracking dengan keyframe serta pembuatan Null layer.
+  - Fitur Text Animator: Targeting karakter/kata/baris/seluruh teks, selector range, kontrol 3D, dan 130 preset bawaan.
+  - Paket efek dan preset kustom yang dapat diimpor/diekspor format JSON.
+  - Sinkronisasi bersih selektif hanya untuk berkas upstream (index.html dan CHANGELOG.md). Hash blob index.html: 5c602db41fe5cde3ba39d9363f1e3a1ece9a14e5 (100% identik upstream).
+- **Pengujian Kompatibilitas Multi-Suite Lolos 100%**:
+  - Test 1: Tombol header editor, modal shortcut #amShortcutsModal dark theme #121820, 16 baris shortcut terpasang sempurna.
+  - Test 2: Ekspor native FFmpeg MP4 30 frame valid via ffprobe (51.391 bytes).
+  - Test 3: Pemuatan proyek riil Alight Motion CelzPredet (38 layer, 1077 keyframe), render panggung WebGL2 100% akurat, dan ekspor 15 frame ke MP4 native (466.450 bytes).
+- **Build Portable Sukses**:
+  - node scripts/build-portable.js mengompilasi release/Alight-Motion-PC-win-x64/Alight Motion PC.exe versi V5.238.
+
+### Update Sebelumnya (11 Okt 2026 22:10) — AM-PC Editor
 - **Perbaikan Lapisan Blur pada Modal Pintasan Keyboard (#amShortcutsModal)**:
   - Mengatasi masalah kartu modal dan teks buram/blur saat menekan tombol tanda tanya (`?`) atau `F1`.
   - Akar masalah: elemen `.amShortcutsBackdrop` (`position: absolute; inset: 0; backdrop-filter: blur(10px)`) terlukis di atas kartu `.amShortcutsCard` karena kartu sebelumnya tidak memiliki `position: relative` dan `z-index`. Serta kontainer sempat mewarisi kelas `.amWebModal` yang menjalankan animasi backdrop filter pada kontainer induk.
@@ -127,7 +140,7 @@ dibungkus jadi aplikasi desktop Windows.
 | Aspek | State |
 |---|---|
 | `index.html` | ✅ Sama persis dengan upstream (lihat [[Fakta]] F-01) |
-| Versi | Open Motion **V5.209** |
+| Versi | Open Motion **V5.238** |
 | Nama & Judul | ✅ **Alight Motion PC** (teks 'Single HTML' & 'Open Motion V5.209' dihapus dari title/brand) |
 | Brand Logo | ✅ Logo resmi Alight Motion (presisi pas squircle `test_prime_am.png`, tanpa offset border) |
 | Dialog Notice | ✅ Muncul pada startup, teks di-rebrand ke **Alight Motion PC**, tombol `INFO` di top bar permanen dan aktif dengan Container Transform Morphing |

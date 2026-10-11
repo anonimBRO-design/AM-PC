@@ -376,3 +376,31 @@
       - Berkas disinkronkan ke paket rilis portable `release/Alight-Motion-PC-win-x64/resources/app/`.
       - Commit `0b80cc4` di-push ke GitHub `origin/main`.
 
+20. **Sinkronisasi Upstream Open-Motion V5.238 (Tracking Motion 2D/3D & Text Animator) dan Verifikasi Kompatibilitas**:
+    - **Latar Belakang**:
+      - Pengguna melaporkan: "openmotion baru aja update".
+      - Dilakukan investigasi ke repositori upstream `Hada45/Open-Motion`: ditemukan commit terbaru `a66fb76`, `26a4484`, dan `9aa7f5e` yang merilis versi V5.238 (2026-10-11).
+      - Pembaruan upstream mencakup:
+        - Pelacakan Gerak Eksperimental (Tracking 2D: Point, Two Points, Planar, Corner Pin, Stabilizer; Tracking 3D Camera dengan keyframe dan pembuatan Null layer).
+        - Text Animator: Penargetan karakter, kata, baris, seluruh teks, range selectors, kontrol 3D, dan 130 preset bawaan.
+        - Paket efek & preset kustom yang dapat diekspor/diimpor lokal via JSON.
+        - Integrasi kartu thumbnail proyek beranda resmi hasil merge PR #32 anonimBRO-design.
+    - **Eksekusi Sinkronisasi Bersih Selektif**:
+      - Memeriksa perbedaan git (`git diff HEAD upstream/main --stat`).
+      - Menjalankan sinkronisasi aman hanya pada berkas milik upstream:
+        - `git checkout upstream/main -- index.html`
+        - `git checkout upstream/main -- CHANGELOG.md`
+      - Memverifikasi hash blob `index.html`: `5c602db41fe5cde3ba39d9363f1e3a1ece9a14e5` (100% identik dengan `upstream/main:index.html`).
+    - **Verifikasi Kompatibilitas Desktop Multi-Suite**:
+      - **Suite 1 (Header Buttons & Shortcuts Modal)**: Berhasil diverifikasi lewat Electron. Tombol switcher layout, tombol bantuan `?`, dan modal `#amShortcutsModal` terpasang rapi dengan kontras dark theme solid `#121820`.
+      - **Suite 2 (Native FFmpeg MP4 Export)**: Berhasil mengekspor 30 frame ke berkas MP4 native berukuran 51.391 bytes (tervalidasi via `ffprobe`).
+      - **Suite 3 (Proyek Riil & Render Stage WebGL2)**: Berhasil memuat proyek riil `CelzPredet` (38 layer, 1077 keyframe), merender kanvas WebGL2 panggung dengan fidelity 100%, dan mengekspor 15 frame ke MP4 native (466.450 bytes, tervalidasi via `ffprobe`).
+    - **Build & Distribusi Portable**:
+      - Menyalin berkas `index.html` V5.238 ke direktori aplikasi rilis `release/Alight-Motion-PC-win-x64/resources/app/index.html`.
+      - Menjalankan `node scripts/build-portable.js` untuk mengemas ulang executable tunggal `Alight Motion PC.exe` lengkap dengan metadata dan ikon resmi.
+    - **Dokumentasi & Memori Proyek**:
+      - Memperbarui `AGENTS.md` (aturan hash V5.238).
+      - Memperbarui `KERJASAMA/Fakta.md` (Fakta F-01 diperbarui ke V5.238).
+      - Memperbarui `KERJASAMA/Handoff.md`.
+
+
