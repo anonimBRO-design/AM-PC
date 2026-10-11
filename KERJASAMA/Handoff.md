@@ -32,7 +32,18 @@ Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
 
 ---
 
-### Update Terbaru (11 Okt 2026 21:10) — AM-PC Editor
+### Update Terbaru (11 Okt 2026 21:30) — AM-PC Editor
+- **Rebranding & Tema Gelap Modal Diagnostik Alight Motion PC (Commit 9065058)**:
+  - Judul diubah dari "Diagnostik Open Motion" menjadi "Diagnostik Alight Motion PC" melalui pseudo-element CSS ::before di frame-0 serta DOM text walker otomatis.
+  - Seluruh kemunculan teks "Open Motion" di dalam modal dan drawer Project & Environment diselaraskan menjadi "Alight Motion".
+  - Tema modal dirombak total dari putih terang menjadi tema gelap modern Alight Motion PC:
+    - Backdrop semi-transparan rgba(8, 12, 18, 0.85) dengan efek blur 10px.
+    - Kontainer modal dark surface #121820 dengan border slate halus #233042 dan sudut membulat 16px.
+    - Kartu diagnostik (#omsDiagAudioV207, #omsDiagPreviewV205, #omsDiagMemoryV198, Master, Kategori) berlatar gelap #161e28 dengan judul hijau neon var(--accent, #00e676).
+    - Tombol aksi primer (REKAM AUDIO + PREVIEW, UJI PREVIEW, UJI RAM, SALIN AKTIF) menggunakan latar #18221d dengan border neon hijau mint dan efek glow.
+    - Tombol aksi sekunder menggunakan tema dark slate #202b3a dengan teks #e2e8f0.
+    - Tabel ringkasan metrik memori diubah menjadi dark table #121820 dengan pembatas #1c2635.
+  - Berkas disinkronkan ke direktori rilis dan diverifikasi tanpa sisa kata Open Motion di modal.
 - **Penyelarasan Tampilan Tombol Plus Mode Studio dengan Mode Asli (Commit a5a9ecc)**:
   - Tombol tambah layer (+) pada Mode Studio disamakan 100% dengan Mode Asli:
     - Lingkaran background gelap charcoal (#18221d).

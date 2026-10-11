@@ -251,3 +251,41 @@
         - Mode Asli: `bg: rgb(24, 34, 29)`, `color: rgb(115, 226, 189)`, `border: 2px solid rgb(115, 226, 189)`, `boxShadow: rgba(0, 230, 118, 0.35) 0px 4px 18px 0px`.
         - Mode Studio: `bg: rgb(24, 34, 29)`, `color: rgb(115, 226, 189)`, `border: 2px solid rgb(115, 226, 189)`, `boxShadow: rgba(0, 230, 118, 0.35) 0px 4px 18px 0px`.
       - Screenshot bukti visual diambil: `test_plus_studio.png` dan `test_plus_original.png` membuktikan kedua mode identik 100%.
+
+16. **Rebranding & Tema Gelap Modal Diagnostik Alight Motion PC (Commit `9065058`)**:
+    - **Permintaan Pengguna**:
+      - Pengguna melampirkan screenshot modal "Diagnostik Open Motion" yang terbuka di editor dengan tampilan latar putih terang.
+      - Instruksi: "update dong nama dan warna nya".
+    - **Analisis**:
+      - Nama modal masih menggunakan branding lama upstream "Diagnostik Open Motion" dan di beberapa bagian teks deskripsi masih menyebut "Open Motion".
+      - Warna modal menggunakan hardcoded inline style putih (`#f7f7f9`, `#fff`, `#f8fafc`) dengan teks hitam `#171923` dan tombol abu-abu kaku. Di tengah aplikasi yang bertema gelap Alight Motion, modal ini menyilaukan dan tidak konsisten.
+    - **Tindakan**:
+      - Di `css/desktop.css`:
+        - Menerapkan penggantian judul frame-0 via pseudo-element:
+          - `#omsDiagnosticsHubModal > div > div:first-child b { font-size: 0 !important; visibility: hidden !important; }`
+          - `#omsDiagnosticsHubModal > div > div:first-child b::before { content: 'Diagnostik Alight Motion PC' !important; font-size: 16px !important; font-weight: 700 !important; color: #ffffff !important; visibility: visible !important; }`
+        - Merombak total tema modal menjadi Dark Theme Alight Motion PC:
+          - Backdrop `#omsDiagnosticsHubModal`: `rgba(8, 12, 18, 0.85)` dengan `backdrop-filter: blur(10px)`.
+          - Kontainer modal: `background: #121820 !important; border: 1px solid #233042 !important; border-radius: 16px !important; color: #e2e8f0 !important; box-shadow: 0 24px 80px rgba(0,0,0,0.75) !important;`.
+          - Kartu bagian diagnostik (`#omsDiagAudioV207`, `#omsDiagPreviewV205`, `#omsDiagMemoryV198`, Master Diagnostik, Kategori List, Auto Error): `background: #161e28 !important; border: 1px solid #233042 !important; border-radius: 12px !important; color: #e2e8f0 !important;`.
+          - Judul `h3`: warna aksen neon hijau mint `var(--accent, #00e676) !important; font-weight: 700 !important;`.
+          - Tombol aksi primer (`#omsDiagAudioTest`, `#omsDiagPreviewTest`, `#omsDiagRamTest`, `#omsDiagCopy`): `background: #18221d !important; border: 1.5px solid var(--accent, #00e676) !important; color: var(--accent, #00e676) !important; box-shadow: 0 2px 10px rgba(0,230,118,0.18) !important;`.
+          - Tombol aksi sekunder (`#omsDiagAudioMark`, `#omsDiagBaseline`, `#omsDiagDownload`, `#omsDiagSnapshot`, `#omsDiagClear`): `background: #202b3a !important; border: 1px solid #2f3e54 !important; color: #e2e8f0 !important;`.
+          - Tabel metrik memori (`#omsDiagMemorySummary` & `.omsDiagMemoryRow`): latar `#121820` dengan garis pembatas gelap `#1c2635`.
+          - Checkbox input: `accent-color: var(--accent, #00e676) !important;`.
+      - Di `electron/preload.js`:
+        - Menambahkan `polishDiagnosticsAndTexts()`: mengganti teks judul ke "Diagnostik Alight Motion PC" serta menjalankan tree-walker teks DOM untuk menyaring dan mengganti sisa teks "Open Motion" menjadi "Alight Motion".
+        - Menghubungkan fungsi tersebut ke `window.omsDiagnostics.openPanel` dan `MutationObserver` pada `document.body` serta observer periodik.
+      - Menyinkronkan seluruh berkas ke direktori rilis `release/Alight-Motion-PC-win-x64/resources/app/`.
+    - **Verifikasi**:
+      - Pengujian headless Electron mengonfirmasi:
+        - `titleText`: `"Diagnostik Alight Motion PC"`
+        - `titleBefore`: `"\"Diagnostik Alight Motion PC\""`
+        - `cardBg`: `rgb(18, 24, 32)` (`#121820`)
+        - `cardColor`: `rgb(226, 232, 240)` (`#e2e8f0`)
+        - `cardBorder`: `1px solid rgb(35, 48, 66)` (`#233042`)
+        - `audioBg`: `rgb(22, 30, 40)` (`#161e28`)
+        - `audioH3Color`: `rgb(115, 226, 189)` (`var(--accent)`)
+        - `ramBtnBg`: `rgb(24, 34, 29)` (`#18221d`)
+        - `ramBtnColor`: `rgb(115, 226, 189)` (`var(--accent)`)
+        - `remainingOpenMotion`: `[]` (0 sisa teks Open Motion).
