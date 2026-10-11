@@ -27,10 +27,17 @@ Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
 
 | Agent | Status | Fokus Area |
 |---|---|---|
-| **Antigravity** | ✅ Selesai Tahap 1 & 2 | WebGL2 Engine, Quad Transform, XML Parser Overhaul, 95.5% Shader Pass, Zero Emojis |
+| **Antigravity** | ✅ Selesai Tahap 1, 2 & Fix Storage | WebGL2 Engine, Quad Transform, XML Parser Overhaul, 95.5% Shader Pass, Zero Emojis, Fix Re-seeding Proyek Kosong (Jebakan #21), Uninstalasi Bersih Cursor |
 | **Hermes** | ✅ Poin 1–3 selesai · ⏳ Poin 4 (remote) | Ikon KnownMap, Media Loader, QA Suite, Git Remote |
 
 ---
+
+### Update Terbaru (11 Okt 2026 17:30)
+- **Fix Re-seeding Proyek Kosong (Commit `8a2285a`)**:
+  - `ProjectStore.getAllProjects()` sebelumnya memaksa fallback ke `getDefaultInitialProjects()` bila `parsed.length === 0`.
+  - Sekarang ditambahkan flag `SEEDED_KEY` (`am_native_desktop_seed_initialized`), sehingga ketika pengguna menghapus semua proyek, array kosong `[]` dihormati dan layar menampilkan empty-state dengan benar tanpa me-reinkarnasi kartu proyek demo ("Preset Jedag Jedug" & "Smooth Motion").
+- **Cursor Uninstalled**:
+  - Uninstaller resmi Cursor (`unins000.exe`) telah dijalankan dan selesai. Direktori `D:\cursor` dan shortcut Start Menu bersih. Hermes tetap berjalan aktif.
 
 ## Kondisi proyek
 

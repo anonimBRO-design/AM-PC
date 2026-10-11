@@ -398,6 +398,22 @@ Suntikkan script dan periksa apakah `window.__amDesktopEngineInitialized` bernil
 **Perbaikan:** `flex-shrink:0` + `overflow-y:auto` (scrollbar disembunyikan) di kolom label; `.tracks-canvas-area` `overflow-y:auto`; `#trackScroller` `min-height:100%` (playhead setinggi konten); sinkron scroll dua arah label ↔ klip di `bindEvents`.
 **Cara memverifikasi:** `scratch/measure-timeline.js` — pitch 38/38px, `misalign [0,0,0,0,0,0]`, scroll sinkron 120→120 & 40→40, `misalignAfter=0`. Commit `e5ed4ff`.
 
+## 21. Re-seed otomatis saat array proyek kosong (`parsed.length === 0`) (AM-Native-Desktop)
+
+**Gejala:** Saat pengguna menghapus semua proyek (mengklik ikon tempat sampah pada semua kartu proyek), proyek demo default ("Preset Jedag Jedug" & "Smooth Motion") langsung muncul kembali dan tidak bisa dihapus permanen.
+**Kejadian:** 11 Oktober 2026, Antigravity.
+**Sebab:** Di `src/storage/project-store.ts`, method `getAllProjects()` menggunakan evaluasi ternary:
+```typescript
+const parsed = JSON.parse(raw);
+return Array.isArray(parsed) && parsed.length > 0 ? parsed : this.getDefaultInitialProjects();
+```
+Ketika pengguna menghapus semua proyek, `parsed` bernilai `[]` (`length === 0`). Karena syarat `parsed.length > 0` bernilai `false`, fungsi fallback memanggil `this.getDefaultInitialProjects()`, sehingga proyek bawaan langsung muncul kembali seketika.
+**Perbaikan:** 
+1. Gunakan flag penanda seed pertama (`am_native_desktop_seed_initialized`).
+2. Jika `localStorage` berisi array (termasuk array kosong `[]`), kembalikan array tersebut apa adanya.
+3. Hanya generate demo projects jika flag inisialisasi belum pernah ada di storage (first launch).
+**Cara memverifikasi:** Hapus semua proyek via UI, pastikan list proyek kosong menampilkan pesan "Belum ada proyek tersimpan" dan tidak membangkitkan proyek demo lagi. Commit `8a2285a`.
+
 ---
 
 ## Cara menambah jebakan baru
