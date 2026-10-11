@@ -84,3 +84,15 @@
      - Mem-patch `TimelineController.prototype.clearTimelineLayerSelection`: jika `ui?.layerMultiSelectMode` aktif, operasi dibatalkan sehingga layer terpilih dan drawer tetap terjaga aman.
      - Mem-patch `TimelineController.prototype.isEmptyTimelineTarget`: saat `ui?.layerMultiSelectMode` aktif, area kosong `.trackLane` diizinkan sebagai target pan sehingga seret kiri-kanan mouse dapat menggeser timeline secara mulus.
    - **Sinkronisasi**: Berkas disinkronkan ke `release/alight-motion-pc-win-x64/resources/app/electron/desktop-engine.js`.
+
+8. **Dual Layout Engine: Mode Studio vs Mode Asli (Sesi 7)**:
+   - **Permintaan Pengguna**: Menyediakan 2 mode tata letak editor:
+     1. **Mode Studio AM-PC** (Mode Sekarang): Preview di atas, Timeline di bawah 280px, Inspector docked di kanan.
+     2. **Mode Asli Open-Motion** (Mode Asli): Preview di kiri, Timeline di kanan (berdampingan / side-by-side), persis seperti di web upstream https://hada45.github.io/Open-Motion/.
+   - **Solusi Arsitektur (Tanpa Sentuh `index.html`)**:
+     - Memisahkan aturan layout grid Studio ke file terpisah `css/desktop-studio.css` (898 baris), sementara `css/desktop.css` tetap memegang shell sistem (kontrol jendela, menu, modal, beat marker).
+     - Menginjeksi `desktop-studio.css` melalui elemen `<style id="amStudioLayoutCss">` yang dapat di-toggle aktif/nonaktif secara instan (`disabled = true/false`).
+     - Saat **Mode Asli** aktif: style Studio dinonaktifkan, sehingga layout fallback 100% ke CSS bawaan `index.html` (Preview kiri, Timeline kanan, divider drag `#editorSplitHandle`, timeline full height). `#drawer` dikembalikan ke `.timelineArea`.
+     - Saat **Mode Studio** aktif: style Studio diaktifkan, layout Preview atas & Timeline bawah 280px berjalan kembali.
+     - Menyediakan tombol switcher `#amLayoutSwitchBtn` di bilah atas `.editorTop` dengan ikon indikator dan shortcut keyboard **`F8`** untuk beralih secara langsung kapan saja.
+   - **Sinkronisasi**: Seluruh file diperbarui dan disalin ke `release/alight-motion-pc-win-x64/resources/app/`.

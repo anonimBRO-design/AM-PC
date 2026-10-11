@@ -61,6 +61,34 @@ function createWindow() {
         await mainWindow.webContents.insertCSS(desktopCss);
       }
 
+      const desktopStudioCssPath = path.join(__dirname, '../css/desktop-studio.css');
+      if (fs.existsSync(desktopStudioCssPath)) {
+        const studioCss = fs.readFileSync(desktopStudioCssPath, 'utf8');
+        await mainWindow.webContents.executeJavaScript(`
+          (function() {
+            let style = document.getElementById('amStudioLayoutCss');
+            if (!style) {
+              style = document.createElement('style');
+              style.id = 'amStudioLayoutCss';
+              document.head.appendChild(style);
+            }
+            style.textContent = ${JSON.stringify(studioCss)};
+            const savedLayout = localStorage.getItem('am_editor_layout_mode') || 'studio';
+            if (savedLayout === 'original') {
+              style.disabled = true;
+              document.documentElement.setAttribute('data-editor-layout', 'original');
+              document.body?.classList?.add('layout-original');
+              document.body?.classList?.remove('layout-studio');
+            } else {
+              style.disabled = false;
+              document.documentElement.setAttribute('data-editor-layout', 'studio');
+              document.body?.classList?.add('layout-studio');
+              document.body?.classList?.remove('layout-original');
+            }
+          })();
+        `);
+      }
+
       const desktopEnginePath = path.join(__dirname, 'desktop-engine.js');
       if (fs.existsSync(desktopEnginePath)) {
         const engineCode = fs.readFileSync(desktopEnginePath, 'utf8');

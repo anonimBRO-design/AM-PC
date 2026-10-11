@@ -37,6 +37,14 @@
         ui.finishLayerMultiSelection({ announce: true });
       }
     }
+
+    // Shortcut F8 untuk beralih antara Mode Studio dan Mode Asli
+    if (e.key === 'F8') {
+      e.preventDefault();
+      if (typeof window.toggleAmEditorLayout === 'function') {
+        window.toggleAmEditorLayout();
+      }
+    }
   }, true);
 
   window.addEventListener('keyup', (e) => {
@@ -842,11 +850,83 @@
     }, { passive: false });
   }
 
+  // 8. Dual Editor Layout Engine: Mode Studio (Atas-Bawah) vs Mode Asli (Berdampingan)
+  function setupLayoutSwitcher() {
+    window.toggleAmEditorLayout = function(targetMode) {
+      const current = localStorage.getItem('am_editor_layout_mode') || 'studio';
+      const newMode = targetMode || (current === 'studio' ? 'original' : 'studio');
+      localStorage.setItem('am_editor_layout_mode', newMode);
+
+      const style = document.getElementById('amStudioLayoutCss');
+      const drawer = document.getElementById('drawer');
+      const editorMain = document.querySelector('.editorMain');
+      const timelineArea = document.querySelector('.timelineArea');
+
+      if (newMode === 'original') {
+        if (style) style.disabled = true;
+        document.documentElement.setAttribute('data-editor-layout', 'original');
+        document.body?.classList?.add('layout-original');
+        document.body?.classList?.remove('layout-studio');
+        if (drawer && timelineArea && drawer.parentElement !== timelineArea) {
+          timelineArea.appendChild(drawer);
+        }
+        if (typeof toast === 'function') toast('Beralih ke Mode Asli (Berdampingan)');
+      } else {
+        if (style) style.disabled = false;
+        document.documentElement.setAttribute('data-editor-layout', 'studio');
+        document.body?.classList?.add('layout-studio');
+        document.body?.classList?.remove('layout-original');
+        if (drawer && editorMain && drawer.parentElement !== editorMain) {
+          editorMain.appendChild(drawer);
+        }
+        if (typeof toast === 'function') toast('Beralih ke Mode Studio (Atas-Bawah)');
+      }
+
+      updateLayoutSwitcherBtn();
+      window.dispatchEvent(new Event('resize'));
+      const timeline = getTimeline();
+      timeline?.rebuild?.();
+      const renderer = window.renderer || window.omsRenderer;
+      renderer?.render?.();
+    };
+
+    function updateLayoutSwitcherBtn() {
+      const btn = document.getElementById('amLayoutSwitchBtn');
+      if (!btn) return;
+      const current = localStorage.getItem('am_editor_layout_mode') || 'studio';
+      const isOriginal = current === 'original';
+
+      btn.classList.toggle('active', isOriginal);
+      btn.title = isOriginal
+        ? 'Tata Letak: Mode Asli (Berdampingan) [F8] • Klik untuk Mode Studio (Atas-Bawah)'
+        : 'Tata Letak: Mode Studio (Atas-Bawah) [F8] • Klik untuk Mode Asli (Berdampingan)';
+
+      btn.innerHTML = isOriginal
+        ? `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;display:block;"><rect x="3" y="3" width="7" height="18" rx="2" fill="rgba(0,230,118,0.2)" stroke="#00e676"/><rect x="14" y="3" width="7" height="18" rx="2"/></svg>`
+        : `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;display:block;"><rect x="3" y="3" width="18" height="7" rx="2" fill="rgba(0,230,118,0.2)" stroke="#00e676"/><rect x="3" y="14" width="18" height="7" rx="2"/></svg>`;
+    }
+
+    const topActions = document.querySelector('.editorTop .topActions');
+    if (topActions) {
+      let btn = document.getElementById('amLayoutSwitchBtn');
+      if (!btn) {
+        btn = document.createElement('button');
+        btn.id = 'amLayoutSwitchBtn';
+        btn.className = 'topIcon';
+        btn.type = 'button';
+        btn.onclick = () => window.toggleAmEditorLayout();
+        topActions.insertBefore(btn, topActions.firstChild);
+      }
+      updateLayoutSwitcherBtn();
+    }
+  }
+
   // Periodic heartbeat to keep patches active
   const runPatches = () => {
     disarmFocusSession();
     disarmMouseLongPress();
     preserveMultiSelectDuringTimelineNavigation();
+    setupLayoutSwitcher();
     hookDrawerAndMulti();
     patchAdjustmentLayers();
     setupTimelineWheelNavigation();

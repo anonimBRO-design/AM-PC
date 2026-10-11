@@ -41,6 +41,17 @@ window.addEventListener('DOMContentLoaded', () => {
     document.body.classList.add('is-electron');
   }
 
+  const savedLayout = localStorage.getItem('am_editor_layout_mode') || 'studio';
+  if (savedLayout === 'original') {
+    document.documentElement.setAttribute('data-editor-layout', 'original');
+    document.body?.classList?.add('layout-original');
+    document.body?.classList?.remove('layout-studio');
+  } else {
+    document.documentElement.setAttribute('data-editor-layout', 'studio');
+    document.body?.classList?.add('layout-studio');
+    document.body?.classList?.remove('layout-original');
+  }
+
   // 1. Update branding: Official Alight Motion logo & text
   const updateBrand = () => {
     const markImg = document.querySelector('.homeMark img');
@@ -152,8 +163,18 @@ window.addEventListener('DOMContentLoaded', () => {
   const dockDrawer = () => {
     const drawer = document.getElementById('drawer');
     const editorMain = document.querySelector('.editorMain');
-    if (drawer && editorMain && drawer.parentElement !== editorMain) {
-      editorMain.appendChild(drawer);
+    const timelineArea = document.querySelector('.timelineArea');
+    const isOriginal = document.documentElement.getAttribute('data-editor-layout') === 'original' ||
+                       document.body?.classList?.contains('layout-original');
+
+    if (isOriginal) {
+      if (drawer && timelineArea && drawer.parentElement !== timelineArea) {
+        timelineArea.appendChild(drawer);
+      }
+    } else {
+      if (drawer && editorMain && drawer.parentElement !== editorMain) {
+        editorMain.appendChild(drawer);
+      }
     }
   };
   dockDrawer();
