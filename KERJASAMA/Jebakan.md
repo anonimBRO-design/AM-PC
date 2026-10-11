@@ -1,4 +1,4 @@
-# Jebakan
+﻿# Jebakan
 
 Hal yang sudah pernah bikin rugi di proyek ini. **Baca sebelum mengubah kode.**
 Tambahkan entri baru di bawah, **jangan hapus yang lama.**
@@ -463,6 +463,16 @@ Ketika pengguna menghapus semua proyek, `parsed` bernilai `[]` (`length === 0`).
 **Sebab:** `release/Alight-Motion-PC-win-x64/resources/app/` memuat salinan penuh `electron/`, `index.html`, `css/`; folder di-ignore git dan TIDAK ikut ter-update otomatis saat repo diedit.
 **Perbaikan:** setiap habis edit + commit, sync file yang berubah ke `resources/app/` (atau rebuild `npm run build:portable`); sebelum tes exe, verifikasi dengan `diff -q`. Untuk iterasi cepat, tes dulu via `start-desktop.bat` (`npx electron .` = langsung dari repo).
 **Cara memverifikasi:** `diff -q "release/Alight-Motion-PC-win-x64/resources/app/electron/X.js" "electron/X.js"` → tanpa output = identik.
+
+---
+
+## 27. Menyisipkan elemen anak ke dalam timelineArea merusak CSS Grid auto-placement (tracks timeline hilang total)
+
+**Gejala:** Tracks dan ruler timeline (#timelineScroll) hilang total, area transport (.transport) membesar mengisi seluruh tinggi timeline, dan kanvas mengalami zoom besar tak terkendali.
+**Kejadian:** 11 Oktober 2026, commit b372cea (Antigravity); diperbaiki di 6f7d468.
+**Sebab:** .timelineArea di index.html:429 menggunakan CSS Grid dengan 3 baris: grid-template-rows: 38px minmax(0,1fr) 0 !important;. Anak pertama (.transport) mendapat baris 38px, anak kedua (#timelineScroll) mendapat baris minmax(0, 1fr), dan anak ketiga (#drawer) mendapat baris 0px. Ketika skrip menyisipkan resizeBar sebagai firstChild, resizeBar mengambil baris 38px, .transport terdorong ke baris minmax(0, 1fr) (menjadi raksasa), dan #timelineScroll terlempar ke baris 0px (lenyap total). Selain itu, pemanggilan fitBtn.click() memicu class .fitCompositionLayout yang merusak kalkulasi zoom kanvas.
+**Perbaikan:** JANGAN PERNAH menyisipkan elemen anak baru ke dalam .timelineArea. Letakkan handle interaktif di luar .timelineArea (misalnya di .previewTools #editorSplitHandle). Untuk penyesuaian zoom kanvas, panggil ui.applyCompositionFitZoom() secara langsung, jangan memicu fitBtn.click().
+**Cara memverifikasi:** Buka proyek di Mode Asli dan Mode Studio; pastikan ruler (#ruler), daftar track (#tracks), dan playhead (#playhead) tetap terlihat sempurna dengan tinggi penuh.
 
 ---
 
