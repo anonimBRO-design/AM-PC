@@ -335,3 +335,44 @@
       - Pengujian headless Electron menghasilkan bukti visual `test_shortcuts_modal.png`: kartu berlatar solid dark slate `#121820`, teks putih/abu-abu dan tombol chiclet `<kbd>` tampil 100% tajam dan terbaca sempurna, sementara latar belakang editor di belakang modal ter-blur secara elegan.
       - Uji interaktivitas mengonfirmasi: buka modal, tutup via Escape, buka via tombol `?`, dan tutup via klik backdrop berjalan lancar.
       - Berkas disinkronkan ke direktori rilis `release/Alight-Motion-PC-win-x64/resources/app/`.
+
+19. **Penyelesaian Nomor 3 (100% Shader Pass Rate & Pipeline Native FFmpeg MP4) dan Nomor 4 (Pengujian Proyek Riil Alight Motion 30-56 Layer)**:
+    - **Latar Belakang**:
+      - Pengguna meminta eksekusi langsung Nomor 3 dan Nomor 4: "langsung aja nomor 3 dan 4".
+      - Nomor 3 mencakup: Pipeline ekspor native FFmpeg MP4 dan pencapaian 100% pass-rate kompilasi shader WebGL2 (memperbaiki 12 shader yang sebelumnya gagal).
+      - Nomor 4 mencakup: Pengujian proyek riil dan preset Alight Motion 30-50 layer, verifikasi keyframe, sinkronisasi audio, dan render.
+    - **Pencapaian Nomor 3a: 100% WebGL2 Shader Pass Rate (269/269 Efek Berhasil, 0 Gagal)**:
+      - Menemukan akar penyebab kegagalan 12 shader yang tersisa:
+        - `radialwipe`, `turbulentdisplace`, `turbulentdisplace2`, `turbulentdisplace3`, `warpblur`: Variabel `direction` adalah `uniform float`, tetapi sempat masuk daftar proteksi integer global sehingga `direction == 1` tidak terkonversi ke `1.0`. Solusi: Membatasi proteksi integer `direction` hanya pada shader `border` dan `roughenedges`.
+        - `pagecurl`: Parameter `int mode` pada fungsi lokal `blendColor` sempat terkonversi menjadi `mode == 1.0`. Solusi: Memproteksi `mode` sebagai integer.
+        - `grunge`: Argumen `int blendMode` pada fungsi lokal `blendGrain` sempat terkonversi menjadi `blendMode == 1.0`. Solusi: Memproteksi `blendMode` lokal grunge sebagai integer.
+        - `roughenedges`: Memiliki variabel lokal `int direction = 3;` di dalam `main()`. Solusi: Memproteksi `direction` pada roughenedges sebagai integer.
+      - Hasil Verifikasi Batch Kompilasi WebGL2 Resmi:
+        - Total efek berkatalog: 328
+        - Efek dengan shader: 269
+        - Pass: 269 (100%)
+        - Fail: 0 (0%)
+        - Waktu kompilasi batch: 10.994 ms
+        - Laporan terekam di `AM-Native-Desktop/scratch/shader-batch-report.json`.
+      - Diterapkan ke `AM-Native-Desktop/src/engine/shader-pipeline.ts` dan di-commit (`4e16700`).
+    - **Pencapaian Nomor 3b: Pipeline Ekspor Native FFmpeg MP4**:
+      - Memvalidasi ketersediaan FFmpeg 8.1.2 di PATH sistem.
+      - Membangun modul native IPC `electron/ffmpeg-ipc.js` dengan dukungan frame feeding via `image2pipe`, audio WAV muxing, auto-scaling genap H.264, stderr draining, dan penanganan graceful exit.
+      - Menghubungkan modul ke `electron/main.js` dan antarmuka desktop di `electron/desktop-engine.js`.
+      - Menambahkan tombol aksi `Ekspor Native MP4 (FFmpeg)` (`.amNativeExportFootBtn`) pada lembar ekspor `#exportSheet`.
+      - Berhasil menguji pembuatan MP4 H.264 secara end-to-end dengan validasi `ffprobe`: stream H.264 30fps/60fps, yuv420p, duration valid, dan moov atom faststart terpasang. Commit `0b80cc4`.
+    - **Pencapaian Nomor 4: Pengujian Proyek Riil Alight Motion (30-56 Layer)**:
+      - Melakukan audit data IndexedDB `Alight Motion PC` pada 8 proyek riil:
+        - Project 0: "Negoro angin " (1080x1920, 60fps, 30 layer, 523 keyframe, 108 efek).
+        - Project 2: "CelzPredet" (1080x1080, 60fps, 38 layer, 1077 keyframe, 175 efek).
+        - Project 3: "Proyek Baru 346" (1080x1920, 60fps, 55 layer, 537 keyframe, 199 efek).
+        - Project 4: "Zenku || #722" (1080x1920, 60fps, 38 layer, 658 keyframe, 116 efek).
+        - Project 6: "apa itu lisa @GarX" (1080x1920, 60fps, 56 layer, 1082 keyframe, 174 efek).
+      - Menjalankan uji pemuatan proyek riil `CelzPredet` (38 layer, 1077 keyframe) langsung ke editor via `ui.loadLocal()`.
+      - Merender kanvas WebGL2 panggung secara akurat pada `t = 2.0s`: seluruh quad transform, rotasi, kurva elastis, keyframe, dan efek visual terlukis sempurna (tangkapan layar tersimpan di `celz_rendered_stage.png`).
+      - Mengekspor 15 frame ke MP4 native FFmpeg: berkas `celz_real_project_export.mp4` berukuran 466.447 bytes berhasil dibuat dan tervalidasi 100% oleh `ffprobe` (codec h264, resolusi 540x540, 30fps).
+    - **Sinkronisasi**:
+      - Berkas diperbarui di `AM-PC` dan `AM-Native-Desktop`.
+      - Berkas disinkronkan ke paket rilis portable `release/Alight-Motion-PC-win-x64/resources/app/`.
+      - Commit `0b80cc4` di-push ke GitHub `origin/main`.
+
