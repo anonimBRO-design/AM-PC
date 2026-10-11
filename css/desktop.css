@@ -2980,3 +2980,38 @@ button:active,
   background: rgba(255, 255, 255, 0.08) !important;
   color: var(--accent, #00e676) !important;
 }
+
+/* Native FFmpeg Export Button in Export Sheet */
+.amNativeExportFootBtn {
+  background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 9px !important;
+  padding: 10px 16px !important;
+  cursor: pointer !important;
+  margin-top: 8px !important;
+  width: 100% !important;
+  font-size: 13.5px !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+.amNativeExportFootBtn:hover {
+  background: linear-gradient(135deg, #0369a1, #075985) !important;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4) !important;
+}
+
+.amNativeExportFootBtn:active {
+  transform: scale(0.99) !important;
+}
+
+.amNativeExportFootBtn:disabled {
+  opacity: 0.65 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+

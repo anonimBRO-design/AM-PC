@@ -282,16 +282,8 @@ ipcMain.handle('read-file-buffer', async (event, filePath) => {
 // ==========================================
 // IPC HANDLERS: NATIVE FFMPEG EXPORT PIPELINE
 // ==========================================
-const { spawn } = require('child_process');
-let activeFfmpeg = null;
-
-ipcMain.handle('ffmpeg-check', async () => {
-  return new Promise((resolve) => {
-    const p = spawn('ffmpeg', ['-version']);
-    p.on('error', () => resolve(false));
-    p.on('close', (code) => resolve(code === 0));
-  });
-});
+const ffmpegIpc = require('./ffmpeg-ipc');
+ffmpegIpc.register(ipcMain, () => mainWindow);
 
 ipcMain.handle('dialog-save-video', async (event, { defaultName, ext = 'mp4' }) => {
   if (!mainWindow) return { canceled: true };
@@ -306,66 +298,6 @@ ipcMain.handle('dialog-save-video', async (event, { defaultName, ext = 'mp4' }) 
   });
   if (result.canceled || !result.filePath) return { canceled: true };
   return { canceled: false, filePath: result.filePath };
-});
-
-ipcMain.handle('ffmpeg-start-session', async (event, { outputPath, fps, width, height, bitrate = '12M' }) => {
-  try {
-    if (activeFfmpeg) {
-      try { activeFfmpeg.kill(); } catch (e) {}
-      activeFfmpeg = null;
-    }
-
-    const args = [
-      '-y',
-      '-f', 'image2pipe',
-      '-vcodec', 'png',
-      '-r', String(fps),
-      '-i', 'pipe:0',
-      '-c:v', 'libx264',
-      '-pix_fmt', 'yuv420p',
-      '-preset', 'veryfast',
-      '-b:v', String(bitrate),
-      '-movflags', '+faststart',
-      outputPath
-    ];
-
-    const child = spawn('ffmpeg', args, { stdio: ['pipe', 'ignore', 'pipe'] });
-    activeFfmpeg = child;
-
-    child.on('close', (code) => {
-      activeFfmpeg = null;
-      if (mainWindow) {
-        mainWindow.webContents.send('ffmpeg-session-closed', { code, outputPath });
-      }
-    });
-
-    return { success: true };
-  } catch (err) {
-    return { success: false, error: err.message };
-  }
-});
-
-ipcMain.handle('ffmpeg-feed-frame', async (event, buffer) => {
-  if (!activeFfmpeg || !activeFfmpeg.stdin || activeFfmpeg.stdin.destroyed) {
-    return { success: false, error: 'FFmpeg session is not active' };
-  }
-  return new Promise((resolve) => {
-    const ok = activeFfmpeg.stdin.write(Buffer.from(buffer), () => {
-      resolve({ success: true });
-    });
-    if (!ok) {
-      activeFfmpeg.stdin.once('drain', () => resolve({ success: true }));
-    }
-  });
-});
-
-ipcMain.handle('ffmpeg-end-session', async () => {
-  if (!activeFfmpeg) return { success: true };
-  return new Promise((resolve) => {
-    activeFfmpeg.stdin.end(() => {
-      resolve({ success: true });
-    });
-  });
 });
 
 ipcMain.handle('shell-show-item', async (event, filePath) => {

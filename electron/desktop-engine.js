@@ -1354,6 +1354,139 @@
     }
   }
 
+  // 10. Native FFmpeg Export Integration in #exportSheet
+  function setupNativeExportOption() {
+    const exportFoot = document.querySelector('.exportFoot');
+    if (!exportFoot) return;
+
+    let nativeBtn = document.getElementById('amNativeFfmpegExportBtn');
+    if (!nativeBtn) {
+      nativeBtn = document.createElement('button');
+      nativeBtn.id = 'amNativeFfmpegExportBtn';
+      nativeBtn.className = 'amNativeExportFootBtn';
+      nativeBtn.type = 'button';
+      nativeBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="display:inline-block;vertical-align:middle;flex-shrink:0;">
+          <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+        </svg>
+        <span>Ekspor Native MP4 (FFmpeg)</span>
+      `;
+      nativeBtn.onclick = () => window.amStartNativeFfmpegExport();
+      exportFoot.appendChild(nativeBtn);
+    }
+  }
+
+  window.amStartNativeFfmpegExport = async function() {
+    if (!window.desktopAPI?.ffmpegStartSession) {
+      alert('Fitur ekspor FFmpeg hanya tersedia di aplikasi desktop Alight Motion PC.');
+      return;
+    }
+
+    const model = getModel();
+    const timeline = getTimeline();
+    const renderer = window.omsTimelinePreRender?.renderer || window.renderer;
+
+    if (!model?.project) {
+      alert('Tidak ada proyek aktif untuk diekspor.');
+      return;
+    }
+
+    const btn = document.getElementById('amNativeFfmpegExportBtn');
+    const origHtml = btn ? btn.innerHTML : '';
+
+    try {
+      const defaultName = (model.project.name || 'Proyek_Alight_Motion').replace(/[\\/:*?"<>|]/g, '_');
+      const dialogRes = await window.desktopAPI.saveVideoDialog({
+        defaultName: defaultName + '.mp4'
+      });
+
+      if (!dialogRes || dialogRes.canceled || !dialogRes.filePath) {
+        return;
+      }
+
+      const outputPath = dialogRes.filePath;
+      const fps = Math.max(1, parseInt(document.getElementById('exportFps')?.value || model.project.fps || 30, 10));
+      const duration = model.project.duration || 10;
+      const totalFrames = Math.max(1, Math.round(duration * fps));
+
+      const stageCanvas = document.getElementById('stage');
+      if (!stageCanvas) throw new Error('Stage canvas tidak ditemukan');
+
+      const width = model.project.width || 1080;
+      const height = model.project.height || 1080;
+
+      const outCanvas = document.createElement('canvas');
+      outCanvas.width = width;
+      outCanvas.height = height;
+      const outCtx = outCanvas.getContext('2d');
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span>Menyiapkan sesi FFmpeg...</span>`;
+      }
+
+      const session = await window.desktopAPI.ffmpegStartSession({
+        outputPath,
+        fps,
+        width,
+        height,
+        bitrate: '12M'
+      });
+
+      if (!session || !session.success) {
+        throw new Error(session?.error || 'Gagal memulai FFmpeg');
+      }
+
+      const originalTime = model.time;
+
+      for (let f = 0; f < totalFrames; f++) {
+        const t = f / fps;
+        model.time = t;
+        if (timeline?.updatePlayhead) timeline.updatePlayhead();
+        if (renderer?.render) renderer.render();
+
+        outCtx.clearRect(0, 0, width, height);
+        outCtx.drawImage(stageCanvas, 0, 0, width, height);
+
+        const blob = await new Promise((res) => outCanvas.toBlob(res, 'image/png'));
+        const buf = await blob.arrayBuffer();
+
+        const feed = await window.desktopAPI.ffmpegFeedFrame(buf);
+        if (!feed || !feed.success) {
+          throw new Error('Gagal mengirim frame ' + f + ': ' + (feed?.error || 'unknown'));
+        }
+
+        if (btn && (f % 5 === 0 || f === totalFrames - 1)) {
+          const pct = Math.round(((f + 1) / totalFrames) * 100);
+          btn.innerHTML = `<span>Mengekspor: ${pct}% (Frame ${f + 1}/${totalFrames})</span>`;
+        }
+      }
+
+      if (btn) {
+        btn.innerHTML = `<span>Menyelesaikan berkas MP4...</span>`;
+      }
+
+      await window.desktopAPI.ffmpegEndSession();
+      model.time = originalTime;
+      if (timeline?.updatePlayhead) timeline.updatePlayhead();
+      if (renderer?.render) renderer.render();
+
+      if (typeof window.toast === 'function') {
+        window.toast('Ekspor Native MP4 selesai!');
+      } else {
+        alert('Ekspor Native MP4 selesai: ' + outputPath);
+      }
+    } catch (err) {
+      console.error('Native FFmpeg export error:', err);
+      alert('Gagal mengekspor video: ' + (err?.message || err));
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = origHtml;
+      }
+    }
+  };
+
   // Periodic heartbeat to keep patches active
   const runPatches = () => {
     disarmFocusSession();
@@ -1365,6 +1498,7 @@
     setupTimelineWheelNavigation();
     decorateEffectThumbnails();
     setupKeyboardShortcutsModal();
+    setupNativeExportOption();
   };
 
   runPatches();
