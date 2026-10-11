@@ -881,27 +881,15 @@
   function refitEditorCanvas() {
     requestAnimationFrame(() => {
       try {
+        const main = document.querySelector('.editorMain');
+        if (main) main.classList.remove('fitCompositionLayout');
+        const ui = getUI();
+        ui?.applyCompositionFitZoom?.();
         const renderer = window.renderer || window.omsRenderer;
         renderer?.resize?.();
-        const fitBtn = document.getElementById('fitBtn');
-        if (fitBtn) {
-          fitBtn.click();
-        } else {
-          const ui = getUI();
-          ui?.applyCompositionFitZoom?.();
-        }
         renderer?.render?.();
       } catch (e) {}
     });
-    setTimeout(() => {
-      try {
-        const renderer = window.renderer || window.omsRenderer;
-        renderer?.resize?.();
-        const fitBtn = document.getElementById('fitBtn');
-        if (fitBtn) fitBtn.click();
-        renderer?.render?.();
-      } catch (e) {}
-    }, 60);
   }
 
   function protectStudioGrid(editorMain) {
@@ -938,68 +926,57 @@
   }
 
   function setupTimelineVerticalResizer() {
-    initStudioTimelineHeight();
-    const timelineArea = document.querySelector('.timelineArea');
-    if (!timelineArea) return;
+    // Bersihkan resizeBar agar tidak merusak urutan grid timelineArea
+    const oldBar = document.getElementById('amTimelineResizeBar');
+    if (oldBar) oldBar.remove();
 
-    let resizeBar = document.getElementById('amTimelineResizeBar');
-    if (!resizeBar) {
-      resizeBar = document.createElement('div');
-      resizeBar.id = 'amTimelineResizeBar';
-      resizeBar.title = 'Tahan dan geser vertikal untuk mengatur tinggi timeline';
-      timelineArea.insertBefore(resizeBar, timelineArea.firstChild);
-    }
+    initStudioTimelineHeight();
 
     const splitHandle = document.getElementById('editorSplitHandle');
-    const attachDrag = (el) => {
-      if (!el || el._amVerticalResizerAttached) return;
-      el._amVerticalResizerAttached = true;
+    if (!splitHandle || splitHandle._amVerticalResizerAttached) return;
+    splitHandle._amVerticalResizerAttached = true;
 
-      el.addEventListener('pointerdown', (ev) => {
-        const isOriginal = document.documentElement.getAttribute('data-editor-layout') === 'original' ||
-                           document.body?.classList?.contains('layout-original');
-        if (isOriginal) return;
+    splitHandle.addEventListener('pointerdown', (ev) => {
+      const isOriginal = document.documentElement.getAttribute('data-editor-layout') === 'original' ||
+                         document.body?.classList?.contains('layout-original');
+      if (isOriginal) return;
 
-        ev.preventDefault();
-        ev.stopPropagation();
+      ev.preventDefault();
+      ev.stopPropagation();
 
-        const startY = ev.clientY;
-        const currentH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--am-timeline-height'), 10) || 280;
-        let lastH = currentH;
+      const startY = ev.clientY;
+      const currentH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--am-timeline-height'), 10) || 280;
+      let lastH = currentH;
 
-        document.body.style.cursor = 'ns-resize';
-        document.body.style.userSelect = 'none';
-        el.classList.add('dragging');
+      document.body.style.cursor = 'ns-resize';
+      document.body.style.userSelect = 'none';
+      splitHandle.classList.add('dragging');
 
-        const onPointerMove = (moveEv) => {
-          const deltaY = moveEv.clientY - startY;
-          const minH = 180;
-          const maxH = Math.max(minH, window.innerHeight - 200);
-          lastH = Math.min(maxH, Math.max(minH, Math.round(currentH - deltaY)));
-          document.documentElement.style.setProperty('--am-timeline-height', lastH + 'px');
-        };
+      const onPointerMove = (moveEv) => {
+        const deltaY = moveEv.clientY - startY;
+        const minH = 180;
+        const maxH = Math.max(minH, window.innerHeight - 200);
+        lastH = Math.min(maxH, Math.max(minH, Math.round(currentH - deltaY)));
+        document.documentElement.style.setProperty('--am-timeline-height', lastH + 'px');
+      };
 
-        const onPointerUp = () => {
-          window.removeEventListener('pointermove', onPointerMove, true);
-          window.removeEventListener('pointerup', onPointerUp, true);
-          window.removeEventListener('pointercancel', onPointerUp, true);
-          document.body.style.cursor = '';
-          document.body.style.userSelect = '';
-          el.classList.remove('dragging');
-          localStorage.setItem('am_studio_timeline_height', lastH);
-          refitEditorCanvas();
-          const timeline = getTimeline();
-          timeline?.rebuild?.();
-        };
+      const onPointerUp = () => {
+        window.removeEventListener('pointermove', onPointerMove, true);
+        window.removeEventListener('pointerup', onPointerUp, true);
+        window.removeEventListener('pointercancel', onPointerUp, true);
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        splitHandle.classList.remove('dragging');
+        localStorage.setItem('am_studio_timeline_height', lastH);
+        refitEditorCanvas();
+        const timeline = getTimeline();
+        timeline?.rebuild?.();
+      };
 
-        window.addEventListener('pointermove', onPointerMove, true);
-        window.addEventListener('pointerup', onPointerUp, true);
-        window.addEventListener('pointercancel', onPointerUp, true);
-      }, { passive: false });
-    };
-
-    attachDrag(resizeBar);
-    attachDrag(splitHandle);
+      window.addEventListener('pointermove', onPointerMove, true);
+      window.addEventListener('pointerup', onPointerUp, true);
+      window.addEventListener('pointercancel', onPointerUp, true);
+    }, { passive: false });
   }
 
   function watchDrawerForCanvasFit() {
