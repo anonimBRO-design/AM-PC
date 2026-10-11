@@ -118,3 +118,23 @@
        - Mode Studio: Preview full width 1424px (atas 50px), Timeline full width 1424px (bawah 555px, tinggi 280px), Kanvas di tengah (margin kiri 561.5px, margin kanan 562.5px).
        - Beralih bolak-balik berulang kali berjalan 100% mulus dan akurat.
      - Seluruh berkas disinkronkan ke direktori `release/alight-motion-pc-win-x64/resources/app/`.
+
+10. **Perbaikan Injeksi Mandiri Studio Layout CSS (Sesi 9 - Commit `afa204d`)**:
+    - **Masalah yang Dilaporkan**:
+      - User menekan tombol ganti tata letak, namun timeline tidak berpindah ke bawah ("mana kok gak kebawah????????????").
+    - **Root Cause Analysis**:
+      - Proses Electron (`Alight Motion PC.exe`, PID 316) telah berjalan sejak pukul 18:33 WIB, sebelum `desktop-studio.css` dan dual layout dibuat pada commit `6010169` (pukul 18:59 WIB).
+      - Di Electron, `electron/main.js` dievaluasi hanya sekali saat proses Node utama pertama kali dimulai.
+      - Menekan `Ctrl + R` (reload WebContents) hanya memuat ulang renderer (`index.html`, `preload.js`, dan skrip renderer), tetapi **TIDAK** memuat ulang proses utama `main.js`.
+      - Karena `main.js` yang sedang berjalan di memori masih versi lama pukul 18:33 WIB, fungsi `webContents.insertCSS(studioCss)` di event `dom-ready` tidak pernah dieksekusi.
+      - Akibatnya, elemen `<style id="amStudioLayoutCss">` bernilai `null` di renderer, sehingga fungsi `toggleAmEditorLayout('studio')` tidak menemukan aturan CSS Studio untuk diaktifkan.
+    - **Solusi Arsitektur Mandiri (Self-Healing)**:
+      - Menambahkan fungsi `ensureStudioCss()` di `electron/desktop-engine.js` menggunakan panggilan sinkron lokal `XMLHttpRequest('GET', 'css/desktop-studio.css', false)`. Jika `<style id="amStudioLayoutCss">` belum ada atau kosong, skrip renderer langsung membuat dan mengisinya seketika (< 1ms).
+      - Menambahkan `injectStudioCss()` di `electron/preload.js` menggunakan `fs.readFileSync(path.join(__dirname, '../css/desktop-studio.css'))` saat event `DOMContentLoaded` dan perpindahan tampilan.
+      - Memastikan `setupLayoutSwitcher()` memanggil `initLayoutState()` secara mandiri saat DOM siap.
+      - Menyinkronkan seluruh perubahan ke direktori rilis `release/alight-motion-pc-win-x64/resources/app/`.
+    - **Verifikasi**:
+      - Diuji dengan skrip simulasi klik headless `test-click.js` tanpa bantuan injeksi dari `main.js`:
+        - Mode Asli: Preview 776.7px (kiri 0), Timeline 647.3px (kiri 776.7px).
+        - Klik Switcher (Mode Studio): Preview 1424px (atas 50px), Timeline 1424px (bawah 555px, tinggi 280px).
+      - Commit `afa204d` tersimpan di branch `main`.
