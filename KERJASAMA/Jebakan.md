@@ -446,6 +446,26 @@ Ketika pengguna menghapus semua proyek, `parsed` bernilai `[]` (`length === 0`).
 
 ---
 
+## 25. Hijack roda mouse tanpa modifier mematikan scroll vertikal native timeline (AM-PC)
+
+**Gejala:** Setelah handler wheel ditambahkan di timeline, roda mouse biasa berhenti menggulir daftar track/layer (T1..T30) atas-bawah — semua roda jadi pan horizontal.
+**Kejadian:** 11 Oktober 2026, commit `88658c7` (Antigravity); teridentifikasi dari konfirmasi user (sesi /grill-me); diperbaiki di `cc135f0`.
+**Sebab:** Handler di `#timelineScroll` meng-intercept SEMUA event wheel tanpa modifier + `e.preventDefault()` → perilaku scroll vertikal native hilang total (padahal `.timelineScroll` = `overflow:auto`, jalur native-nya ada tapi selalu dicegah).
+**Perbaikan:** jangan hijack input native tanpa menyediakan jalur pengganti — roda biasa dibiarkan native (tanpa `preventDefault`); aksi khusus hanya dengan modifier: Shift+roda = geser horizontal (`scrollLeft += delta`, `preventDefault` + normalisasi deltaMode ×24/×240, `e.deltaY || e.deltaX`), Ctrl+roda = zoom (delegasi `timeline.onZoomWheel(e)`). Event dari `#ruler` tetap dilewati (`closest('#ruler')`) agar zoom native ruler tidak terganggu.
+**Cara memverifikasi:** `git show cc135f0` (+12/−15) — jalur roda biasa tidak lagi `preventDefault`; uji manual: roda = scroll vertikal track, Shift+roda = geser waktu, Ctrl+roda = zoom, roda di ruler = zoom.
+
+---
+
+## 26. `release/` adalah salinan kedua kode — mudah drift dari repo (AM-PC)
+
+**Gejala:** Perubahan yang sudah di-commit di repo tidak terasa saat mengetes lewat `Buka-Alight-Motion-PC.bat` (exe menjalankan salinan lama), atau sebaliknya — dua salinan kode beda isi tanpa disadari.
+**Kejadian:** 11 Oktober 2026 — teridentifikasi saat review Hermes; dicegah sebelum memakan korban (sync manual sudah dilakukan 3× oleh Antigravity dan terverifikasi identik).
+**Sebab:** `release/Alight-Motion-PC-win-x64/resources/app/` memuat salinan penuh `electron/`, `index.html`, `css/`; folder di-ignore git dan TIDAK ikut ter-update otomatis saat repo diedit.
+**Perbaikan:** setiap habis edit + commit, sync file yang berubah ke `resources/app/` (atau rebuild `npm run build:portable`); sebelum tes exe, verifikasi dengan `diff -q`. Untuk iterasi cepat, tes dulu via `start-desktop.bat` (`npx electron .` = langsung dari repo).
+**Cara memverifikasi:** `diff -q "release/Alight-Motion-PC-win-x64/resources/app/electron/X.js" "electron/X.js"` → tanpa output = identik.
+
+---
+
 ## Cara menambah jebakan baru
 
 Kalau kamu menemukan hal yang bikin rugi, tambahkan di sini dengan format:
