@@ -5,3 +5,5 @@ scratch/
 .system_generated/
 *.log
 .rig/
+*.xapk
+*.apk
