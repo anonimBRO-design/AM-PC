@@ -789,23 +789,32 @@
     width: 44px !important;
     height: 44px !important;
     border-radius: 50% !important;
-    background: linear-gradient(135deg, #00e676, #00b0ff) !important;
-    color: #0b0e14 !important;
-    border: 0 !important;
-    font-size: 24px !important;
-    font-weight: 800 !important;
+    border: 2px solid var(--accent, #00e676) !important;
+    background: #18221d !important;
+    color: var(--accent, #00e676) !important;
+    font-size: 26px !important;
+    font-weight: 600 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    box-shadow: 0 4px 16px rgba(0, 230, 118, 0.4) !important;
+    box-shadow: 0 4px 18px rgba(0, 230, 118, 0.35) !important;
     cursor: pointer !important;
     z-index: 40 !important;
-    transition: transform 0.15s ease, filter 0.15s ease !important;
+    transition: transform 0.18s ease, background 0.18s ease, filter 0.15s ease !important;
   }
 
   .timelineArea .plusBtn:hover {
     transform: scale(1.08) !important;
-    filter: brightness(1.1) !important;
+    background: #1d2c25 !important;
+    box-shadow: 0 6px 22px rgba(0, 230, 118, 0.45) !important;
+  }
+
+  .timelineArea .plusBtn.open {
+    transform: rotate(45deg) !important;
+    background: #243047 !important;
+    border-color: #5f7596 !important;
+    color: #e2e8f0 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
   }
 
   /* Add Hub in Right Dock */
