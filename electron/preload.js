@@ -925,7 +925,30 @@ window.addEventListener('DOMContentLoaded', () => {
     `;
     (document.head || document.documentElement).appendChild(script);
   };
-    injectThumbnailEngine();
+  // 5a. Inject Studio Layout CSS
+  const injectStudioCss = () => {
+    let style = document.getElementById('amStudioLayoutCss');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'amStudioLayoutCss';
+      (document.head || document.documentElement).appendChild(style);
+    }
+    if (!style.textContent || style.textContent.length < 50) {
+      try {
+        const studioCssPath = path.join(__dirname, '../css/desktop-studio.css');
+        if (fs.existsSync(studioCssPath)) {
+          style.textContent = fs.readFileSync(studioCssPath, 'utf8');
+        }
+      } catch (err) {
+        console.error('[AM-PC] Failed to inject studio CSS:', err);
+      }
+    }
+    const savedLayout = localStorage.getItem('am_editor_layout_mode') || 'studio';
+    const isOriginal = savedLayout === 'original';
+    style.disabled = isOriginal;
+    style.media = isOriginal ? 'not all' : 'all';
+  };
+  injectStudioCss();
 
   // 5b. Desktop Engine: Anti-Jump Timeline, Anti-LongPress Mouse, & Multi-Select Media Relinker
   const injectDesktopEngine = () => {

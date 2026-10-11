@@ -851,13 +851,63 @@
   }
 
   // 8. Dual Editor Layout Engine: Mode Studio (Atas-Bawah) vs Mode Asli (Berdampingan)
+  function ensureStudioCss() {
+    let style = document.getElementById('amStudioLayoutCss');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'amStudioLayoutCss';
+      (document.head || document.documentElement).appendChild(style);
+    }
+    if (!style.textContent || style.textContent.length < 50) {
+      try {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'css/desktop-studio.css', false);
+        xhr.send(null);
+        if (xhr.status === 200 || xhr.status === 0) {
+          style.textContent = xhr.responseText;
+        }
+      } catch (e) {
+        console.warn('Gagal memuat desktop-studio.css via XHR:', e);
+      }
+    }
+    return style;
+  }
+
   function setupLayoutSwitcher() {
+    const style = ensureStudioCss();
+    const savedLayout = localStorage.getItem('am_editor_layout_mode') || 'studio';
+    const isOriginal = savedLayout === 'original';
+
+    // Pastikan status stylesheet dan drawer sesuai mode saat inisialisasi
+    if (style && !style._amInitApplied) {
+      style._amInitApplied = true;
+      style.disabled = isOriginal;
+      style.media = isOriginal ? 'not all' : 'all';
+      document.documentElement.setAttribute('data-editor-layout', savedLayout);
+      if (document.body) {
+        document.body.classList.toggle('layout-original', isOriginal);
+        document.body.classList.toggle('layout-studio', !isOriginal);
+      }
+      const drawer = document.getElementById('drawer');
+      const timelineArea = document.querySelector('.timelineArea');
+      const editorMain = document.querySelector('.editorMain');
+      if (isOriginal) {
+        if (drawer && timelineArea && drawer.parentElement !== timelineArea) {
+          timelineArea.appendChild(drawer);
+        }
+      } else {
+        if (drawer && editorMain && drawer.parentElement !== editorMain) {
+          editorMain.appendChild(drawer);
+        }
+      }
+    }
+
     window.toggleAmEditorLayout = function(targetMode) {
       const current = localStorage.getItem('am_editor_layout_mode') || 'studio';
       const newMode = targetMode || (current === 'studio' ? 'original' : 'studio');
       localStorage.setItem('am_editor_layout_mode', newMode);
 
-      const style = document.getElementById('amStudioLayoutCss');
+      const style = ensureStudioCss();
       const drawer = document.getElementById('drawer');
       const editorMain = document.querySelector('.editorMain');
       const timelineArea = document.querySelector('.timelineArea');
