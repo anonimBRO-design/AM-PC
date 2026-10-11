@@ -10,17 +10,24 @@ Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
 
 ## Sedang apa
 
-**Idle.** Sesuai arahan user (*"kita cuma akan aplikasikan icon effect asli ajaa ke main"*), branch `main` kini telah mengadopsi **ikon efek resmi Alight Motion**:
-- 368 thumbnail WebP resmi diekstrak dari APK AM v5.0 ke `icons/effects/`.
-- Effect Browser Drawer kini dihiasi thumbnail squircle 42px resmi.
-- Inspector Effect Stack kini dihiasi thumbnail squircle 22px resmi.
-- `userDataPath` dikunci permanen ke `AppData/Roaming/Alight Motion PC` sehingga proyek pengguna selalu tampil lengkap.
-- Eksperimen porting paket 228 efek native tetap tersimpan aman di branch `feat/am-native-effects-and-icons`.
+**Aktif Paralel (Antigravity & Hermes) pada proyek AM-Native-Desktop**:
+- **Antigravity (SELESAI)**:
+  - Memperbaiki `acScreenNorm` & `acLayerNorm` menjadi varying (`vTexCoord`), menghilangkan fatal bug flat-color di 250 shader.
+  - Mendeklarasikan 13 uniform APK bawaan (`acScreenSize`, `acTime`, `acLayerCenterNorm`, `acLayerToScreen`, dll.) + global `l2s` & `s2l` helper, menghilangkan 87 shader compile fail.
+  - Memperbaiki `setBlendMode` (`add`, `screen`, `multiply`, `lighten`, `darken`) dan runtime uniform bindings per frame.
+  - Memperbaiki category chips di Effects Panel (`matte`, `procedural`, `transform`, `general`, `opacity`) dan menyematkan badge tipe `[GLSL]` vs `[CPU]`.
+  - Mengganti placeholder teks logo `<div class="am-logo-pill">AM</div>` dengan logo resmi Alight Motion (`test_prime_am.png` squircle swirl) di HomeScreen dan Editor Studio.
+  - Memperbaiki entrypoint `main` di `package.json` ke `electron/main.js`.
+  - Teruji live di Electron: 5 efek diterapkan sekaligus ke stack tanpa error/crash WebGL.
+- **Hermes (ANTRIAN / SEDANG BERJALAN)**:
+  - Porting `knownMap` dan normalizer snake-case ke `scripts/bundle-effects.js` (target: 185+ ikon WebP resolve).
+  - Implementasi `src/engine/media-manager.ts` untuk loader gambar/video ke WebGL texture `texImage2D`.
+  - Setup remote GitHub untuk `AM-Native-Desktop`.
 
-| Agent | Status |
-|---|---|
-| **Antigravity** | Selesai — Aplikasi thumbnail efek resmi Alight Motion ke `main`, lock userData path, sinkronisasi build release |
-| **Claude Code** | Selesai — audit, verifikasi, buat sistem kerja sama |
+| Agent | Status | Fokus Area |
+|---|---|---|
+| **Antigravity** | ✅ Selesai Tahap 1 | WebGL2 Engine, Shader Pipeline, Environment Uniforms, UI Badging |
+| **Hermes** | ⏳ Sedang Berjalan | Ikon KnownMap, Media Loader (`texImage2D`), QA Suite, Git Remote |
 
 ---
 
