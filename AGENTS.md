@@ -78,7 +78,7 @@ Kalau perlu mengubah file milik agent lain, **tulis dulu di
 | `electron/main.js` | Pembungkus desktop |
 | `electron/preload.js` | Jembatan aman ke Electron |
 | `scripts/build-portable.js` | Skrip build `.exe` |
-| `css/` | CSS tambahan — **saat ini tidak dimuat** |
+| `css/` | CSS kustom desktop & tema — **dimuat aktif via Electron insertCSS** |
 | `icons/` | Ikon aplikasi |
 | `manifest.webmanifest` | Manifest PWA |
 | `release/` | Hasil build — di-`.gitignore` |

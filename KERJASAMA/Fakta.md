@@ -124,23 +124,6 @@ tulis di [[Handoff]] sebagai "belum pasti".
 - **Akibat:** Kalau mau bagikan `.exe`, harus lewat GitHub Releases
   atau link lain — bukan lewat commit.
 
-### F-14 · Upstream menyembunyikan outline seleksi di tepi kanvas (`boundarySegment`)
-
-- **Fakta:** Upstream Open-Motion (`index.html` baris 11377-11396) secara sengaja melewati (`skip`) penggambaran sisi outline seleksi jika garis tersebut berimpit dengan batas kanvas (`boundarySegment(a, b)`). Akibatnya, layer yang mengisi 100% layar (seperti video/gambar 1080×1920) keempat sisinya tidak digambar sama sekali (terlihat seperti tidak terpilih).
-- **Bukti:**
-  ```javascript
-  const boundarySegment=(a,b)=>(
-    (near(a.x,0)&&near(b.x,0)) ||
-    (near(a.x,W)&&near(b.x,W)) ||
-    (near(a.y,0)&&near(b.y,0)) ||
-    (near(a.y,H)&&near(b.y,H))
-  );
-  if(boundarySegment(a,b))continue;
-  ```
-- **Diperiksa:** 10 Okt 2026, Antigravity
-- **Akibat:** Untuk membuat hitbox seleksi cyan otentik Alight Motion, supresi ini dihapus di modul `electron/am-hitbox.js` dengan meng-override `WebGLRenderer.prototype.drawOverlay`, sehingga semua layer terpilih selalu menampilkan outline cyan neon `#00e5ff` secara utuh.
-
-
 ---
 
 ## Cara memakai file ini
@@ -240,7 +223,27 @@ mengulangi cara berpikir yang sama.
 - **Diperiksa:** 9 Okt 2026, Claude Code
 - **Akibat:** Resolve path `.exe` dulu, jangan `.cmd`.
 
-### F-14 · Akses instance inti Open Motion via window globals & IndexedDB
+---
+
+## Modifikasi & Integrasi Desktop AM-PC
+
+### F-14 · Upstream menyembunyikan outline seleksi di tepi kanvas (`boundarySegment`)
+
+- **Fakta:** Upstream Open-Motion (`index.html` baris 11377-11396) secara sengaja melewati (`skip`) penggambaran sisi outline seleksi jika garis tersebut berimpit dengan batas kanvas (`boundarySegment(a, b)`). Akibatnya, layer yang mengisi 100% layar (seperti video/gambar 1080×1920) keempat sisinya tidak digambar sama sekali (terlihat seperti tidak terpilih).
+- **Bukti:**
+  ```javascript
+  const boundarySegment=(a,b)=>(
+    (near(a.x,0)&&near(b.x,0)) ||
+    (near(a.x,W)&&near(b.x,W)) ||
+    (near(a.y,0)&&near(b.y,0)) ||
+    (near(a.y,H)&&near(b.y,H))
+  );
+  if(boundarySegment(a,b))continue;
+  ```
+- **Diperiksa:** 10 Okt 2026, Antigravity
+- **Akibat:** Untuk membuat hitbox seleksi cyan otentik Alight Motion, supresi ini dihapus di modul `electron/am-hitbox.js` dengan meng-override `WebGLRenderer.prototype.drawOverlay`, sehingga semua layer terpilih selalu menampilkan outline cyan neon `#00e5ff` secara utuh.
+
+### F-15 · Akses instance inti Open Motion via window globals & IndexedDB
 
 - **Fakta:** Variabel internal `model`, `renderer`, `timeline`, dan `ui` berada dalam closure IIFE privat di `index.html`. Namun Open Motion secara resmi mengekspos instancenya ke properti `window`:
   - `model`: `window.omsTimelinePreRender.model`
@@ -254,7 +257,7 @@ mengulangi cara berpikir yang sama.
 - **Diperiksa:** 10 Okt 2026, Antigravity
 - **Akibat:** Skrip kustom luar (seperti thumbnail generator) harus mengambil `model` dan `renderer` via `window.omsTimelinePreRender`. Proyek tersimpan dapat dibaca langsung melalui IndexedDB browser tanpa perlu menunggu method internal.
 
-### F-15 · Perilaku Mobile Focus Session & Long-Press Timer pada Desktop
+### F-16 · Perilaku Mobile Focus Session & Long-Press Timer pada Desktop
 
 - **Fakta:**
   1. Open Motion mengaktifkan `startSelectedLayerFocusSession()` di `EditorSplitController` yang didesain untuk layar sentuh ponsel portrait. Di desktop, sesi ini mengaktifkan kelas `.timelineArea.omsSelectedLayerFocus`, memaksa tinggi `#tracks` ke 29px, menyembunyikan track lain (`display: none !important`), dan memaksa `sc.scrollTop = 0` (timeline meloncat ke atas).
@@ -266,7 +269,7 @@ mengulangi cara berpikir yang sama.
 - **Diperiksa:** 10 Okt 2026, Antigravity
 - **Akibat:** Seluruh penyesuaian UX desktop untuk timeline and drawer multi-select wajib ditempatkan di `electron/desktop-engine.js` dan `css/desktop.css` tanpa mengubah `index.html`.
 
-### F-16 · Ganti Semua Sekaligus pada Multi-Select Media Relinker
+### F-17 · Ganti Semua Sekaligus pada Multi-Select Media Relinker
 
 - **Fakta:** Saat memilih banyak layer media yang hilang atau ingin diganti bersamaan, tombol "Ganti Semua Sekaligus (N Media)" di `#drawer.multiSelectDrawer` mengizinkan user memilih satu file dari PC dan menerapkannya ke seluruh layer terpilih secara serentak.
 - **Bukti:**
@@ -274,7 +277,7 @@ mengulangi cara berpikir yang sama.
 - **Diperiksa:** 10 Okt 2026, Antigravity
 - **Akibat:** User tidak perlu mengklik tombol "Ganti" satu per satu untuk puluhan layer media yang menggunakan file yang sama.
 
-### F-17 · Alight Motion Adjustment Layer & Backdrop Capture (`magnifybg` & `copybg`)
+### F-18 · Alight Motion Adjustment Layer & Backdrop Capture (`magnifybg` & `copybg`)
 
 - **Fakta:**
   1. Di Alight Motion, efek `com.alightcreative.effects.magnifybg` dan `copybg` menandakan **Adjustment Layer** (Layer Penyesuaian). Shape layer (misal kotak `#cdfa43` hijau muda) tidak dimaksudkan untuk menampilkan warnanya, melainkan menyalin gambar latar belakang komposisi di bawahnya (`comp.tex`), lalu menerapkan efek berikutnya (seperti `tile`, `wavewarp2`, `exposure`) langsung ke atas gambar latar belakang tersebut.
@@ -287,7 +290,7 @@ mengulangi cara berpikir yang sama.
 - **Diperiksa:** 10 Okt 2026, Antigravity
 - **Akibat:** Efek Wave Warp dan penyesuaian latar belakang Alight Motion bekerja sempurna tanpa ada balok warna hijau/merah/kuning yang menutupi layar. Semua logic berada di `electron/desktop-engine.js` tanpa menyentuh `index.html`.
 
-### F-18 · Official Effect Thumbnails Integration (Ikon Resmi Alight Motion di UI)
+### F-19 · Official Effect Thumbnails Integration (Ikon Resmi Alight Motion di UI)
 
 - **Fakta:**
   1. Sebanyak 368 thumbnail WebP resmi Alight Motion diekstrak langsung dari `assets/effects/thumb/*` di dalam APK v5.0 (`alight-motion-5-0-273-1028425.xapk`) ke folder `icons/effects/`.
@@ -297,4 +300,5 @@ mengulangi cara berpikir yang sama.
   3. Menggunakan pemetaan otomatis + nama deskriptif (`commonMap`), kartu efek di perpustakaan efek dan stack layer kini menampilkan ikon resmi Alight Motion asli.
 - **Diperiksa:** 11 Okt 2026, Antigravity
 - **Akibat:** Tampilan antarmuka efek di AM-PC kini otentik dan identik dengan visual Alight Motion mobile.
+
 
