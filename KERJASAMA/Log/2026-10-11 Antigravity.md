@@ -138,3 +138,35 @@
         - Mode Asli: Preview 776.7px (kiri 0), Timeline 647.3px (kiri 776.7px).
         - Klik Switcher (Mode Studio): Preview 1424px (atas 50px), Timeline 1424px (bawah 555px, tinggi 280px).
       - Commit `afa204d` tersimpan di branch `main`.
+
+11. **Penyempurnaan Widescreen Studio, Pengatur Tinggi Timeline, & Auto-Fit Kanvas (Sesi 10)**:
+    - **Masalah yang Ditemukan (via Screenshot Pengguna)**:
+      - Pada Mode Studio (preview di atas, timeline di bawah), area preview hanya mengisi lebar ~776px dan menyisakan ruang kosong hitam sebesar 664px di sebelah kanan (seperti yang ditandai garis putih pada tangkapan layar ketiga).
+      - Kanvas 9:16 terdorong ke kiri dan tidak berada di tengah layar.
+      - Tinggi timeline terkunci kaku di 280px tanpa opsi pengaturan tinggi vertikal.
+    - **Hasil Alignment Desain (/grill-me)**:
+      1. Area preview pada Mode Studio dibuat memenuhi 100% lebar layar (kanvas tepat di tengah layar secara horizontal dan vertikal). Saat drawer/inspector dibuka, dock kanan 400px baru muncul secara otomatis.
+      2. Tinggi timeline di Mode Studio dapat ditarik naik-turun menggunakan handle geser vertikal (batas minimal 180px, batas maksimal dinamis, default 280px, tersimpan di localStorage).
+      3. Zoom kanvas disesuaikan secara otomatis (Fit to Viewport) saat beralih mode tata letak agar komposisi selalu pas dan tidak terpotong.
+    - **Root Cause Analysis Ruang Hitam Kosong**:
+      - Pada `index.html:37318`, fungsi `applySplit` upstream Open-Motion selalu memaksakan inline style `main.style.setProperty('grid-template-columns', '${previewPx}px minmax(0,1fr)', 'important')` setiap kali jendela berubah ukuran atau proyek dimuat.
+      - Properti inline `!important` tersebut mengunci kolom pertama grid pada 776px dan menyisakan kolom kedua kosong, sehingga elemen `.previewArea` terperangkap di sebelah kiri.
+    - **Solusi yang Diterapkan Tanpa Mengubah `index.html`**:
+      1. Di `electron/desktop-engine.js`:
+         - Menambahkan `protectStudioGrid()` yang mencegat `editorMain.style.setProperty` dan memasang MutationObserver pada atribut `style` untuk menghapus paksaan `grid-template-columns` dan `grid-template-rows` khusus saat Mode Studio aktif.
+         - Menambahkan `setupTimelineVerticalResizer()`: memasang `#amTimelineResizeBar` dan menghubungkan `#editorSplitHandle` dengan event pointer drag untuk mengatur variabel CSS `--am-timeline-height`. Nilai disimpan ke `am_studio_timeline_height` di localStorage.
+         - Menambahkan `refitEditorCanvas()`: otomatis memicu klik `#fitBtn` / `ui.applyCompositionFitZoom()` dan resize WebGL setelah pergantian mode dan perubahan ukuran timeline.
+         - Menambahkan `watchDrawerForCanvasFit()`: memantau buka-tutup `#drawer` agar saat inspector terbuka/tertutup, zoom kanvas menyesuaikan ulang secara otomatis.
+      2. Di `css/desktop-studio.css`:
+         - Mengubah `.editorMain` menjadi `grid-template-columns: 1fr !important;` dan `grid-template-rows: minmax(0, 1fr) var(--am-timeline-height, 280px) !important;`.
+         - Menambahkan `.editorMain:has(#drawer:not(.hidden)) { grid-template-columns: minmax(0, 1fr) 400px !important; }`.
+         - Mengubah `.timelineArea` menjadi `grid-column: 1 / -1 !important;` sehingga selalu membentang penuh di baris kedua.
+         - Memusatkan `.viewport` dan `#canvasWrap` dengan `place-items: center`, `justify-content: center`, dan `margin: auto`.
+         - Memberi styling pada bar resizer vertikal `#amTimelineResizeBar` dan `#editorSplitHandle` dengan kursor `ns-resize`.
+    - **Verifikasi**:
+      - Diuji dengan skrip Electron headless `test-studio-layout.js`:
+        - Mode Studio (drawer tertutup): Grid 1fr, preview memenuhi lebar penuh, tidak ada ruang hitam kosong.
+        - Mode Studio (drawer terbuka): Grid minmax(0, 1fr) 400px, inspector dock di kanan 400px.
+        - Tinggi timeline dinamis: variabel `--am-timeline-height` merespons perubahan ukuran.
+        - Mode Asli: Grid minmax(420px, 1.2fr) minmax(520px, 1fr) kembali berfungsi 100% normal.
+      - Seluruh berkas pembaruan disinkronkan ke direktori rilis `release/Alight-Motion-PC-win-x64/resources/app/`.

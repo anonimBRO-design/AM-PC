@@ -873,10 +873,167 @@
     return style;
   }
 
+  function initStudioTimelineHeight() {
+    const savedH = parseInt(localStorage.getItem('am_studio_timeline_height'), 10) || 280;
+    document.documentElement.style.setProperty('--am-timeline-height', savedH + 'px');
+  }
+
+  function refitEditorCanvas() {
+    requestAnimationFrame(() => {
+      try {
+        const renderer = window.renderer || window.omsRenderer;
+        renderer?.resize?.();
+        const fitBtn = document.getElementById('fitBtn');
+        if (fitBtn) {
+          fitBtn.click();
+        } else {
+          const ui = getUI();
+          ui?.applyCompositionFitZoom?.();
+        }
+        renderer?.render?.();
+      } catch (e) {}
+    });
+    setTimeout(() => {
+      try {
+        const renderer = window.renderer || window.omsRenderer;
+        renderer?.resize?.();
+        const fitBtn = document.getElementById('fitBtn');
+        if (fitBtn) fitBtn.click();
+        renderer?.render?.();
+      } catch (e) {}
+    }, 60);
+  }
+
+  function protectStudioGrid(editorMain) {
+    if (!editorMain || editorMain._amGridProtected) return;
+    editorMain._amGridProtected = true;
+
+    const origSetProperty = editorMain.style.setProperty.bind(editorMain.style);
+    const origRemoveProperty = editorMain.style.removeProperty.bind(editorMain.style);
+
+    editorMain.style.setProperty = function(property, value, priority) {
+      const isOriginal = document.documentElement.getAttribute('data-editor-layout') === 'original' ||
+                         document.body?.classList?.contains('layout-original');
+      if (!isOriginal && (property === 'grid-template-columns' || property === 'grid-template-rows')) {
+        origRemoveProperty('grid-template-columns');
+        origRemoveProperty('grid-template-rows');
+        return;
+      }
+      return origSetProperty(property, value, priority);
+    };
+
+    const styleObserver = new MutationObserver(() => {
+      const isOriginal = document.documentElement.getAttribute('data-editor-layout') === 'original' ||
+                         document.body?.classList?.contains('layout-original');
+      if (!isOriginal) {
+        if (editorMain.style.getPropertyValue('grid-template-columns')) {
+          origRemoveProperty('grid-template-columns');
+        }
+        if (editorMain.style.getPropertyValue('grid-template-rows')) {
+          origRemoveProperty('grid-template-rows');
+        }
+      }
+    });
+    styleObserver.observe(editorMain, { attributes: true, attributeFilter: ['style'] });
+  }
+
+  function setupTimelineVerticalResizer() {
+    initStudioTimelineHeight();
+    const timelineArea = document.querySelector('.timelineArea');
+    if (!timelineArea) return;
+
+    let resizeBar = document.getElementById('amTimelineResizeBar');
+    if (!resizeBar) {
+      resizeBar = document.createElement('div');
+      resizeBar.id = 'amTimelineResizeBar';
+      resizeBar.title = 'Tahan dan geser vertikal untuk mengatur tinggi timeline';
+      timelineArea.insertBefore(resizeBar, timelineArea.firstChild);
+    }
+
+    const splitHandle = document.getElementById('editorSplitHandle');
+    const attachDrag = (el) => {
+      if (!el || el._amVerticalResizerAttached) return;
+      el._amVerticalResizerAttached = true;
+
+      el.addEventListener('pointerdown', (ev) => {
+        const isOriginal = document.documentElement.getAttribute('data-editor-layout') === 'original' ||
+                           document.body?.classList?.contains('layout-original');
+        if (isOriginal) return;
+
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        const startY = ev.clientY;
+        const currentH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--am-timeline-height'), 10) || 280;
+        let lastH = currentH;
+
+        document.body.style.cursor = 'ns-resize';
+        document.body.style.userSelect = 'none';
+        el.classList.add('dragging');
+
+        const onPointerMove = (moveEv) => {
+          const deltaY = moveEv.clientY - startY;
+          const minH = 180;
+          const maxH = Math.max(minH, window.innerHeight - 200);
+          lastH = Math.min(maxH, Math.max(minH, Math.round(currentH - deltaY)));
+          document.documentElement.style.setProperty('--am-timeline-height', lastH + 'px');
+        };
+
+        const onPointerUp = () => {
+          window.removeEventListener('pointermove', onPointerMove, true);
+          window.removeEventListener('pointerup', onPointerUp, true);
+          window.removeEventListener('pointercancel', onPointerUp, true);
+          document.body.style.cursor = '';
+          document.body.style.userSelect = '';
+          el.classList.remove('dragging');
+          localStorage.setItem('am_studio_timeline_height', lastH);
+          refitEditorCanvas();
+          const timeline = getTimeline();
+          timeline?.rebuild?.();
+        };
+
+        window.addEventListener('pointermove', onPointerMove, true);
+        window.addEventListener('pointerup', onPointerUp, true);
+        window.addEventListener('pointercancel', onPointerUp, true);
+      }, { passive: false });
+    };
+
+    attachDrag(resizeBar);
+    attachDrag(splitHandle);
+  }
+
+  function watchDrawerForCanvasFit() {
+    const drawer = document.getElementById('drawer');
+    if (!drawer || drawer._amFitWatched) return;
+    drawer._amFitWatched = true;
+    let wasHidden = drawer.classList.contains('hidden');
+
+    const obs = new MutationObserver(() => {
+      const isHidden = drawer.classList.contains('hidden');
+      if (isHidden !== wasHidden) {
+        wasHidden = isHidden;
+        const isOriginal = document.documentElement.getAttribute('data-editor-layout') === 'original' ||
+                           document.body?.classList?.contains('layout-original');
+        if (!isOriginal) {
+          refitEditorCanvas();
+        }
+      }
+    });
+    obs.observe(drawer, { attributes: true, attributeFilter: ['class'] });
+  }
+
   function setupLayoutSwitcher() {
     const style = ensureStudioCss();
+    initStudioTimelineHeight();
     const savedLayout = localStorage.getItem('am_editor_layout_mode') || 'studio';
     const isOriginal = savedLayout === 'original';
+
+    const editorMain = document.querySelector('.editorMain');
+    if (editorMain) {
+      protectStudioGrid(editorMain);
+    }
+    setupTimelineVerticalResizer();
+    watchDrawerForCanvasFit();
 
     // Pastikan status stylesheet dan drawer sesuai mode saat inisialisasi
     if (style && !style._amInitApplied) {
@@ -890,7 +1047,6 @@
       }
       const drawer = document.getElementById('drawer');
       const timelineArea = document.querySelector('.timelineArea');
-      const editorMain = document.querySelector('.editorMain');
       if (isOriginal) {
         if (drawer && timelineArea && drawer.parentElement !== timelineArea) {
           timelineArea.appendChild(drawer);
@@ -898,6 +1054,10 @@
       } else {
         if (drawer && editorMain && drawer.parentElement !== editorMain) {
           editorMain.appendChild(drawer);
+        }
+        if (editorMain) {
+          editorMain.style.removeProperty('grid-template-columns');
+          editorMain.style.removeProperty('grid-template-rows');
         }
       }
     }
@@ -909,7 +1069,7 @@
 
       const style = ensureStudioCss();
       const drawer = document.getElementById('drawer');
-      const editorMain = document.querySelector('.editorMain');
+      const main = document.querySelector('.editorMain');
       const timelineArea = document.querySelector('.timelineArea');
 
       if (newMode === 'original') {
@@ -923,9 +1083,9 @@
         if (drawer && timelineArea && drawer.parentElement !== timelineArea) {
           timelineArea.appendChild(drawer);
         }
-        if (editorMain) {
-          editorMain.style.removeProperty('grid-template-columns');
-          editorMain.style.removeProperty('grid-template-rows');
+        if (main) {
+          main.style.removeProperty('grid-template-columns');
+          main.style.removeProperty('grid-template-rows');
         }
         try { sessionStorage.removeItem('omsDesktopCanvasSplitRatioV441A'); } catch(e) {}
         try { sessionStorage.removeItem('omsDesktopLandscapePreviewRatio'); } catch(e) {}
@@ -938,26 +1098,21 @@
         document.documentElement.setAttribute('data-editor-layout', 'studio');
         document.body?.classList?.add('layout-studio');
         document.body?.classList?.remove('layout-original');
-        if (drawer && editorMain && drawer.parentElement !== editorMain) {
-          editorMain.appendChild(drawer);
+        if (drawer && main && drawer.parentElement !== main) {
+          main.appendChild(drawer);
         }
-        if (editorMain) {
-          editorMain.style.removeProperty('grid-template-columns');
-          editorMain.style.removeProperty('grid-template-rows');
+        if (main) {
+          main.style.removeProperty('grid-template-columns');
+          main.style.removeProperty('grid-template-rows');
+          protectStudioGrid(main);
         }
         if (typeof toast === 'function') toast('Beralih ke Mode Studio (Atas-Bawah)');
       }
 
       updateLayoutSwitcherBtn();
-      window.dispatchEvent(new Event('resize'));
-      const ui = getUI();
-      ui?.applyCompositionFitZoom?.();
-      ui?.fit?.();
+      refitEditorCanvas();
       const timeline = getTimeline();
       timeline?.rebuild?.();
-      const renderer = window.renderer || window.omsRenderer;
-      renderer?.resize?.();
-      renderer?.render?.();
     };
 
     function updateLayoutSwitcherBtn() {
