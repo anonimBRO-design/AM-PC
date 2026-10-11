@@ -56,3 +56,13 @@
      - Memperbesar tombol `+ PROYEK BARU` (`#newProjectFab`): container 38px, ikon `span` 18px, label `b` **13px** (extrabold 800, uppercase).
      - Memperbesar tombol bahasa `ID` (`#homeLanguageBtn`): container 36px, teks kode **12px** (bold 800).
    - **Verifikasi**: Diuji dan diambil screenshot verifikasi visual di `screenshot_home_typography.png`. Commit `740220f`.
+
+5. **Eksekusi Optimasi Editor AM-PC Sesuai Review Hermes (Sesi 4)**:
+   - **Langkah 1 (`preload.js` — Commit `f1c0a10`)**:
+     - Menerapkan *leading + trailing throttle gate* (250ms) pada `MutationObserver` (`preload.js:1194`).
+     - Menghilangkan beban eksekusi 7 fungsi DOM traversal yang sebelumnya terpicu 60× per detik akibat mutasi teks timecode (`#previewTime` / `#timeRead`) selama playback.
+   - **Langkah 2 (`main.js` — Commit `5010357`)**:
+     - Menambahkan `backgroundThrottling: false` ke `webPreferences` pada BrowserWindow utama untuk mencegah penurunan frame rate saat jendela tidak fokus.
+   - **Langkah 3 & 4 (`desktop-engine.js` — Commit `88658c7`)**:
+     - Menambahkan penanganan roda mouse (`wheel`) di `#timelineScroll`: scroll vertikal mouse otomatis menggeser timeline horizontal (`scrollLeft += deltaY`), dan `Ctrl + Wheel` meneruskan ke fungsi zoom bawaan `timeline.onZoomWheel(e)`. Gesture pan trackpad (`deltaX`) dan zoom ruler native tetap dijaga.
+     - Membatasi *scope* pencarian kartu efek `.effectCard` agar hanya memeriksa di dalam `#drawer` saat terlihat, bukan memindai satu dokumen penuh.
