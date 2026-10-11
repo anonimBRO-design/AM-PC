@@ -762,7 +762,7 @@
     }
   }
 
-  // 7. Desktop Timeline Mouse Wheel Navigation (Horizontal Scroll & Zoom)
+  // 7. Desktop Timeline Mouse Wheel Navigation (Vertical Scroll, Shift+Horizontal, Ctrl+Zoom)
   function setupTimelineWheelNavigation() {
     const scroller = document.getElementById('timelineScroll');
     if (!scroller || scroller._amWheelBound) return;
@@ -772,13 +772,7 @@
       // Don't intercept wheel events coming directly from the ruler band (which has native zoom)
       if (e.target && e.target.closest && e.target.closest('#ruler')) return;
 
-      const absY = Math.abs(e.deltaY);
-      const absX = Math.abs(e.deltaX);
-
-      // If horizontal gesture is dominant (e.g. 2-finger trackpad pan), let native handle it
-      if (absX > absY) return;
-
-      // If user holds Ctrl / Meta: delegate to Open Motion native timeline.onZoomWheel(e)
+      // 1. If user holds Ctrl / Meta: delegate to Open Motion native timeline.onZoomWheel(e)
       if (e.ctrlKey || e.metaKey) {
         const timeline = getTimeline();
         if (timeline && typeof timeline.onZoomWheel === 'function') {
@@ -787,15 +781,18 @@
         return;
       }
 
-      // Vertical mouse wheel: pan timeline horizontally
-      if (absY > 0.01) {
+      // 2. If user holds Shift: pan timeline horizontally (kiri-kanan waktu) with smooth 1x speed
+      if (e.shiftKey) {
         e.preventDefault();
-        let delta = e.deltaY;
-        if (e.deltaMode === 1) delta *= 32;       // DOM_DELTA_LINE
-        else if (e.deltaMode === 2) delta *= 320; // DOM_DELTA_PAGE
-        const speed = e.shiftKey ? 2.5 : 1.2;
-        scroller.scrollLeft += delta * speed;
+        let delta = e.deltaY || e.deltaX;
+        if (e.deltaMode === 1) delta *= 24;       // DOM_DELTA_LINE
+        else if (e.deltaMode === 2) delta *= 240; // DOM_DELTA_PAGE
+        scroller.scrollLeft += delta;
+        return;
       }
+
+      // 3. Normal mouse wheel without modifier:
+      // Biarkan scroll vertikal native (atas-bawah) untuk melihat daftar track/layer tanpa di-hijack!
     }, { passive: false });
   }
 
