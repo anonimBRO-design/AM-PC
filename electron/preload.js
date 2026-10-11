@@ -33,6 +33,54 @@ contextBridge.exposeInMainWorld('desktopAPI', {
   showItemInFolder: (filePath) => ipcRenderer.invoke('shell-show-item', filePath)
 });
 
+// Injeksi CSS dini: Hapus seketika FOUC (Flash of Unstyled Content) dan sembunyikan popup notice dari frame pertama
+(() => {
+  try {
+    const desktopCssPath = path.join(__dirname, '../css/desktop.css');
+    const themeCssPath = path.join(__dirname, '../css/theme.css');
+
+    let combinedEarlyCss = `
+      #experimentalNotice,
+      #homeAMNoticeBtn {
+        display: none !important;
+        pointer-events: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+      }
+    `;
+
+    if (fs.existsSync(themeCssPath)) {
+      combinedEarlyCss += '\n' + fs.readFileSync(themeCssPath, 'utf8');
+    }
+    if (fs.existsSync(desktopCssPath)) {
+      combinedEarlyCss += '\n' + fs.readFileSync(desktopCssPath, 'utf8');
+    }
+
+    const injectTag = () => {
+      const target = document.head || document.documentElement;
+      if (target && !document.getElementById('am-early-css')) {
+        const style = document.createElement('style');
+        style.id = 'am-early-css';
+        style.textContent = combinedEarlyCss;
+        target.prepend(style);
+        return true;
+      }
+      return false;
+    };
+
+    if (!injectTag()) {
+      const obs = new MutationObserver(() => {
+        if (injectTag()) {
+          obs.disconnect();
+        }
+      });
+      obs.observe(document, { childList: true, subtree: true });
+    }
+  } catch (err) {
+    console.error('[AM-PC] Early CSS injection failed:', err);
+  }
+})();
+
 // Native Desktop styling, branding & in-app web modal hooks
 window.addEventListener('DOMContentLoaded', () => {
   document.title = 'Alight Motion PC';
