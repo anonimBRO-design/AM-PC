@@ -314,6 +314,26 @@ Suntikkan script dan periksa apakah `window.__amDesktopEngineInitialized` bernil
 
 ---
 
+## 13. Format warna hex Android `#AARRGGBB` vs Web `#RRGGBBAA` (AM-Native-Desktop)
+
+**Gejala:** Kanvas proyek Alight Motion yang diimpor dari XML tertutup warna pink/salmon solid satu layar penuh. Proyek dengan 52 layer tidak menampilkan gambar apa pun selain warna salmon solid.
+**Kejadian:** 11 Okt 2026, Antigravity.
+**Sebab:** Alight Motion di Android mengekspor warna 8-digit dalam format Android Color Int `#AARRGGBB` (2 digit pertama adalah Alpha). Fungsi `parseHexColor()` lama menganggapnya sebagai format CSS/Web `#RRGGBBAA` (`(num >> 24)` diambil sebagai Red). Akibatnya, `#ff000000` (hitam pekat, Alpha=0xFF) dibaca sebagai Red=1.0, Green=0, Blue=0, Alpha=0.
+**Perbaikan:** Di `src/engine/webgl2-renderer.ts`, parsing hex 8-digit diubah agar membaca `str.slice(0, 2)` sebagai Alpha, `str.slice(2, 4)` sebagai Red, `str.slice(4, 6)` sebagai Green, dan `str.slice(6, 8)` sebagai Blue.
+**Cara memverifikasi:** Proyek Alight Motion dengan `#ff000000` atau `#ffffffff` terbaca akurat `[0, 0, 0, 1.0]` dan `[1, 1, 1, 1.0]`.
+
+---
+
+## 14. Pemanggilan `gl.clear` satu layar penuh pada `renderBaseLayerContent` di WebGL FBO
+
+**Gejala:** Setiap layer menimpa seluruh viewport kanvas dengan warna solid (atau latar belakang default hijau toska `[0.0, 0.9, 0.5, 1.0]`), sehingga hanya layer paling atas yang terlihat menutupi seluruh layar.
+**Kejadian:** 11 Okt 2026, Antigravity.
+**Sebab:** `renderBaseLayerContent` lama melakukan `gl.clearColor(...)` dan `gl.clear(gl.COLOR_BUFFER_BIT)` langsung ke buffer ping FBO. Buffer ping seharusnya dibersihkan transparan `(0, 0, 0, 0)` di awal render layer, lalu konten layer (shape/media) digambar sebagai quad bertransformasi (`uMatrix`) yang dibatasi ukuran dan koordinat lokal layer tersebut.
+**Perbaikan:** Hapus `gl.clear` dari `renderBaseLayerContent`. Buat program `layerProgram` yang menerima `uMatrix` (mat4 proyeksi orthographic 2D + model matrix: posisi, skala, rotasi, ukuran), lalu panggil `shaderPipeline.drawQuad()`.
+**Cara memverifikasi:** Kanvas menampilkan layer dengan batas ukuran dan posisinya masing-masing, area di luar layer tetap transparan atau menampilkan layer di bawahnya.
+
+---
+
 ## Cara menambah jebakan baru
 
 Kalau kamu menemukan hal yang bikin rugi, tambahkan di sini dengan format:

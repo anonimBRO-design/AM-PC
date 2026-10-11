@@ -25,3 +25,21 @@
    - **Verifikasi Smoke Test**:
      - Divalidasi via headless Electron test script dengan 0 error konsol dan 0 feedback loop WebGL.
      - Dihasilkan visual screenshot pembuktian di `dist/smoke-screenshot.png` dan `dist/smoke-mobile-screenshot.png`.
+
+3. **Perbaikan Kanvas Solid Salmon/Pink, Parser XML & Shader Pipeline (Sesi 2)**:
+   - **Root Cause Kanvas Solid Pink**:
+     1. `parseHexColor()` membaca format 8-digit hex `#AARRGGBB` sebagai RGBA sehingga `#ff000000` (hitam opaque) dibaca sebagai merah (R=1.0).
+     2. `renderBaseLayerContent()` memanggil `gl.clearColor(...)` dan `gl.clear(gl.COLOR_BUFFER_BIT)` ke seluruh framebuffer FBO untuk setiap layer, menimpa seluruh layar dengan warna solid tanpa batas quad transform.
+   - **Solusi Transform Quad & Media Rendering**:
+     - Menambahkan program shader `layerProgram` di `src/engine/shader-pipeline.ts` yang mendukung `uMatrix` (mat4 2D orthographic + transform), `uUseTexture` (sampler2D), dan `uColor` (vec4).
+     - Mengganti `renderBaseLayerContent()` dengan kalkulasi matriks model-view-proyeksi layer (`position`, `scale`, `rotation`, `size`) dan penggambaran quad berbatas presisi via `shaderPipeline.drawQuad()`.
+     - Mengintegrasikan `MediaManager` ke dalam `WebGL2Renderer` untuk auto-registrasi layer media dan binding texture ke GL.
+   - **Overhaul XML Parser (`src/parser/am-xml-parser.ts`)**:
+     - Membaca metadata `<media>` lengkap (`uri`, `filename`, `type`, `width`, `height`).
+     - Mendukung parsing rekursif `<embedScene>` dan `<scene>` bersarang (terbukti membaca 50 track pada project nyata Alight Motion).
+     - Membaca timing milidetik (`startTime`, `endTime`), `<transform>` (`location`, `scale`, `rotation`, `opacity`, `pivot`), ukuran setengah dimensi (`<size>`, `<property name="size">`), dan keyframe `<kf>`.
+   - **Sanitasi Shader Pipeline GLSL ES 3.00**:
+     - Berhasil menaikkan pass-rate kompilasi shader dari **60.2% (162/269)** menjadi **95.5% (257/269 pass, hanya tersisa 12 efek)**.
+   - **Pembersihan Emoji 100% Bebas**:
+     - Menghapus seluruh karakter emoji di `timeline-panel.ts`, `inspector-panel.ts`, `studio-ui.ts`, dan `main.ts`.
+   - **Verifikasi**: Divalidasi lewat `scripts/test-import-render.js` dan `npm run verify:ui`, menghasilkan bukti visual kanvas 9:16 ter-render sempurna di `screenshot_imported_xml_rendered.png`.

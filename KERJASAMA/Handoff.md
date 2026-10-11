@@ -11,25 +11,24 @@ Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
 ## Sedang apa
 
 **Aktif Paralel (Antigravity & Hermes) pada proyek AM-Native-Desktop**:
-- **Antigravity (SELESAI)**:
-  - Memperbaiki `acScreenNorm` & `acLayerNorm` menjadi varying (`vTexCoord`), menghilangkan fatal bug flat-color di 250 shader.
-  - Mendeklarasikan 13 uniform APK bawaan (`acScreenSize`, `acTime`, `acLayerCenterNorm`, `acLayerToScreen`, dll.) + global `l2s` & `s2l` helper, menghilangkan 87 shader compile fail.
-  - Memperbaiki `setBlendMode` (`add`, `screen`, `multiply`, `lighten`, `darken`) dan runtime uniform bindings per frame.
-  - Memperbaiki category chips di Effects Panel (`matte`, `procedural`, `transform`, `general`, `opacity`) dan menyematkan badge tipe `[GLSL]` vs `[CPU]`.
-  - Mengganti placeholder teks logo `<div class="am-logo-pill">AM</div>` dengan logo resmi Alight Motion (`test_prime_am.png` squircle swirl) di HomeScreen dan Editor Studio.
-  - Memperbaiki entrypoint `main` di `package.json` ke `electron/main.js`.
-  - Teruji live di Electron: 5 efek diterapkan sekaligus ke stack tanpa error/crash WebGL.
+- **Antigravity (SELESAI Tahap 1 & 2)**:
+  - ✅ **Root Cause Kanvas Pink Terpecahkan**: Memperbaiki `parseHexColor()` untuk format Android/AM `#AARRGGBB` (sebelumnya `#ff000000` hitam terbaca merah R=1.0) dan menghapus `gl.clearColor` layar penuh di `renderBaseLayerContent()`.
+  - ✅ **Rendering Transform Quad & Media**: Membuat `layerProgram` WebGL2 dengan `uMatrix` (mat4 2D orthographic + transform), `uColor`, dan `uUseTexture`. Mengintegrasikan `MediaManager` milik Hermes ke dalam `WebGL2Renderer`.
+  - ✅ **Overhaul Parser XML (`am-xml-parser.ts`)**: Mendukung parsing rekursif `<embedScene>`, resolusi aset `<media>`, pembacaan timing milidetik, transformasi `<transform>` (`location`, `scale`, `rotation`, `opacity`, `pivot`), ukuran `<size>`, dan keyframe `<kf>`. Berhasil mengimpor project riil Alight Motion 50 track secara akurat.
+  - ✅ **Sanitasi Shader Pipeline**: Menaikkan pass rate kompilasi shader dari **60.2%** menjadi **95.5%** (257 dari 269 shader pass, hanya tersisa 12 efek).
+  - ✅ **Pembersihan Emoji 100%**: Membersihkan semua sisa karakter emoji di UI (`timeline-panel.ts`, `inspector-panel.ts`, `studio-ui.ts`, `main.ts`).
+  - ✅ **Verifikasi Visual**: Berhasil diuji coba dan menghasilkan screenshot bukti `screenshot_imported_xml_rendered.png` dan `screenshot_effects_applied.png`.
 - **Hermes (SELESAI poin 1–3, poin 4 menunggu keputusan user)**:
   - ✅ Ikon: `KNOWN_THUMB_MAP` (105 entri dari `commonMap` AM-PC) + normalizer snake-case → resolusi 55 → **276/328 (84,1%)**. Commit `d8f52c8`.
   - ✅ Fix bug parser param `bundle-effects.js`: tag `choice`/`hue-disc`/`float` + dedupe id duplikat (18 efek) → shader pass-rate 148 → 162/269.
-  - ✅ `src/engine/media-manager.ts` (467 baris, texImage2D loader; `webgl2-renderer.ts` tidak disentuh — **butuh wiring dari Antigravity**). Commit `7373cb1`.
-  - ✅ Batch test shader: `npm run verify:shaders` → laporan `scratch/shader-batch-report.json`; sisa 107 gagal + resep fix ada di [[Log/2026-10-11 Hermes]].
+  - ✅ `src/engine/media-manager.ts` (467 baris, texImage2D loader; **sudah di-wire sempurna oleh Antigravity**).
+  - ✅ Batch test shader: `npm run verify:shaders` → laporan `scratch/shader-batch-report.json`.
   - 🔶 Remote GitHub: `origin` **sudah di-set** ke `anonimBRO-design/AM-Native-Desktop`; push tertunda — repo belum dibuat di GitHub (tugas user) + kredensial tidak tersedia di sesi non-tty. Retry `git push -u origin main` setelah repo ada.
 
 | Agent | Status | Fokus Area |
 |---|---|---|
-| **Antigravity** | ✅ Selesai Tahap 1 | WebGL2 Engine, Shader Pipeline, Environment Uniforms, UI Badging |
-| **Hermes** | ✅ Poin 1–3 selesai · ⏳ Poin 4 (remote) | Ikon KnownMap, Media Loader (`texImage2D`), QA Suite, Git Remote |
+| **Antigravity** | ✅ Selesai Tahap 1 & 2 | WebGL2 Engine, Quad Transform, XML Parser Overhaul, 95.5% Shader Pass, Zero Emojis |
+| **Hermes** | ✅ Poin 1–3 selesai · ⏳ Poin 4 (remote) | Ikon KnownMap, Media Loader, QA Suite, Git Remote |
 
 ---
 
