@@ -68,94 +68,17 @@ window.addEventListener('DOMContentLoaded', () => {
   };
   updateBrand();
 
-  // 1b. Rebrand & ensure Experimental Notice dialog is accessible
-  const openNoticeModal = (triggerEl = null) => {
-    const notice = document.getElementById('experimentalNotice');
-    if (!notice) return;
-
-    const trigger = triggerEl || document.getElementById('homeAMNoticeBtn');
-    if (trigger) {
-      const rect = trigger.getBoundingClientRect();
-      notice._amOpenTrigger = {
-        x: rect.left + rect.width / 2,
-        y: rect.top + rect.height / 2,
-        target: trigger
-      };
-    } else {
-      notice._amOpenTrigger = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    }
-
-    notice._amClosing = false;
-    notice.removeAttribute('aria-hidden');
-    notice.style.removeProperty('display');
-    notice.style.removeProperty('pointer-events');
-
-    const card = notice.querySelector('.experimentalNoticeCard');
-    if (card && notice._amOpenTrigger) {
-      const cardRect = card.getBoundingClientRect();
-      const ox = notice._amOpenTrigger.x - cardRect.left;
-      const oy = notice._amOpenTrigger.y - cardRect.top;
-      card.style.transformOrigin = `${ox}px ${oy}px`;
-    }
-
-    notice.classList.remove('am-morph-close');
-    void notice.offsetWidth;
-    notice.classList.add('am-morph-open');
-  };
-  window.openNotice = openNoticeModal;
-
+  // 1b. Hapus/Sembunyikan dialog Experimental Notice permanen
   const updateNotice = () => {
     const notice = document.getElementById('experimentalNotice');
-    if (!notice) return;
-
-    // Do NOT auto-hide with localStorage!
-    try {
-      localStorage.removeItem('am_notice_accepted');
-    } catch (e) {}
-
-    // Show notice on startup if not dismissed during THIS session
-    if (!sessionStorage.getItem('am_notice_dismissed_session')) {
-      openNoticeModal();
+    if (notice) {
+      notice.setAttribute('aria-hidden', 'true');
+      notice.style.setProperty('display', 'none', 'important');
+      notice.style.setProperty('pointer-events', 'none', 'important');
     }
-
-    const title = document.getElementById('experimentalNoticeTitle');
-    if (title && (title.textContent.includes('Open Motion') || !title.textContent.includes('Alight Motion PC'))) {
-      title.textContent = 'Alight Motion PC masih dalam tahap eksperimen';
-    }
-
-    const intro = document.getElementById('experimentalNoticeIntro');
-    if (intro && intro.textContent.includes('Open Motion')) {
-      intro.textContent = intro.textContent.replaceAll('Open Motion', 'Alight Motion PC');
-    }
-
-    const eyebrow = notice.querySelector('.experimentalNoticeEyebrow');
-    if (eyebrow && eyebrow.textContent !== 'ALIGHT MOTION PC') {
-      eyebrow.textContent = 'ALIGHT MOTION PC';
-    }
-
-    const body = notice.querySelector('.experimentalNoticeBody');
-    if (body && body.innerHTML.includes('Open Motion')) {
-      body.innerHTML = body.innerHTML.replaceAll('Open Motion', 'Alight Motion PC');
-    }
-
-    const accept = document.getElementById('experimentalNoticeAccept');
-    if (accept && !accept.dataset.amBound) {
-      accept.dataset.amBound = 'true';
-      accept.addEventListener('click', () => {
-        sessionStorage.setItem('am_notice_dismissed_session', 'true');
-        window.__omsExperimentalNoticeAccepted = true;
-      });
-    }
-
-    if (!notice.dataset.amBound) {
-      notice.dataset.amBound = 'true';
-      notice.addEventListener('click', (e) => {
-        if (e.target === notice) {
-          sessionStorage.setItem('am_notice_dismissed_session', 'true');
-          window.__omsExperimentalNoticeAccepted = true;
-        }
-      });
-    }
+    const noticeBtn = document.getElementById('homeAMNoticeBtn');
+    if (noticeBtn) noticeBtn.remove();
+    window.__omsExperimentalNoticeAccepted = true;
   };
   updateNotice();
 
@@ -529,21 +452,8 @@ window.addEventListener('DOMContentLoaded', () => {
         topActions.insertBefore(hubBtn, amLinkBtn);
       }
 
-      if (!document.getElementById('homeAMNoticeBtn')) {
-        const noticeBtn = document.createElement('button');
-        noticeBtn.id = 'homeAMNoticeBtn';
-        noticeBtn.className = 'rightBtn';
-        noticeBtn.type = 'button';
-        noticeBtn.title = 'Info Alight Motion PC (Catatan Eksperimental)';
-        noticeBtn.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-          <span>INFO</span>
-        `;
-        noticeBtn.onclick = () => {
-          openNoticeModal(noticeBtn);
-        };
-        topActions.appendChild(noticeBtn);
-      }
+      const oldNoticeBtn = document.getElementById('homeAMNoticeBtn');
+      if (oldNoticeBtn) oldNoticeBtn.remove();
     }
   };
   mountActionButtons();

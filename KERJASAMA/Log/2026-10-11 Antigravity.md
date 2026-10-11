@@ -184,3 +184,13 @@
       - Memverifikasi hash: `git hash-object index.html` menghasilkan `be33d60e92a0a275af1c286df3aed262ab84e77f` (identik 100% dengan upstream).
       - Menyinkronkan `index.html` ke direktori rilis `release/Alight-Motion-PC-win-x64/resources/app/index.html`.
       - Memperbarui dokumentasi `AGENTS.md`, `KERJASAMA/Fakta.md` (F-01), dan `KERJASAMA/Handoff.md`.
+
+13. **Pembersihan Tombol INFO dan Dialog Notice Eksperimental Startup**:
+    - **Permintaan Pengguna**: Menghapus tombol "INFO" di bilah atas Beranda dan dialog popup catatan eksperimental saat startup ("info ga penting, hapus aja?").
+    - **Tindakan**:
+      - Di `electron/preload.js`:
+        - Menghapus pembuatan tombol `#homeAMNoticeBtn` pada `mountActionButtons()` dan menghapus tombol tersebut jika ada di DOM.
+        - Menyederhanakan `updateNotice()` agar `#experimentalNotice` disembunyikan secara permanen (`aria-hidden="true"`, `display: none !important`, `pointer-events: none !important`), serta menandai `window.__omsExperimentalNoticeAccepted = true` agar tidak ada dialog popup yang mengganggu startup.
+      - Di `css/desktop.css`:
+        - Menambahkan aturan global permanen: `#experimentalNotice, #homeAMNoticeBtn { display: none !important; pointer-events: none !important; visibility: hidden !important; opacity: 0 !important; }`.
+      - Menyinkronkan seluruh berkas ke direktori rilis `release/Alight-Motion-PC-win-x64/resources/app/`.

@@ -1,3 +1,13 @@
+
+/* Info & Experimental Notice Permanently Hidden */
+#experimentalNotice,
+#homeAMNoticeBtn {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
 /* ============================================================
    Alight Motion PC (AM-PC) — Desktop System Shell
    ============================================================ */
