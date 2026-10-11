@@ -1,7 +1,7 @@
 # Handoff — State Terkini
 
 > **File ini DITIMPA, bukan ditambahi.** Selalu cerminkan kondisi terkini.
-> Terakhir diperbarui: 10 Okt 2026 · oleh: Antigravity
+> Terakhir diperbarui: 11 Okt 2026 · oleh: Antigravity
 
 Bagian dari [[README|protokol kerja bersama]].
 Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
@@ -10,11 +10,16 @@ Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
 
 ## Sedang apa
 
-**Idle.** Masalah tautkan ulang media pada multi-selection ("itu tautkan ulang gaada pas kita pilih layer banyak") dan loncatan timeline/kolaps track ("pas pencet salah satu layar malah keatas sendiri") telah diperbaiki secara tuntas. Kini saat memilih banyak layer, drawer kanan menampilkan kartu "Tautkan Ulang Media" lengkap dengan daftar media, tombol relink per-media, tombol cari otomatis, dan tombol batalkan pilihan. Klik mouse pada timeline kini stabil tanpa loncat ke atas atau salah masuk mode multi-select.
+**Idle.** Sesuai arahan user (*"kita cuma akan aplikasikan icon effect asli ajaa ke main"*), branch `main` kini telah mengadopsi **ikon efek resmi Alight Motion**:
+- 368 thumbnail WebP resmi diekstrak dari APK AM v5.0 ke `icons/effects/`.
+- Effect Browser Drawer kini dihiasi thumbnail squircle 42px resmi.
+- Inspector Effect Stack kini dihiasi thumbnail squircle 22px resmi.
+- `userDataPath` dikunci permanen ke `AppData/Roaming/Alight Motion PC` sehingga proyek pengguna selalu tampil lengkap.
+- Eksperimen porting paket 228 efek native tetap tersimpan aman di branch `feat/am-native-effects-and-icons`.
 
 | Agent | Status |
 |---|---|
-| **Antigravity** | Selesai — Implementasi Multi-Select Media Relinker, netralisasi timeline focus session jump, proteksi mouse click long-press, build & rilis terverifikasi |
+| **Antigravity** | Selesai — Aplikasi thumbnail efek resmi Alight Motion ke `main`, lock userData path, sinkronisasi build release |
 | **Claude Code** | Selesai — audit, verifikasi, buat sistem kerja sama |
 
 ---

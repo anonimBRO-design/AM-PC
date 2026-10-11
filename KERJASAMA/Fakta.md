@@ -287,3 +287,14 @@ mengulangi cara berpikir yang sama.
 - **Diperiksa:** 10 Okt 2026, Antigravity
 - **Akibat:** Efek Wave Warp dan penyesuaian latar belakang Alight Motion bekerja sempurna tanpa ada balok warna hijau/merah/kuning yang menutupi layar. Semua logic berada di `electron/desktop-engine.js` tanpa menyentuh `index.html`.
 
+### F-18 · Official Effect Thumbnails Integration (Ikon Resmi Alight Motion di UI)
+
+- **Fakta:**
+  1. Sebanyak 368 thumbnail WebP resmi Alight Motion diekstrak langsung dari `assets/effects/thumb/*` di dalam APK v5.0 (`alight-motion-5-0-273-1028425.xapk`) ke folder `icons/effects/`.
+  2. `electron/desktop-engine.js` menginjeksi thumbnail resmi ini ke:
+     - Drawer Effect Browser (`.effectLibraryCard .effectGlyph`), menggantikan glyph teks/karakter simbol dengan squircle 42px ikon resmi.
+     - Inspector Effect Stack (`.effectCardHead`), menambahkan squircle 22px ikon resmi di sebelah judul efek.
+  3. Menggunakan pemetaan otomatis + nama deskriptif (`commonMap`), kartu efek di perpustakaan efek dan stack layer kini menampilkan ikon resmi Alight Motion asli.
+- **Diperiksa:** 11 Okt 2026, Antigravity
+- **Akibat:** Tampilan antarmuka efek di AM-PC kini otentik dan identik dengan visual Alight Motion mobile.
+

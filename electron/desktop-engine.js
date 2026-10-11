@@ -577,12 +577,196 @@
     }
   }
 
+  // 6. Alight Motion Authentic Effect Thumbnails (Desktop UI)
+  function getEffectThumbnailPath(specId, effectName) {
+    if (!specId && !effectName) return null;
+    const extDefs = window.AMExtendedEffectDefinitions;
+
+    // Direct lookup in extDefs if available
+    let def = null;
+    if (extDefs && specId) {
+      def = extDefs[specId] ||
+            extDefs['com.alightcreative.effects.' + specId.replace(/^am_/, '')] ||
+            extDefs['com.alightcreative.blend.' + specId.replace(/^am_/, '')] ||
+            extDefs['com.alightcreative.' + specId.replace(/^am_/, '')];
+    }
+    if (def?.thumb) return 'icons/effects/' + def.thumb;
+
+    const cleanId = (specId || '').replace(/^am_/, '').replace(/^com\.alightcreative\.(effects\.)?/, '').toLowerCase();
+    const baseCleanId = cleanId.replace(/\d+$/, '');
+
+    const commonMap = {
+      'transform_motion_blur': 'motion_blur.webp',
+      'directional_motion_blur': 'directional_blur.webp',
+      'zoom_motion_blur': 'zoom_blur.webp',
+      'spin_motion_blur': 'spin_blur.webp',
+      'motion_tile': 'tiles.webp',
+      'bulge': 'pinch_bulge.webp',
+      'blink': 'blink.webp',
+      'blink2': 'blink.webp',
+      'light_sweep': 'rays.webp',
+      'flip': 'flip_layer.webp',
+      'flip3': 'flip_layer.webp',
+      '3d_flip': 'flip_layer.webp',
+      'channelmap': 'channel_remap_rgb.webp',
+      'channelmaphsv': 'channel_remap_hsv.webp',
+      'checkerdissolve': 'checker.webp',
+      'checkerdissolve2': 'checker.webp',
+      'chromakey_adv': 'advanced_chroma_key.webp',
+      'chromakey-adv': 'advanced_chroma_key.webp',
+      'chromatic_aberration': 'rgb_split.webp',
+      'color_balance_hls': 'color_balance.webp',
+      'colorhot': 'hot_color.webp',
+      'colorhot2': 'hot_color.webp',
+      'colortint': 'colorize.webp',
+      'colortemp': 'color_temperature.webp',
+      'colortune': 'color_tune.webp',
+      'bendwarp': 'bend.webp',
+      'brightcont': 'brightness_contrast.webp',
+      'brightcont2': 'brightness_contrast.webp',
+      'brightness_contrast': 'brightness_contrast.webp',
+      'hue_saturation': 'hue_shift.webp',
+      'gaussian_blur': 'gaussian_blur.webp',
+      'gaussianblur': 'gaussian_blur.webp',
+      'wave_warp': 'wave_warp.webp',
+      'wavewarp': 'wave_warp.webp',
+      'wavewarp2': 'wave_warp.webp',
+      'glow': 'glow.webp',
+      'tile': 'tiles.webp',
+      'tiles': 'tiles.webp',
+      'drop_shadow': 'drop_shadow.webp',
+      'vignette': 'vignette.webp',
+      'crop': 'crop.webp',
+      'border': 'border.webp',
+      'levels': 'levels.webp',
+      'curves': 'curves.webp',
+      'find_edges': 'find_edges.webp',
+      'gradient_ramp': 'gradient_map.webp',
+      'four_color_gradient': 'four_color_gradient.webp',
+      'fourcolorgradient': 'four_color_gradient.webp',
+      'gradientoverlay2': 'gradient_overlay.webp',
+      'gradient_overlay': 'gradient_overlay.webp',
+      'glowscan': 'glow_scan.webp',
+      'glow_scan': 'glow_scan.webp',
+      'magnifybg': 'copy_background.webp',
+      'copybg': 'copy_background.webp',
+      'copy_background': 'copy_background.webp',
+      'fade': 'fade_in_out.webp',
+      'fade_in_out': 'fade_in_out.webp',
+      'swing': 'swing.webp',
+      'swing2': 'swing.webp',
+      'oscillate': 'oscillate.webp',
+      'oscillate3': 'oscillate.webp',
+      'exposure': 'exposure_gamma.webp',
+      'exposure_gamma': 'exposure_gamma.webp',
+      'mblur': 'motion_blur.webp',
+      'motionblur': 'motion_blur.webp',
+      'motionblur2': 'motion_blur.webp',
+      'motionblur3': 'motion_blur.webp',
+      'motionblur4': 'motion_blur.webp',
+      'dblur': 'directional_blur.webp',
+      'directional_blur': 'directional_blur.webp',
+      'lensblur': 'lens_blur.webp',
+      'lensblur2': 'lens_blur.webp',
+      'lens_blur': 'lens_blur.webp',
+      'zoomblur': 'zoom_blur.webp',
+      'zoomblur2': 'zoom_blur.webp',
+      'zoomblur3': 'zoom_blur.webp',
+      'zoom_blur': 'zoom_blur.webp',
+      'spin': 'spin.webp',
+      'spinblur': 'spin_blur.webp',
+      'spinblur2': 'spin_blur.webp',
+      'spin_blur': 'spin_blur.webp',
+      'sharpen': 'sharpen.webp',
+      'satvib': 'saturation_vibrance.webp',
+      'saturation_vibrance': 'saturation_vibrance.webp',
+      'hueshift': 'hue_shift.webp',
+      'chromakey': 'chroma_key.webp',
+      'displacemap3': 'displacement_map.webp',
+      'displacement_map': 'displacement_map.webp',
+      'circularripple': 'circular_ripple.webp',
+      'circularripple2': 'circular_ripple.webp',
+      'circular_ripple': 'circular_ripple.webp',
+      'rgbsep': 'rgb_split.webp',
+      'rgb_split': 'rgb_split.webp',
+      'pinchbulge2': 'pinch_bulge.webp',
+      'pinch_bulge': 'pinch_bulge.webp',
+      'randomdisplace': 'turbulent_displace.webp',
+      'turbulent_displace': 'turbulent_displace.webp',
+      'swirl': 'swirl.webp',
+      'swirl4': 'swirl.webp',
+      'boxblur': 'box_blur.webp',
+      'boxblur2': 'box_blur.webp',
+      'boxblur3': 'box_blur.webp',
+      'box_blur': 'box_blur.webp',
+      'radialwipe': 'radial_wipe.webp',
+      'radial_wipe': 'radial_wipe.webp'
+    };
+
+    if (commonMap[cleanId]) return 'icons/effects/' + commonMap[cleanId];
+    if (commonMap[baseCleanId]) return 'icons/effects/' + commonMap[baseCleanId];
+
+    if (effectName) {
+      const nameClean = effectName.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+      if (commonMap[nameClean]) return 'icons/effects/' + commonMap[nameClean];
+      const nameBase = nameClean.replace(/\d+$/, '');
+      if (commonMap[nameBase]) return 'icons/effects/' + commonMap[nameBase];
+    }
+    return null;
+  }
+
+  function decorateEffectThumbnails() {
+    // In Effect Browser: inject authentic thumbnail into .effectLibraryCard
+    const drawer = document.getElementById('drawer');
+    if (drawer && drawer.classList.contains('effectsBrowserDrawer')) {
+      const cards = drawer.querySelectorAll('.effectLibraryCard[data-effect-library]:not([data-am-thumb-injected])');
+      cards.forEach(card => {
+        card.setAttribute('data-am-thumb-injected', 'true');
+        const specId = card.dataset.effectLibrary;
+        const effectName = card.dataset.effectName || card.querySelector('b')?.textContent?.trim();
+        const thumbPath = getEffectThumbnailPath(specId, effectName);
+        if (thumbPath) {
+          const glyphSpan = card.querySelector('.effectGlyph');
+          if (glyphSpan) {
+            glyphSpan.classList.add('hasThumb');
+            glyphSpan.innerHTML = `<img class="amEffectThumb" src="${thumbPath}" alt="" loading="lazy">`;
+          }
+        }
+      });
+    }
+
+    // In Inspector Effect Stack: inject authentic thumbnail into .effectCardHead
+    const effectCards = document.querySelectorAll('.effectCard[data-effect-instance]:not([data-am-head-thumb])');
+    effectCards.forEach(card => {
+      card.setAttribute('data-am-head-thumb', 'true');
+      const head = card.querySelector('.effectCardHead');
+      const title = head?.querySelector('.effectCardTitle');
+      if (head && title) {
+        const instId = card.dataset.effectInstance;
+        const model = getModel();
+        const l = model?.selectedLayer?.();
+        const inst = (l?.effectStack || []).find(i => i.instanceId === instId);
+        const specId = inst?.specId || inst?.amEffect?.id;
+        const effectName = title.textContent?.trim();
+        const thumbPath = getEffectThumbnailPath(specId, effectName);
+        if (thumbPath) {
+          const img = document.createElement('img');
+          img.className = 'amEffectHeadThumb';
+          img.src = thumbPath;
+          img.alt = '';
+          head.insertBefore(img, title);
+        }
+      }
+    });
+  }
+
   // Periodic heartbeat to keep patches active
   const runPatches = () => {
     disarmFocusSession();
     disarmMouseLongPress();
     hookDrawerAndMulti();
     patchAdjustmentLayers();
+    decorateEffectThumbnails();
   };
 
   runPatches();

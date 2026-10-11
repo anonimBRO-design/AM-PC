@@ -4,6 +4,8 @@ const fs = require('fs');
 
 // Configure Native App Identity
 app.name = 'Alight Motion PC';
+const userDataPath = path.join(app.getPath('appData'), 'Alight Motion PC');
+app.setPath('userData', userDataPath);
 if (process.platform === 'win32') {
   app.setAppUserModelId('com.alightmotion.pc');
 }
