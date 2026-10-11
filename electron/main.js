@@ -32,7 +32,8 @@ function createWindow() {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,
-      webSecurity: false // Enables direct local video/audio streaming and drag-drop
+      webSecurity: false, // Enables direct local video/audio streaming and drag-drop
+      backgroundThrottling: false // Cegah penurunan frame-rate saat window tidak fokus
     }
   });
 
