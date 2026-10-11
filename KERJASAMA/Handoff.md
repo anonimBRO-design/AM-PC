@@ -32,7 +32,16 @@ Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
 
 ---
 
-### Update Terbaru (11 Okt 2026 21:50) — AM-PC Editor
+### Update Terbaru (11 Okt 2026 22:10) — AM-PC Editor
+- **Perbaikan Lapisan Blur pada Modal Pintasan Keyboard (#amShortcutsModal)**:
+  - Mengatasi masalah kartu modal dan teks buram/blur saat menekan tombol tanda tanya (`?`) atau `F1`.
+  - Akar masalah: elemen `.amShortcutsBackdrop` (`position: absolute; inset: 0; backdrop-filter: blur(10px)`) terlukis di atas kartu `.amShortcutsCard` karena kartu sebelumnya tidak memiliki `position: relative` dan `z-index`. Serta kontainer sempat mewarisi kelas `.amWebModal` yang menjalankan animasi backdrop filter pada kontainer induk.
+  - Perbaikan tuntas:
+    - Memberikan `position: relative !important; z-index: 10 !important; filter: none !important; backdrop-filter: none !important;` pada `.amShortcutsCard`.
+    - Memberikan `z-index: 1 !important;` pada `#amShortcutsBackdrop` dan `.amWebModalBackdrop` sehingga backdrop selalu berada di bawah kartu.
+    - Mengisolasi kelas kontainer modal pintasan menjadi independen dari `.amWebModal`.
+    - Menambahkan `e.stopPropagation()` pada klik kartu agar interaksi di dalam kartu tidak memicu penutupan backdrop.
+  - Verifikasi: Berhasil diverifikasi secara visual melalui tangkapan layar Electron (`test_shortcuts_modal.png`), computed styles kartu terbukti `opacity: 1`, `z-index: 10`, `filter: none`, dan seluruh teks pintasan tajam 100%. Berkas disinkronkan ke direktori rilis.
 - **Distribusi Rilis & Sinkronisasi Remote GitHub (Commit 715693b)**:
   - Berhasil melakukan `git push origin main` untuk menyinkronkan seluruh 43 commit terbaru ke repositori GitHub resmi `anonimBRO-design/AM-PC`.
   - Berhasil mengompilasi dan mengemas ulang aplikasi mandiri portable dengan `node scripts/build-portable.js` ke folder `release/Alight-Motion-PC-win-x64/` lengkap dengan ikon resmi dan metadata aplikasi tersemat di `Alight Motion PC.exe`.

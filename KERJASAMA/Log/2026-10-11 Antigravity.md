@@ -312,3 +312,26 @@
       - Branch lokal `main` terkonfirmasi `up to date with origin/main`.
       - Pengujian headless Electron mengonfirmasi modal `#amShortcutsModal` terpasang sempurna dengan 16 baris shortcut terdaftar dan tombol bantuan `#amShortcutsHelpBtn` terpasang di top bar.
       - Berkas build executable portable di `release/` telah selesai dibangun dan siap pakai.
+
+18. **Perbaikan Layering dan Isolasi Blur Modal Pintasan Keyboard (#amShortcutsModal)**:
+    - **Laporan Masalah**:
+      - Pengguna melaporkan: "ini kok blur semua pas pencet tanda tanya" disertai tangkapan layar `media_1791730602621_c724594f.png`.
+      - Pada tangkapan layar, kartu dialog dan seluruh teks di dalamnya terlihat kabur dan ter-blur parah seperti tertutup kaca es gelap.
+    - **Akar Masalah (Root Cause)**:
+      - Di dalam modal terdapat elemen backdrop `<div class="amShortcutsBackdrop" id="amShortcutsBackdrop">` dengan `position: absolute; inset: 0; backdrop-filter: blur(10px);`.
+      - Elemen kartu `.amShortcutsCard` sebelumnya berada dalam normal flow (`position: static`). Menurut spesifikasi CSS Stacking Context, elemen positioned (`position: absolute`) dilukis di atas elemen in-flow non-positioned.
+      - Akibatnya, backdrop absolut terlukis persis di atas kartu modal, menyebabkan efek blur dan bayangan gelap backdrop menutupi seluruh isi kartu dan teks.
+      - Selain itu, kontainer modal sempat memakai kelas `.amWebModal` yang menjalankan animasi `amModalBackdropIn` pada kontainer induk.
+    - **Solusi**:
+      - Di `css/desktop.css`:
+        - Menetapkan `position: relative !important; z-index: 10 !important; filter: none !important; backdrop-filter: none !important;` pada `.amShortcutsCard`.
+        - Menetapkan `z-index: 1 !important;` pada `#amShortcutsBackdrop` dan `.amWebModalBackdrop` agar selalu berada di bawah kartu.
+        - Menghapus pewarisan animasi backdrop blur dari kontainer induk `#amShortcutsModal`.
+      - Di `electron/desktop-engine.js`:
+        - Mengisolasi kelas `#amShortcutsModal` menjadi `hidden` independen tanpa `.amWebModal`.
+        - Mengganti kelas backdrop menjadi `amShortcutsBackdrop`.
+        - Menambahkan `e.stopPropagation()` pada klik kartu modal agar klik di dalam kartu tidak memicu event backdrop.
+    - **Verifikasi**:
+      - Pengujian headless Electron menghasilkan bukti visual `test_shortcuts_modal.png`: kartu berlatar solid dark slate `#121820`, teks putih/abu-abu dan tombol chiclet `<kbd>` tampil 100% tajam dan terbaca sempurna, sementara latar belakang editor di belakang modal ter-blur secara elegan.
+      - Uji interaktivitas mengonfirmasi: buka modal, tutup via Escape, buka via tombol `?`, dan tutup via klik backdrop berjalan lancar.
+      - Berkas disinkronkan ke direktori rilis `release/Alight-Motion-PC-win-x64/resources/app/`.

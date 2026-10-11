@@ -1181,9 +1181,9 @@
     if (!modal) {
       modal = document.createElement('div');
       modal.id = 'amShortcutsModal';
-      modal.className = 'amWebModal hidden';
+      modal.className = 'hidden';
       modal.innerHTML = `
-        <div class="amWebModalBackdrop" id="amShortcutsBackdrop"></div>
+        <div class="amShortcutsBackdrop" id="amShortcutsBackdrop"></div>
         <div class="amShortcutsCard" role="dialog" aria-modal="true" aria-labelledby="amShortcutsTitle">
           <div class="amShortcutsHead">
             <div class="amShortcutsTitleGroup">
@@ -1298,23 +1298,34 @@
 
       const closeBtn = modal.querySelector('#amShortcutsClose');
       const backdrop = modal.querySelector('#amShortcutsBackdrop');
-      closeBtn?.addEventListener('click', () => window.closeKeyboardShortcutsModal());
-      backdrop?.addEventListener('click', () => window.closeKeyboardShortcutsModal());
+      const card = modal.querySelector('.amShortcutsCard');
+      closeBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.closeKeyboardShortcutsModal();
+      });
+      backdrop?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.closeKeyboardShortcutsModal();
+      });
+      card?.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
     }
 
     window.openKeyboardShortcutsModal = function() {
       const m = document.getElementById('amShortcutsModal');
       if (!m) return;
       m.classList.remove('hidden');
-      m.classList.add('am-morph-open');
       m.classList.remove('am-morph-close');
+      void m.offsetWidth;
+      m.classList.add('am-morph-open');
     };
 
     window.closeKeyboardShortcutsModal = function() {
       const m = document.getElementById('amShortcutsModal');
-      if (!m || m.classList.contains('hidden')) return;
-      m.classList.add('am-morph-close');
+      if (!m || m.classList.contains('hidden') || m.classList.contains('am-morph-close')) return;
       m.classList.remove('am-morph-open');
+      m.classList.add('am-morph-close');
       setTimeout(() => {
         m.classList.add('hidden');
         m.classList.remove('am-morph-close');

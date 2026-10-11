@@ -489,6 +489,23 @@ Ketika pengguna menghapus semua proyek, `parsed` bernilai `[]` (`length === 0`).
 
 ---
 
+## 29. Backdrop absolut tanpa penegasan z-index kartu modal menyebabkan seluruh kartu dan teks ter-blur
+
+**Gejala:** Saat dialog modal pintasan keyboard (#amShortcutsModal) dibuka dengan menekan tombol tanda tanya (?) atau F1, seluruh kartu modal, teks panduan, dan tombol kbd di dalamnya buram/blur parah serta gelap seperti tertutup kaca es.
+**Kejadian:** 11 Oktober 2026, commit 715693b (Antigravity); diperbaiki di sesi ini.
+**Sebab:** 
+1. Di dalam modal terdapat elemen backdrop (<div class="amShortcutsBackdrop" id="amShortcutsBackdrop">) dengan position: absolute; inset: 0; backdrop-filter: blur(10px);.
+2. Kartu modal (.amShortcutsCard) secara default berada dalam normal flow (position: static). Menurut spesifikasi CSS Stacking Context, elemen keturunan yang diposisikan (positioned elements, seperti position: absolute) dilukis di atas (on top of) elemen statis dalam stacking context yang sama.
+3. Akibatnya, elemen backdrop yang memiliki filter blur dan latar gelap terlukis persis di atas kartu modal beserta seluruh teks dan tombolnya.
+4. Selain itu, kontainer modal (#amShortcutsModal) sempat mewarisi kelas .amWebModal yang menjalankan animasi amModalBackdropIn (backdrop-filter pada kontainer induk), yang memperparah pemburaman elemen anak di Chromium.
+**Perbaikan:**
+1. Berikan penegasan mutlak pada kartu modal: position: relative !important; z-index: 10 !important; filter: none !important; backdrop-filter: none !important;.
+2. Berikan z-index: 1 !important; pada elemen backdrop sehingga urutan lapisan (layer stacking) selalu backdrop di bawah (z-index 1) dan kartu modal di atas (z-index 10).
+3. Pisahkan kelas modal pintasan dari .amWebModal agar tidak terikat aturan animasi kontainer induk web modal in-app browser.
+**Cara memverifikasi:** Buka modal via F1 atau tombol ?; periksa bahwa computed style kartu memiliki position: relative, z-index: 10, filter: none, dan teks terlihat 100% tajam dan jelas.
+
+---
+
 ## Cara menambah jebakan baru
 
 Kalau kamu menemukan hal yang bikin rugi, tambahkan di sini dengan format:

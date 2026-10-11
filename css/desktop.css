@@ -1542,6 +1542,7 @@ html, body, .app, .home, .editor, button, input, select, textarea {
   inset: 0 !important;
   background: rgba(8, 10, 15, 0.78) !important;
   backdrop-filter: blur(8px) !important;
+  z-index: 1 !important;
 }
 
 /* Modal Card */
@@ -2704,13 +2705,33 @@ button:active,
   align-items: center !important;
   justify-content: center !important;
   padding: 20px !important;
+  background: transparent !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 #amShortcutsModal.hidden {
   display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+#amShortcutsBackdrop,
+.amShortcutsBackdrop {
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(8, 10, 16, 0.75) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  z-index: 1 !important;
+  cursor: pointer !important;
 }
 
 .amShortcutsCard {
+  position: relative !important;
+  z-index: 10 !important;
   width: min(840px, 96vw) !important;
   max-height: 88vh !important;
   max-height: 88dvh !important;
@@ -2722,6 +2743,39 @@ button:active,
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  pointer-events: auto !important;
+}
+
+#amShortcutsModal.am-morph-open {
+  animation: none !important;
+}
+
+#amShortcutsModal.am-morph-open #amShortcutsBackdrop,
+#amShortcutsModal.am-morph-open .amShortcutsBackdrop {
+  animation: amModalBackdropIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+#amShortcutsModal.am-morph-open .amShortcutsCard {
+  animation: amModalMorphIn 0.28s cubic-bezier(0.34, 1.35, 0.64, 1) forwards !important;
+  will-change: transform, opacity !important;
+}
+
+#amShortcutsModal.am-morph-close {
+  animation: none !important;
+  pointer-events: none !important;
+}
+
+#amShortcutsModal.am-morph-close #amShortcutsBackdrop,
+#amShortcutsModal.am-morph-close .amShortcutsBackdrop {
+  animation: amModalBackdropOut 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+}
+
+#amShortcutsModal.am-morph-close .amShortcutsCard {
+  animation: amModalMorphOut 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  will-change: transform, opacity !important;
 }
 
 .amShortcutsHead {
