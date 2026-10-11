@@ -43,3 +43,16 @@
    - **Pembersihan Emoji 100% Bebas**:
      - Menghapus seluruh karakter emoji di `timeline-panel.ts`, `inspector-panel.ts`, `studio-ui.ts`, dan `main.ts`.
    - **Verifikasi**: Divalidasi lewat `scripts/test-import-render.js` dan `npm run verify:ui`, menghasilkan bukti visual kanvas 9:16 ter-render sempurna di `screenshot_imported_xml_rendered.png`.
+
+4. **Penyempurnaan Tipografi & Font UI Home (Sesi 3)**:
+   - **Latar Belakang**:
+     - Pengguna meminta perbesaran font dan peningkatan kejelasan tipografi pada elemen Home screen: "WORKSPACE LOKAL", "PROYEK BARU", "Terbaru", dan kode bahasa "ID".
+     - Font bawaan `index.html` menggunakan ukuran micro-type mobile (7px untuk kicker, 8px untuk dropdown urutkan, 8px untuk label Proyek Baru, dan 8px untuk kode bahasa).
+   - **Perubahan yang Diterapkan**:
+     - Mengintegrasikan font **Plus Jakarta Sans** ke dalam `css/theme.css` sebagai `--font-main` primer bersama `Inter` untuk ketajaman glyph antialiasing maksimal.
+     - Memperbesar `WORKSPACE LOKAL` (`#workspaceKicker`): dari 7px menjadi **11px** (bold 700, letter-spacing 0.14em, uppercase).
+     - Memperbesar judul `Proyek Anda` (`#workspaceTitle`): menjadi **26px** (extrabold 800) + badge jumlah proyek 13px.
+     - Memperbesar tombol dropdown `Terbaru` (`#projectSortLabel`): container 38px, font teks **13px** (semibold 600).
+     - Memperbesar tombol `+ PROYEK BARU` (`#newProjectFab`): container 38px, ikon `span` 18px, label `b` **13px** (extrabold 800, uppercase).
+     - Memperbesar tombol bahasa `ID` (`#homeLanguageBtn`): container 36px, teks kode **12px** (bold 800).
+   - **Verifikasi**: Diuji dan diambil screenshot verifikasi visual di `screenshot_home_typography.png`. Commit `740220f`.
