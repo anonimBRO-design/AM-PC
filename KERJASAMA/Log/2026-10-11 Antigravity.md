@@ -96,3 +96,25 @@
      - Saat **Mode Studio** aktif: style Studio diaktifkan, layout Preview atas & Timeline bawah 280px berjalan kembali.
      - Menyediakan tombol switcher `#amLayoutSwitchBtn` di bilah atas `.editorTop` dengan ikon indikator dan shortcut keyboard **`F8`** untuk beralih secara langsung kapan saja.
    - **Sinkronisasi**: Seluruh file diperbarui dan disalin ke `release/alight-motion-pc-win-x64/resources/app/`.
+
+9. **Fix Toggle Mode Layout & Penyelarasan Kanvas di Mode Asli (Sesi 8)**:
+   - **Masalah yang Dilaporkan**:
+     1. Switcher tata letak macet / tidak bisa beralih kembali ("lah kok gabisa diganti").
+     2. Kanvas pada Mode Asli terdorong jauh ke pinggir kiri dan muncul void hitam besar antara kanvas dan timeline ("kok pinggir banget tuh, kenapa lu gak ambil source code asli nya aja?").
+   - **Root Cause Analysis (Terbukti 100% via Headless Debugging)**:
+     1. Di `css/desktop-studio.css`, baris 59 memiliki `transition: grid-template-columns 0.18s cubic-bezier(...) !important;`. Menurut spesifikasi CSS Transitions, transisi antar-tata-letak grid dengan tanda tangan track berbeda (`minmax(420px, 1.2fr) minmax(520px, 1fr)` ke `1fr 0px`) tidak dapat diinterpolasi oleh Blink/Chromium. Hal ini menyebabkan Chromium membatalkan kalkulasi transisi dan membekukan `grid-template-columns` pada nilai `776px 647px` secara permanen saat beralih kembali ke Studio.
+     2. Polusi `sessionStorage`: Saat pertama kali berjalan di Mode Studio, fungsi pembaca split upstream mengira lebar 1fr adalah rasio kolom pertama yang diseret user, lalu menyimpan rasio `~0.78` ke `sessionStorage.getItem('omsDesktopCanvasSplitRatioV441A')`. Akibatnya saat beralih ke Mode Asli, preview dipaksa melebar hingga 78% layar, timeline terhimpit di 22% ujung kanan, dan kanvas 9:16 terperangkap di sebelah kiri dengan jarak kosong hitam raksasa di sebelah kanannya.
+     3. Tombol switcher melakukan penulisan ulang `innerHTML` setiap heartbeat 400ms tanpa memeriksa apakah mode berubah, yang berpotensi membatalkan event klik pointer.
+   - **Solusi yang Diterapkan**:
+     1. Menghapus properti `transition: grid-template-columns` dari `.editorMain` di `css/desktop-studio.css`.
+     2. Menggandakan mekanisme nonaktif stylesheet dengan `style.disabled` dan `style.media = 'not all'` / `style.media = 'all'`.
+     3. Menambahkan pembersihan inline style `grid-template-columns` dan `grid-template-rows` pada `.editorMain` saat perpindahan mode.
+     4. Menghapus rasio split yang terpolusi dari `sessionStorage` (`omsDesktopCanvasSplitRatioV441A`) saat beralih ke Mode Asli, sehingga tata letak split kembali 100% mengikuti kalkulasi asli Open-Motion (`minmax(420px, 1.2fr) minmax(520px, 1fr)` atau ~48% / 52%).
+     5. Di `css/desktop.css`, menambahkan aturan khusus Mode Asli: `.previewArea` tanpa border-bottom, `.viewport` dengan `place-items: center`, `#canvasWrap` dengan `margin: auto`, serta menyembunyikan handle split `#desktopCanvasSplitToolbarBtn` di Mode Studio dan menampilkannya di Mode Asli.
+     6. Mengoptimalkan `updateLayoutSwitcherBtn()` dengan `dataset.mode` caching agar idempoten dan tidak menimpa DOM bila mode tidak berubah.
+   - **Verifikasi**:
+     - Diuji via script Electron headless `debug-asli.js`:
+       - Mode Asli: Preview 776.7px (kiri 0), Timeline 647.3px (kiri 776.7px), Kanvas presisi di tengah (margin kiri 237.86px, margin kanan 237.86px).
+       - Mode Studio: Preview full width 1424px (atas 50px), Timeline full width 1424px (bawah 555px, tinggi 280px), Kanvas di tengah (margin kiri 561.5px, margin kanan 562.5px).
+       - Beralih bolak-balik berulang kali berjalan 100% mulus dan akurat.
+     - Seluruh berkas disinkronkan ke direktori `release/alight-motion-pc-win-x64/resources/app/`.

@@ -56,7 +56,6 @@
     min-width: 0 !important;
     overflow: hidden !important;
     background: #0e1015 !important;
-    transition: grid-template-columns 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
 
   /* When drawer is open (not hidden), smoothly reserve 400px on the right for docked inspector */

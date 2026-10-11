@@ -76,11 +76,13 @@ function createWindow() {
             const savedLayout = localStorage.getItem('am_editor_layout_mode') || 'studio';
             if (savedLayout === 'original') {
               style.disabled = true;
+              style.media = 'not all';
               document.documentElement.setAttribute('data-editor-layout', 'original');
               document.body?.classList?.add('layout-original');
               document.body?.classList?.remove('layout-studio');
             } else {
               style.disabled = false;
+              style.media = 'all';
               document.documentElement.setAttribute('data-editor-layout', 'studio');
               document.body?.classList?.add('layout-studio');
               document.body?.classList?.remove('layout-original');

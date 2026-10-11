@@ -863,30 +863,50 @@
       const timelineArea = document.querySelector('.timelineArea');
 
       if (newMode === 'original') {
-        if (style) style.disabled = true;
+        if (style) {
+          style.disabled = true;
+          style.media = 'not all';
+        }
         document.documentElement.setAttribute('data-editor-layout', 'original');
         document.body?.classList?.add('layout-original');
         document.body?.classList?.remove('layout-studio');
         if (drawer && timelineArea && drawer.parentElement !== timelineArea) {
           timelineArea.appendChild(drawer);
         }
+        if (editorMain) {
+          editorMain.style.removeProperty('grid-template-columns');
+          editorMain.style.removeProperty('grid-template-rows');
+        }
+        try { sessionStorage.removeItem('omsDesktopCanvasSplitRatioV441A'); } catch(e) {}
+        try { sessionStorage.removeItem('omsDesktopLandscapePreviewRatio'); } catch(e) {}
         if (typeof toast === 'function') toast('Beralih ke Mode Asli (Berdampingan)');
       } else {
-        if (style) style.disabled = false;
+        if (style) {
+          style.disabled = false;
+          style.media = 'all';
+        }
         document.documentElement.setAttribute('data-editor-layout', 'studio');
         document.body?.classList?.add('layout-studio');
         document.body?.classList?.remove('layout-original');
         if (drawer && editorMain && drawer.parentElement !== editorMain) {
           editorMain.appendChild(drawer);
         }
+        if (editorMain) {
+          editorMain.style.removeProperty('grid-template-columns');
+          editorMain.style.removeProperty('grid-template-rows');
+        }
         if (typeof toast === 'function') toast('Beralih ke Mode Studio (Atas-Bawah)');
       }
 
       updateLayoutSwitcherBtn();
       window.dispatchEvent(new Event('resize'));
+      const ui = getUI();
+      ui?.applyCompositionFitZoom?.();
+      ui?.fit?.();
       const timeline = getTimeline();
       timeline?.rebuild?.();
       const renderer = window.renderer || window.omsRenderer;
+      renderer?.resize?.();
       renderer?.render?.();
     };
 
@@ -894,8 +914,10 @@
       const btn = document.getElementById('amLayoutSwitchBtn');
       if (!btn) return;
       const current = localStorage.getItem('am_editor_layout_mode') || 'studio';
-      const isOriginal = current === 'original';
+      if (btn.dataset.mode === current) return;
+      btn.dataset.mode = current;
 
+      const isOriginal = current === 'original';
       btn.classList.toggle('active', isOriginal);
       btn.title = isOriginal
         ? 'Tata Letak: Mode Asli (Berdampingan) [F8] • Klik untuk Mode Studio (Atas-Bawah)'

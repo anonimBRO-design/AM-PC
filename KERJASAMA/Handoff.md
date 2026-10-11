@@ -32,12 +32,16 @@ Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
 
 ---
 
-### Update Terbaru (11 Okt 2026 19:00) — AM-PC Editor
-- **Dual Editor Layout Engine (Mode Studio vs Mode Asli)**:
+### Update Terbaru (11 Okt 2026 19:35) — AM-PC Editor
+- **Dual Editor Layout Engine (Mode Studio vs Mode Asli) — FIX SELESAI**:
   - Tersedia 2 mode tata letak editor yang bisa di-toggle secara instan:
     1. **Mode Studio AM-PC**: Preview di atas, Timeline di bawah 280px, Inspector docked di kanan.
     2. **Mode Asli Open-Motion**: Preview di kiri, Timeline di kanan (berdampingan / side-by-side) persis sesuai sumber asli upstream `index.html` dan web https://hada45.github.io/Open-Motion/.
-  - Dilengkapi tombol switcher visual `#amLayoutSwitchBtn` di bilah atas `.editorTop` dan shortcut **`F8`** untuk beralih mode kapan saja tanpa perlu reload.
+  - **Fix Bug Switcher & Kanvas Pinggir (Sesi 8)**:
+    - Menghapus `transition: grid-template-columns` di `desktop-studio.css` yang sebelumnya membekukan kalkulasi kolom Blink/Chromium pada `776px 647px`.
+    - Membersihkan inline styles dan rasio polusi `sessionStorage` (`omsDesktopCanvasSplitRatioV441A`) sehingga Mode Asli kembali 100% ke proporsi Open-Motion asli dan kanvas berada tepat di tengah tanpa void hitam.
+    - Menambahkan `style.media = 'not all'` / `style.media = 'all'` dan caching `dataset.mode` pada tombol switcher.
+  - Dilengkapi tombol switcher visual `#amLayoutSwitchBtn` di bilah atas `.editorTop` dan shortcut **`F8`** untuk beralih mode kapan saja tanpa reload.
 - **Fix Pembatalan Mode Multi-Select saat Menggeser/Mengklik Timeline**:
   - Mengatasi issue user keluar dari mode multi-select ketika menggeser timeline kiri-kanan dengan klik kiri mouse.
   - Mem-patch `TimelineController.prototype.clearTimelineLayerSelection` agar membatalkan penghapusan multi-selection saat `ui.layerMultiSelectMode` aktif.

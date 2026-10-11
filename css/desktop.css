@@ -27,6 +27,32 @@
   color: #00e676 !important;
 }
 
+/* Mode Asli (Berdampingan) — Penyelarasan Kanvas & Garis Pembatas */
+html[data-editor-layout="original"] .previewArea,
+body.layout-original .previewArea {
+  border-bottom: none !important;
+  border-right: 1px solid var(--line) !important;
+}
+
+html[data-editor-layout="original"] .viewport,
+body.layout-original .viewport {
+  display: grid !important;
+  place-items: center !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+html[data-editor-layout="original"] #canvasWrap,
+body.layout-original #canvasWrap {
+  margin: auto !important;
+}
+
+/* Sembunyikan handle split horizontal di Mode Studio karena timeline bawah berukuran tetap */
+html:not([data-editor-layout="original"]) #desktopCanvasSplitToolbarBtn,
+body:not(.layout-original) #desktopCanvasSplitToolbarBtn {
+  display: none !important;
+}
+
 /* Timeline Beat Marker Line */
 .timelineBeatLine {
   position: absolute;
