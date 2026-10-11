@@ -28,14 +28,32 @@
     if (e.key === 'Control' || e.key === 'Meta') window._amCtrlHeld = true;
     if (e.key === 'Shift') window._amShiftHeld = true;
 
-    // Global Escape to exit multi-select mode
+    const activeTag = document.activeElement?.tagName;
+    const isEditingText = ['INPUT', 'TEXTAREA', 'SELECT'].includes(activeTag) || document.activeElement?.isContentEditable;
+
+    // Global Escape to exit shortcuts modal or multi-select mode
     if (e.key === 'Escape') {
+      const shortcutsModal = document.getElementById('amShortcutsModal');
+      if (shortcutsModal && !shortcutsModal.classList.contains('hidden')) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.closeKeyboardShortcutsModal?.();
+        return;
+      }
       const ui = getUI();
       if (ui?.layerMultiSelectMode) {
         e.preventDefault();
         e.stopPropagation();
         ui.finishLayerMultiSelection({ announce: true });
+        return;
       }
+    }
+
+    // Shortcut F1 atau ? untuk membuka panduan pintasan keyboard
+    if ((e.key === 'F1' || (e.key === '?' && !e.ctrlKey && !e.metaKey)) && !isEditingText) {
+      e.preventDefault();
+      window.openKeyboardShortcutsModal?.();
+      return;
     }
 
     // Shortcut F8 untuk beralih antara Mode Studio dan Mode Asli
@@ -43,6 +61,38 @@
       e.preventDefault();
       if (typeof window.toggleAmEditorLayout === 'function') {
         window.toggleAmEditorLayout();
+      }
+      return;
+    }
+
+    // Navigasi frame presisi panah kiri/kanan (1 frame biasa, 10 frame dengan Shift)
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && !isEditingText) {
+      const model = getModel();
+      const timeline = getTimeline();
+      const renderer = getRenderer();
+      if (model?.project && timeline) {
+        e.preventDefault();
+        const fps = timeline.projectFPS ? timeline.projectFPS() : (model.project.fps || 30);
+        const step = (e.shiftKey ? 10 : 1) / fps;
+        const duration = model.project.duration || 10;
+        if (e.key === 'ArrowLeft') {
+          model.time = Math.max(0, model.time - step);
+        } else {
+          model.time = Math.min(duration, model.time + step);
+        }
+        timeline.updatePlayhead?.();
+        renderer?.render?.();
+        return;
+      }
+    }
+
+    // Home / End untuk lompat ke batas awal atau akhir timeline
+    if ((e.key === 'Home' || e.key === 'End') && !isEditingText) {
+      const timeline = getTimeline();
+      if (timeline?.jumpBoundary) {
+        e.preventDefault();
+        timeline.jumpBoundary(e.key === 'End');
+        return;
       }
     }
   }, true);
@@ -1125,6 +1175,174 @@
     }
   }
 
+  // 8. Cheatsheet Shortcut Keyboard Modal
+  function setupKeyboardShortcutsModal() {
+    let modal = document.getElementById('amShortcutsModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'amShortcutsModal';
+      modal.className = 'amWebModal hidden';
+      modal.innerHTML = `
+        <div class="amWebModalBackdrop" id="amShortcutsBackdrop"></div>
+        <div class="amShortcutsCard" role="dialog" aria-modal="true" aria-labelledby="amShortcutsTitle">
+          <div class="amShortcutsHead">
+            <div class="amShortcutsTitleGroup">
+              <span class="amShortcutsBadge">PINTASAN KEYBOARD</span>
+              <h2 id="amShortcutsTitle" class="amShortcutsTitle">Panduan Kontrol Cepat Desktop</h2>
+              <p class="amShortcutsSubtitle">Pintasan keyboard &amp; kontrol mouse profesional Alight Motion PC</p>
+            </div>
+            <button id="amShortcutsClose" class="amShortcutsCloseBtn" type="button" aria-label="Tutup">×</button>
+          </div>
+          <div class="amShortcutsBody">
+            <div class="amShortcutsGrid">
+              <!-- Kolom 1 -->
+              <div class="amShortcutGroup">
+                <div class="amShortcutGroupTitle">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  Pemutaran &amp; Garis Waktu
+                </div>
+                <div class="amShortcutRow">
+                  <span class="amShortcutDesc">Putar / Jeda (Play &amp; Pause)</span>
+                  <div class="amShortcutKeys"><kbd>Spasi</kbd></div>
+                </div>
+                <div class="amShortcutRow">
+                  <span class="amShortcutDesc">Maju / Mundur 1 Frame</span>
+                  <div class="amShortcutKeys"><kbd>→</kbd> / <kbd>←</kbd></div>
+                </div>
+                <div class="amShortcutRow">
+                  <span class="amShortcutDesc">Lompat 10 Frame (Cepat)</span>
+                  <div class="amShortcutKeys"><kbd>Shift</kbd> + <kbd>→</kbd> / <kbd>←</kbd></div>
+                </div>
+                <div class="amShortcutRow">
+                  <span class="amShortcutDesc">Lompat ke Awal / Akhir Timeline</span>
+                  <div class="amShortcutKeys"><kbd>Home</kbd> / <kbd>End</kbd></div>
+                </div>
+                <div class="amShortcutRow">
+                  <span class="amShortcutDesc">Keyframe Sebelumnya / Berikutnya</span>
+                  <div class="amShortcutKeys"><kbd>[</kbd> / <kbd>]</kbd></div>
+                </div>
+
+                <div class="amShortcutGroupTitle" style="margin-top: 18px;">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                  Tata Letak &amp; Tampilan
+                </div>
+                <div class="amShortcutRow">
+                  <span class="amShortcutDesc">Ganti Mode Studio / Mode Asli</span>
+                  <div class="amShortcutKeys"><kbd>F8</kbd></div>
+                </div>
+                <div class="amShortcutRow">
+                  <span class="amShortcutDesc">Buka Panduan Pintasan Ini</span>
+                  <div class="amShortcutKeys"><kbd>F1</kbd> atau <kbd>?</kbd></div>
+                </div>
+                <div class="amShortcutRow">
+                  <span class="amShortcutDesc">Tutup Dialog / Batal Pilihan</span>
+                  <div class="amShortcutKeys"><kbd>Esc</kbd></div>
+                </div>
+              </div>
+
+              <!-- Kolom 2 -->
+              <div class="amShortcutGroup">
+                <div class="amShortcutGroupTitle">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                  Kontrol Mouse &amp; Timeline
+                </div>
+                <div class="amShortcutRow">
+                  <span class="amShortcutDesc">Geser Timeline Horizontal (Pan)</span>
+                  <div class="amShortcutKeys"><kbd>Shift</kbd> + <kbd>Scroll</kbd></div>
+                </div>
+                <div class="amShortcutRow">
+                  <span class="amShortcutDesc">Perbesar / Perkecil Skala (Zoom)</span>
+                  <div class="amShortcutKeys"><kbd>Ctrl</kbd> + <kbd>Scroll</kbd></div>
+                </div>
+                <div class="amShortcutRow">
+                  <span class="amShortcutDesc">Gulir Daftar Track Atas / Bawah</span>
+                  <div class="amShortcutKeys"><kbd>Scroll Roda</kbd></div>
+                </div>
+                <div class="amShortcutRow">
+                  <span class="amShortcutDesc">Multi-Pilih Beberapa Layer Sekaligus</span>
+                  <div class="amShortcutKeys"><kbd>Shift</kbd> + <kbd>Klik Layer</kbd></div>
+                </div>
+
+                <div class="amShortcutGroupTitle" style="margin-top: 18px;">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Manajemen &amp; Pengeditan
+                </div>
+                <div class="amShortcutRow">
+                  <span class="amShortcutDesc">Simpan Proyek ke Disk Lokal</span>
+                  <div class="amShortcutKeys"><kbd>Ctrl</kbd> + <kbd>S</kbd></div>
+                </div>
+                <div class="amShortcutRow">
+                  <span class="amShortcutDesc">Batalkan Tindakan (Undo)</span>
+                  <div class="amShortcutKeys"><kbd>Ctrl</kbd> + <kbd>Z</kbd></div>
+                </div>
+                <div class="amShortcutRow">
+                  <span class="amShortcutDesc">Ulangi Tindakan (Redo)</span>
+                  <div class="amShortcutKeys"><kbd>Ctrl</kbd> + <kbd>Y</kbd></div>
+                </div>
+                <div class="amShortcutRow">
+                  <span class="amShortcutDesc">Hapus Layer Terpilih</span>
+                  <div class="amShortcutKeys"><kbd>Del</kbd> / <kbd>Backspace</kbd></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="amShortcutsFoot">
+            <div class="amShortcutsTip">
+              <span class="amShortcutsTipBadge">TIPS PRO</span>
+              <span>Gunakan <b>Rekam Pre-render</b> (titik lingkaran di kiri tombol Play) saat memutar timeline dengan efek WebGL berat agar preview berjalan 100% mulus tanpa lag.</span>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      const closeBtn = modal.querySelector('#amShortcutsClose');
+      const backdrop = modal.querySelector('#amShortcutsBackdrop');
+      closeBtn?.addEventListener('click', () => window.closeKeyboardShortcutsModal());
+      backdrop?.addEventListener('click', () => window.closeKeyboardShortcutsModal());
+    }
+
+    window.openKeyboardShortcutsModal = function() {
+      const m = document.getElementById('amShortcutsModal');
+      if (!m) return;
+      m.classList.remove('hidden');
+      m.classList.add('am-morph-open');
+      m.classList.remove('am-morph-close');
+    };
+
+    window.closeKeyboardShortcutsModal = function() {
+      const m = document.getElementById('amShortcutsModal');
+      if (!m || m.classList.contains('hidden')) return;
+      m.classList.add('am-morph-close');
+      m.classList.remove('am-morph-open');
+      setTimeout(() => {
+        m.classList.add('hidden');
+        m.classList.remove('am-morph-close');
+      }, 200);
+    };
+
+    // Pasang tombol ? di bilah atas .editorTop .topActions
+    const topActions = document.querySelector('.editorTop .topActions');
+    if (topActions) {
+      let helpBtn = document.getElementById('amShortcutsHelpBtn');
+      if (!helpBtn) {
+        helpBtn = document.createElement('button');
+        helpBtn.id = 'amShortcutsHelpBtn';
+        helpBtn.className = 'topIcon';
+        helpBtn.type = 'button';
+        helpBtn.title = 'Panduan Pintasan Keyboard [F1 / ?]';
+        helpBtn.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;display:block;"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+        helpBtn.onclick = () => window.openKeyboardShortcutsModal();
+        const layoutBtn = document.getElementById('amLayoutSwitchBtn');
+        if (layoutBtn && layoutBtn.nextSibling) {
+          topActions.insertBefore(helpBtn, layoutBtn.nextSibling);
+        } else {
+          topActions.appendChild(helpBtn);
+        }
+      }
+    }
+  }
+
   // Periodic heartbeat to keep patches active
   const runPatches = () => {
     disarmFocusSession();
@@ -1135,6 +1353,7 @@
     patchAdjustmentLayers();
     setupTimelineWheelNavigation();
     decorateEffectThumbnails();
+    setupKeyboardShortcutsModal();
   };
 
   runPatches();
