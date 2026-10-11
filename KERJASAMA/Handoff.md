@@ -32,7 +32,18 @@ Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
 
 ---
 
-### Update Terbaru (11 Okt 2026 21:30) — AM-PC Editor
+### Update Terbaru (11 Okt 2026 21:50) — AM-PC Editor
+- **Distribusi Rilis & Sinkronisasi Remote GitHub (Commit 715693b)**:
+  - Berhasil melakukan `git push origin main` untuk menyinkronkan seluruh 43 commit terbaru ke repositori GitHub resmi `anonimBRO-design/AM-PC`.
+  - Berhasil mengompilasi dan mengemas ulang aplikasi mandiri portable dengan `node scripts/build-portable.js` ke folder `release/Alight-Motion-PC-win-x64/` lengkap dengan ikon resmi dan metadata aplikasi tersemat di `Alight Motion PC.exe`.
+- **Fitur Cheatsheet Shortcut Keyboard & Navigasi Frame Presisi (Commit 715693b)**:
+  - Tombol Bantuan Pintasan: Menambahkan tombol ikon `?` (`#amShortcutsHelpBtn`) pada bilah atas editor di samping tombol switcher tata letak.
+  - Dialog Modal Pintasan Keyboard: Modal dark theme modern (`#amShortcutsModal`) yang dapat dibuka via klik tombol `?` atau shortcut keyboard `F1` / `?`. Menampilkan 16 pintasan terorganisir rapi dengan komponen `<kbd>` chiclet untuk kategori Pemutaran, Garis Waktu, Tata Letak, Mouse, dan Manajemen Dokumen.
+  - Navigasi Frame Presisi:
+    - `ArrowLeft` / `ArrowRight`: Melangkah mundur / maju 1 frame persis sesuai FPS proyek.
+    - `Shift + ArrowLeft` / `Shift + ArrowRight`: Melompat cepat 10 frame (atau 1/3 detik).
+    - `Home` / `End`: Melompat langsung ke frame awal (0) atau akhir proyek.
+    - `Escape`: Menutup modal pintasan secara instan.
 - **Rebranding & Tema Gelap Modal Diagnostik Alight Motion PC (Commit 9065058)**:
   - Judul diubah dari "Diagnostik Open Motion" menjadi "Diagnostik Alight Motion PC" melalui pseudo-element CSS ::before di frame-0 serta DOM text walker otomatis.
   - Seluruh kemunculan teks "Open Motion" di dalam modal dan drawer Project & Environment diselaraskan menjadi "Alight Motion".

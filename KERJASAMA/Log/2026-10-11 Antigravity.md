@@ -287,5 +287,28 @@
         - `audioBg`: `rgb(22, 30, 40)` (`#161e28`)
         - `audioH3Color`: `rgb(115, 226, 189)` (`var(--accent)`)
         - `ramBtnBg`: `rgb(24, 34, 29)` (`#18221d`)
-        - `ramBtnColor`: `rgb(115, 226, 189)` (`var(--accent)`)
         - `remainingOpenMotion`: `[]` (0 sisa teks Open Motion).
+
+17. **Distribusi Rilis GitHub, Build Portable, dan Fitur Cheatsheet Shortcut Keyboard (Commit `715693b`)**:
+    - **Permintaan Pengguna**:
+      - Pengguna memilih opsi 1 (Rilis & Distribusi) dan opsi 2 (Fitur Kenyamanan Editor) secara lengkap.
+    - **Tindakan yang Dilakukan**:
+      - **Tahap 1: Fitur Kenyamanan Editor & Navigasi Presisi**:
+        - Di `electron/desktop-engine.js`:
+          - Menambahkan navigasi frame presisi pada event listener keydown: `ArrowLeft` dan `ArrowRight` melangkah mundur/maju 1 frame persis (atau 10 frame jika dikombinasikan dengan `Shift`), serta `Home` dan `End` untuk melompat langsung ke frame awal atau akhir timeline.
+          - Mengabaikan tombol navigasi jika pengguna sedang mengetik di input form (`isEditingText`).
+          - Menambahkan modal panduan pintasan `#amShortcutsModal` lengkap dengan fungsi buka/tutup animasi morphing (`openKeyboardShortcutsModal()` / `closeKeyboardShortcutsModal()`).
+          - Menambahkan tombol bantuan ikon `?` (`#amShortcutsHelpBtn`) di sebelah tombol switcher tata letak `#amLayoutSwitchBtn`.
+          - Menangani shortcut pembuka `F1` atau `?` dan penutupan dengan tombol `Escape`.
+        - Di `css/desktop.css`:
+          - Mendesain antarmuka modal `#amShortcutsModal` dengan tema gelap modern Alight Motion PC (`#121820`), border slate halus (`#233042`), badge kategori neon mint, dan komponen tombol chiclet `<kbd>` 3D keyboard berlatar `#1c2534`.
+          - Menyusun 16 daftar pintasan ke dalam 4 kategori terpisah (Pemutaran & Garis Waktu, Tata Letak & Tampilan, Kontrol Mouse & Timeline, serta Manajemen Dokumen).
+      - **Tahap 2: Distribusi Rilis & Push GitHub**:
+        - Melakukan pengujian dry-run `git push origin main --dry-run` yang berhasil terautentikasi.
+        - Menjalankan `git push origin main` secara penuh untuk menyinkronkan seluruh 43 commit terbaru ke repositori GitHub `anonimBRO-design/AM-PC`.
+        - Menutup instance lama secara bersih dan menjalankan skrip `node scripts/build-portable.js` untuk mengemas ulang executable portable `Alight Motion PC.exe` di folder `release/Alight-Motion-PC-win-x64/` dengan ikon resmi dan metadata aplikasi.
+        - Meluncurkan instance baru yang telah diperbarui secara langsung.
+    - **Verifikasi**:
+      - Branch lokal `main` terkonfirmasi `up to date with origin/main`.
+      - Pengujian headless Electron mengonfirmasi modal `#amShortcutsModal` terpasang sempurna dengan 16 baris shortcut terdaftar dan tombol bantuan `#amShortcutsHelpBtn` terpasang di top bar.
+      - Berkas build executable portable di `release/` telah selesai dibangun dan siap pakai.
