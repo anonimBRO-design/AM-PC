@@ -200,8 +200,14 @@
           <p class="amMultiRelinkDesc">
             ${isAnyMissing
               ? 'Pilih media di bawah ini untuk mencari ulang file asli dari PC kamu:'
-              : 'Semua file media terdeteksi. Kamu tetap dapat menautkan atau mengganti file secara manual:'}
+              : 'Semua file media terdeteksi. Kamu dapat mengganti semua layer sekaligus atau per-media:'}
           </p>
+          <div class="amMultiRelinkBatchRow">
+            <button type="button" class="amBatchReplaceBtn" id="amBatchReplaceBtn" title="Pilih satu file dari PC untuk mengganti semua ${mediaLayers.length} media terpilih sekaligus">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>Ganti Semua Sekaligus (${mediaLayers.length} Media)</span>
+            </button>
+          </div>
           <div class="amMultiMediaList">
             ${mediaLayers.map(l => {
               const isMissing = missingLayers.includes(l);
@@ -236,6 +242,123 @@
     if (cancelBtn) {
       cancelBtn.onclick = () => {
         if (ui?.finishLayerMultiSelection) ui.finishLayerMultiSelection({ announce: true });
+      };
+    }
+
+    // Helper: Apply one file to multiple media layers simultaneously
+    async function applyFileToMediaLayers(file, targetLayers) {
+      if (!file || !targetLayers || !targetLayers.length) return;
+      const model = getModel();
+      const ui = getUI();
+      const renderer = window.omsTimelinePreRender?.renderer || window.renderer;
+
+      const isImg = file.type.startsWith('image/');
+      const isVid = file.type.startsWith('video/');
+      const isAud = file.type.startsWith('audio/');
+      const fileKind = isImg ? 'image' : isVid ? 'video' : isAud ? 'audio' : null;
+
+      const layersToUpdate = targetLayers.filter(l => !fileKind || l.type === fileKind);
+      if (!layersToUpdate.length) {
+        if (typeof toast === 'function') toast('Tipe file tidak cocok dengan layer yang dipilih.');
+        return;
+      }
+
+      const assetId = 'asset_' + Math.random().toString(36).slice(2, 9) + '_' + Date.now();
+      const blobUrl = URL.createObjectURL(file);
+
+      // Persist in IndexedDB 'assets' store
+      try {
+        const idbReq = indexedDB.open('open-motion-studio-v4', 1);
+        idbReq.onsuccess = () => {
+          const db = idbReq.result;
+          if (db.objectStoreNames.contains('assets')) {
+            const tx = db.transaction('assets', 'readwrite');
+            tx.objectStore('assets').put({
+              id: assetId,
+              blob: file,
+              name: file.name,
+              type: file.type,
+              updated: Date.now()
+            });
+          }
+        };
+      } catch (e) {
+        console.warn('Gagal menyimpan asset ke IndexedDB:', e);
+      }
+
+      // Apply to all layers
+      let successCount = 0;
+      for (const l of layersToUpdate) {
+        try {
+          if (model?.disposeLayerRuntime) model.disposeLayerRuntime(l);
+          l.assetId = assetId;
+          l.dataUrl = blobUrl;
+          if (l.type === 'image') {
+            const img = new Image();
+            img.src = blobUrl;
+            l.img = img;
+          } else if (l.type === 'video') {
+            const v = document.createElement('video');
+            v.src = blobUrl;
+            v.muted = !!l.amSilentVideo;
+            v.playsInline = true;
+            v.preload = 'auto';
+            l.video = v;
+          }
+          if (renderer?.textures) {
+            renderer.textures.delete(l.id);
+            const entry = renderer.textures.get(l.id);
+            if (entry) entry.signature = null;
+          }
+          if (model?.hydrateLayer) model.hydrateLayer(l);
+          if (window.media?.probe) {
+            try { await window.media.probe(l); } catch(err) {}
+          }
+          successCount++;
+        } catch (err) {
+          console.error('Gagal memperbarui layer:', l.id, err);
+        }
+      }
+
+      try {
+        window.omsTimelinePreRender?.clear?.();
+        if (ui?.rebuildAll) ui.rebuildAll();
+        if (renderer?.render) renderer.render();
+        if (window.bus?.emit) window.bus.emit('model:changed');
+        if (window.autosave?.flush) await window.autosave.flush(true);
+      } catch (e) {}
+
+      if (typeof toast === 'function') {
+        toast(`Berhasil mengganti ${successCount} media terpilih sekaligus!`);
+      }
+
+      renderMultiRelinkTools();
+    }
+
+    // Bind batch replace button (replaces ALL selected media layers at once)
+    const batchBtn = wrap.querySelector('#amBatchReplaceBtn');
+    if (batchBtn) {
+      let batchInput = document.getElementById('amBatchMediaFileInput');
+      if (!batchInput) {
+        batchInput = document.createElement('input');
+        batchInput.type = 'file';
+        batchInput.id = 'amBatchMediaFileInput';
+        batchInput.style.display = 'none';
+        document.body.appendChild(batchInput);
+      }
+
+      batchBtn.onclick = () => {
+        const allImages = mediaLayers.every(l => l.type === 'image');
+        const allVideos = mediaLayers.every(l => l.type === 'video');
+        const allAudio = mediaLayers.every(l => l.type === 'audio');
+        batchInput.accept = allImages ? 'image/*' : allVideos ? 'video/*' : allAudio ? 'audio/*' : 'image/*,video/*,audio/*';
+        batchInput.value = '';
+        batchInput.onchange = async () => {
+          const file = batchInput.files?.[0];
+          if (!file) return;
+          await applyFileToMediaLayers(file, mediaLayers);
+        };
+        batchInput.click();
       };
     }
 
@@ -298,11 +421,168 @@
     }
   }
 
+  // 5. Backdrop Capture & Adjustment Layer Engine (Alight Motion magnifybg/copybg/lift/displacemap3)
+  function isAdjustmentLayer(l) {
+    if (!l) return false;
+    const rawXmls = l.amImport?.effects || [];
+    for (const xml of rawXmls) {
+      if (typeof xml === 'string') {
+        if (xml.includes('magnifybg') || xml.includes('copybg')) return true;
+        if (xml.includes('displacemap3')) return true;
+        if (xml.includes('lift') && xml.includes('name="fill"') && (xml.includes('value="0"') || xml.includes('value="0.000000"'))) return true;
+      }
+    }
+    const amGPU = window.omsAMGPU;
+    const fxs = amGPU?.effects ? amGPU.effects(l) : (l.effectStack || []);
+    for (const fx of fxs) {
+      const id = fx.id || fx.specId || fx.amEffect?.id || '';
+      if (/\.(magnifybg|copybg|displacemap3)$/.test(id)) return true;
+      if (/\.lift$/.test(id)) {
+        const fillParam = fx.params?.find(p => p.id === 'fill');
+        const val = fillParam?.channel?.value?.[0] ?? fillParam?.value;
+        if (val === 0) return true;
+      }
+    }
+    return false;
+  }
+
+  function patchAdjustmentLayers() {
+    // 5A. Patch AMEffectGPU.compose (the AM shader compositing pipeline)
+    const amGPU = window.omsAMGPU;
+    if (amGPU && !amGPU._amBackdropPatched) {
+      amGPU._amBackdropPatched = true;
+      const origCompose = amGPU.compose.bind(amGPU);
+
+      amGPU.compose = function(s, layers, depth = 0) {
+        if (depth > 32) throw Error('Group terlalu dalam');
+        const e = s.engine, comp = this.target(s, 'composition:' + depth).a;
+        this.bind(s, comp, true);
+        if (depth === 0) {
+          const model = getModel();
+          const color = s.r.hex(model?.project?.bg || '#000000'), a = model?.project?.amBackgroundAlpha ?? 1;
+          s.gl.clearColor(color[0]*a, color[1]*a, color[2]*a, a);
+          s.gl.clear(s.gl.COLOR_BUFFER_BIT);
+        }
+
+        const model = getModel();
+        for (const l of layers) {
+          if (l.hidden || (model && (model.time < l.start || model.time > l.start + l.duration)) || l.type === 'audio' || l.type === 'camera') continue;
+          if (typeof omsLayerIncludedInExport === 'function' && !omsLayerIncludedInExport(l)) continue;
+
+          let source;
+          if (l.type === 'null' && l.amImport?.semanticVersion === 192) continue;
+          if (l.type === 'null') {
+            const nested = this.children.get(l.id) || [];
+            if (nested.length) { source = this.compose(s, nested, depth + 1); this.blit(s, source, comp); }
+            continue;
+          }
+          if (l.type === 'group') {
+            source = this.compose(s, this.children.get(l.id) || [], depth + 1);
+            const clip = this.target(s, 'clip:' + depth).a;
+            this.source(s, l, clip, true);
+            const groupTarget = this.target(s, 'composition:' + (depth + 1)).a;
+            this.blit(s, clip.tex, groupTarget, 1, 'mask');
+            source = groupTarget.tex;
+          } else if (l.type === 'mesh') {
+            const target = this.target(s, 'source:' + depth).a;
+            this.bind(s, target, true);
+            s.r.frameTrackMattes = [];
+            s.r.drawMesh(l);
+            source = target.tex;
+          } else {
+            if (isAdjustmentLayer(l)) {
+              // Capture composition backdrop beneath this layer as source!
+              const target = this.target(s, 'source:' + depth).a;
+              this.blit(s, comp.tex, target, 1, 'replace');
+              source = target.tex;
+            } else {
+              source = this.source(s, l, this.target(s, 'source:' + depth).a);
+            }
+          }
+
+          source = window.OMSAMComplex ? window.OMSAMComplex.sourceAppearance(s, l, source, depth) : source;
+          source = this.apply(s, l, source, comp, depth);
+
+          // If adjustment layer is bounded shape (not full screen), mask to its shape
+          if (isAdjustmentLayer(l) && l.type === 'shape') {
+            const projW = model?.project?.width || 1080;
+            const projH = model?.project?.height || 1080;
+            const isFullScreen = Math.abs((+l.scaleX || 1)) >= 4 || Math.abs((+l.scale || 1)) >= 4 || (+l.w >= projW && +l.h >= projH);
+            if (!isFullScreen) {
+              const maskTarget = this.target(s, 'mask:' + depth).a;
+              this.source(s, l, maskTarget, true);
+              const maskedSource = this.target(s, 'source-masked:' + depth).a;
+              this.blit(s, source, maskedSource, 1, 'replace');
+              this.blit(s, maskTarget.tex, maskedSource, 1, 'mask');
+              source = maskedSource.tex;
+            }
+          }
+
+          const matte = l.trackMatte?.mode || 'none', blend = l.blend === 'source-over' ? 'normal' : l.blend;
+          this.composite(s, source, comp, this.alpha(s, l), matte !== 'none' ? matte : blend);
+          s.layers++;
+        }
+        return comp.tex;
+      };
+    }
+
+    // 5B. Patch WebGLRenderer.prototype.paintTexture & ensureTexture (for fallback / 2D raster paths)
+    if (typeof WebGLRenderer !== 'undefined' && WebGLRenderer.prototype && !WebGLRenderer.prototype._amBackdropPatched) {
+      WebGLRenderer.prototype._amBackdropPatched = true;
+      const origPaint = WebGLRenderer.prototype.paintTexture;
+      const origEnsure = WebGLRenderer.prototype.ensureTexture;
+
+      WebGLRenderer.prototype.ensureTexture = function(l) {
+        if (isAdjustmentLayer(l)) {
+          const entry = this.textures?.get(l.id);
+          if (entry) entry.signature = null; // Always refresh backdrop each frame
+        }
+        return origEnsure.apply(this, arguments);
+      };
+
+      WebGLRenderer.prototype.paintTexture = function(l, e) {
+        if (isAdjustmentLayer(l) && this.canvas && e?.canvas) {
+          const c = e.ctx;
+          const w = e.canvas.width;
+          const h = e.canvas.height;
+          c.setTransform(1, 0, 0, 1, 0, 0);
+          c.globalAlpha = 1;
+          c.globalCompositeOperation = 'source-over';
+          c.filter = 'none';
+          c.clearRect(0, 0, w, h);
+          try {
+            c.drawImage(this.canvas, 0, 0, w, h);
+          } catch(err) {}
+          if (this.applyOrderedRasterEffects) {
+            const model = getModel();
+            this.applyOrderedRasterEffects(l, e, model?.time || 0);
+          }
+          const gl = this.gl;
+          if (gl && e.texture) {
+            gl.bindTexture(gl.TEXTURE_2D, e.texture);
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+            if (e.gpuWidth !== e.canvas.width || e.gpuHeight !== e.canvas.height) {
+              gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, e.canvas);
+              e.gpuWidth = e.canvas.width;
+              e.gpuHeight = e.canvas.height;
+            } else {
+              gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, e.canvas);
+            }
+          }
+          return;
+        }
+        return origPaint.apply(this, arguments);
+      };
+    }
+  }
+
   // Periodic heartbeat to keep patches active
   const runPatches = () => {
     disarmFocusSession();
     disarmMouseLongPress();
     hookDrawerAndMulti();
+    patchAdjustmentLayers();
   };
 
   runPatches();

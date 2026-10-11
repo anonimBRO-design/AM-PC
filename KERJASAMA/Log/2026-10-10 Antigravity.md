@@ -392,7 +392,36 @@ Mengaktifkan kembali 2.846 baris CSS kustom (`css/theme.css` dan `css/desktop.cs
     - `mediaButtonsCount: 1`
     - `afterCancel.multiSelectMode: false` dan `selectedCount: 0`.
 - **Rilis**:
-  - Seluruh berkas yang dimodifikasi (`css/desktop.css`, `electron/preload.js`, `electron/desktop-engine.js`, `electron/main.js`) telah disinkronkan ke bundle aplikasi `release/Alight-Motion-PC-win-x64/resources/app/`.
-  - Berkas `index.html` tetap 100% identik dengan upstream hash `8816e9f9b03ce058e1543f136e17fabff0a89093`.
+---
+
+## 2026-10-10 · Bagian 12: Multi-Select Batch Media Replace & Alight Motion Adjustment Layer Engine
+
+- **Waktu**: 22:50 - 23:55 WIB
+- **Agent**: Antigravity
+- **Konteks**: User meminta 2 hal spesifik:
+  1. Tombol untuk mengganti seluruh media yang dipilih sekaligus dengan 1 file ("ini kok gantinya satu-satu gw mau bisa ganti semua yang di-select").
+  2. Implementasi Solusi B untuk bug balok warna hijau/kuning solid di detik 14s-17s proyek `CelzPredct 🍁 1:1` ("B", "ya make no mistakes").
+- **Akar Masalah Balok Hijau**:
+  - Pada Alight Motion, efek `com.alightcreative.effects.magnifybg` dan `copybg` menandakan **Adjustment Layer** (Layer Penyesuaian). Layer bentuk (`shape`) yang memiliki efek ini tidak dimaksudkan untuk menampilkan warna isiannya (`#cdfa43`), melainkan menyalin gambar latar belakang komposisi di bawahnya (`comp.tex`), lalu menerapkan efek berikutnya (`tile`, `wavewarp2`, dsb.) ke gambar latar tersebut.
+  - Upstream Open Motion tidak mengenali `magnifybg` di `AMEffectDefinitions` maupun di importer `index.html:25722`. Akibatnya layer dirender sebagai persegi panjang hijau pekat `#cdfa43`, lalu efek `Wave Warp` mendistorsi kotak hijau tersebut dan menutupi foto/video di bawahnya.
+- **Implementasi**:
+  1. **Tombol "Ganti Semua Sekaligus" (`#amBatchReplaceBtn`)**:
+     - Ditambahkan ke drawer multi-select di `electron/desktop-engine.js` dan diberi gaya gradien hijau-cyan neon di `css/desktop.css`.
+     - Fungsi `applyFileToMediaLayers(file, targetLayers)`: membuat ID asset baru, menyimpan Blob ke IndexedDB `open-motion-studio-v4` store `assets`, memperbarui URL blob ke semua target layer, membersihkan texture cache (`renderer.textures.delete`), melakukan hydration, serta me-render ulang kanvas dan me-refresh UI.
+  2. **Backdrop Capture & Adjustment Layer Engine**:
+     - Fungsi `isAdjustmentLayer(l)`: mendeteksi efek `magnifybg`, `copybg`, `lift` (dengan fill=0), dan `displacemap3`.
+     - Hook pada `window.omsAMGPU.compose(s, layers, depth)`:
+       - Ketika layer penyesuaian dievaluasi, sistem menyalin backdrop komposisi (`comp.tex`) ke buffer sumber (`source`) via `this.blit(s, comp.tex, target, 1, 'replace')`.
+       - Rantai efek AM (`apply`) kemudian berjalan langsung di atas gambar latar belakang tersebut.
+       - Jika layer memiliki bentuk yang tidak berukuran layar penuh, buffer dimask sesuai bentuk layer.
+       - Hasilnya dikompositkan kembali ke `comp` secara mulus.
+     - Hook fallback pada `WebGLRenderer.prototype.paintTexture` & `ensureTexture` untuk mode non-amGPU.
+- **Verifikasi**:
+  - Diuji secara otomatis dengan headless Electron pada proyek `CelzPredct 🍁 1:1` detik 16.0s dengan unhidden layer:
+    - Sebelum patch: pixel tengah terukur `[191, 243, 48, 255]` (`#cdfa43` hijau solid pekat).
+    - Setelah patch: pixel tengah terukur `[235, 235, 235, 255]` (latar belakang terdistorsi wave warp, 0% hijau).
+    - Perbandingan 3 frame gambar disimpan dan diverifikasi di `scratch/render_unpatched_green.png` vs `scratch/render_patched_wavewarp.png`.
+  - Berkas disinkronkan ke `release/Alight-Motion-PC-win-x64/resources/app/`.
+  - `index.html` 100% utuh dan tidak tersentuh.
 
 

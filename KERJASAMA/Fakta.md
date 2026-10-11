@@ -265,3 +265,25 @@ mengulangi cara berpikir yang sama.
   - Skrip `electron/desktop-engine.js` berhasil menetralkan `canStartSelectedLayerFocusSession()`, menonaktifkan timer mouse non-modifier, dan menyuntikkan kartu `.amMultiRelinkCard` ke `#drawer.multiSelectDrawer`.
 - **Diperiksa:** 10 Okt 2026, Antigravity
 - **Akibat:** Seluruh penyesuaian UX desktop untuk timeline and drawer multi-select wajib ditempatkan di `electron/desktop-engine.js` dan `css/desktop.css` tanpa mengubah `index.html`.
+
+### F-16 · Ganti Semua Sekaligus pada Multi-Select Media Relinker
+
+- **Fakta:** Saat memilih banyak layer media yang hilang atau ingin diganti bersamaan, tombol "Ganti Semua Sekaligus (N Media)" di `#drawer.multiSelectDrawer` mengizinkan user memilih satu file dari PC dan menerapkannya ke seluruh layer terpilih secara serentak.
+- **Bukti:**
+  - Fungsi `applyFileToMediaLayers(file, targetLayers)` di `electron/desktop-engine.js`: membuat satu ID asset baru, menyimpan Blob ke IndexedDB `'open-motion-studio-v4'` store `'assets'`, menginjeksi URL blob ke semua target layer, membersihkan texture cache (`renderer.textures.delete`), memanggil `model.hydrateLayer`, serta me-refresh UI dan me-render ulang.
+- **Diperiksa:** 10 Okt 2026, Antigravity
+- **Akibat:** User tidak perlu mengklik tombol "Ganti" satu per satu untuk puluhan layer media yang menggunakan file yang sama.
+
+### F-17 · Alight Motion Adjustment Layer & Backdrop Capture (`magnifybg` & `copybg`)
+
+- **Fakta:**
+  1. Di Alight Motion, efek `com.alightcreative.effects.magnifybg` dan `copybg` menandakan **Adjustment Layer** (Layer Penyesuaian). Shape layer (misal kotak `#cdfa43` hijau muda) tidak dimaksudkan untuk menampilkan warnanya, melainkan menyalin gambar latar belakang komposisi di bawahnya (`comp.tex`), lalu menerapkan efek berikutnya (seperti `tile`, `wavewarp2`, `exposure`) langsung ke atas gambar latar belakang tersebut.
+  2. Upstream Open Motion tidak memiliki definisi `magnifybg` di `AMEffectDefinitions` (`index.html:29524`) dan absen dari deteksi adjustment layer di `index.html:25722`. Akibatnya, shape layer dirender sebagai balok warna pekat `#cdfa43` dengan distorsi Wave Warp, menutupi seluruh gambar foto dan efek displacement di bawahnya.
+  3. Ketika di-hide manual, balok hijau hilang namun transisi Wave Warp ikut lenyap.
+- **Bukti:**
+  - Proyek `CelzPredct 🍁 1:1` detik 14s-17s pada layer `layer_mv28uwtf_951` (`Layer AM`, fill `#cdfa43`, effects: `tile`, `magnifybg`, `wavewarp2`, `wavewarp2`).
+  - Sebelum patch: pixel tengah terukur `[191, 243, 48, 255]` (hijau muda pekat `#cdfa43`).
+  - Setelah patch backdrop capture di `electron/desktop-engine.js` (`window.omsAMGPU.compose` menyalin `comp.tex` ke `source`): pixel tengah terukur `[235, 235, 235, 255]` (foto latar belakang terdistorsi wave warp dengan halus, 0% warna hijau).
+- **Diperiksa:** 10 Okt 2026, Antigravity
+- **Akibat:** Efek Wave Warp dan penyesuaian latar belakang Alight Motion bekerja sempurna tanpa ada balok warna hijau/merah/kuning yang menutupi layar. Semua logic berada di `electron/desktop-engine.js` tanpa menyentuh `index.html`.
+

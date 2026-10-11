@@ -39,7 +39,8 @@ dibungkus jadi aplikasi desktop Windows.
 | AM Finder | ✅ Tombol `AMFINDER` aktif di top bar (modal in-app, tetap di dalam exe) |
 | AM Hub | ✅ Tombol `AMHUB` aktif di top bar (modal in-app, tetap di dalam exe) |
 | Web Modal UX | ✅ **Draggable** (dapat digeser bebas), **Maximize/Restore**, dan **Split View 50:50** dengan divider resizer |
-| Multi-Select Relink | ✅ **Tautkan Ulang Media** hadir di drawer kanan saat multi-select layer, per-media link button, batch auto-relink, dan tombol "Batalkan Pilihan" |
+| Multi-Select Relink | ✅ **Tautkan Ulang Media** hadir di drawer kanan saat multi-select layer, tombol "Ganti Semua Sekaligus (N Media)", per-media link button, batch auto-relink, dan tombol "Batalkan Pilihan" |
+| Adjustment Layers | ✅ **Backdrop Capture Engine** aktif untuk efek Alight Motion (`magnifybg`, `copybg`, `lift`, `displacemap3`); Wave Warp & efek lainnya mendistorsi background gambar/video di bawahnya tanpa balok hijau/merah solid |
 | Timeline Stability | ✅ **Anti-Jump & Anti-Focus Collapse** aktif (klik layer tidak lagi loncat ke atas atau mengkolaps track lain ke 29px) |
 | Mouse Selection | ✅ **Anti-LongPress Mouse** aktif (klik biasa mouse tidak memicu timer 360ms multi-select sentuh ponsel) |
 | CSS Desktop | ✅ Aktif disuntikkan via Electron `insertCSS` (lihat [[Fakta]] F-03) |
@@ -68,6 +69,18 @@ dibungkus jadi aplikasi desktop Windows.
   - Menghindari race condition dengan `await this.writeQueue` pada `listProjects()`.
 - **Status PR Branch**: Berhasil diuji via Electron test runner dan sudah di-push ke remote `origin feat/project-thumbnails`. Ready to PR to `Hada45/Open-Motion`.
 - **Posisi Workspace**: Workspace saat ini telah dikembalikan ke branch `main`.
+
+### Antigravity (10 Okt 2026 - Bagian 12: Batch Media Replace & Alight Motion Adjustment Layer Engine)
+- **Tombol "Ganti Semua Sekaligus"**: Pada multi-select drawer, tersedia tombol gradien hijau-cyan neon untuk mengganti seluruh media yang dipilih dengan 1 kali pemilihan file dari PC (`applyFileToMediaLayers`). Asset di-persist ke IndexedDB `assets`, layer di-update dan di-hydrate serentak, serta tekstur di-reset.
+- **Backdrop Capture & Adjustment Layer Support**: Memperbaiki bug balok warna hijau/kuning pekat pada proyek Alight Motion (seperti detik 14s-17s `CelzPredct 🍁 1:1` yang memakai `magnifybg` + `Wave Warp`).
+- **Hook Kompositor AM (`window.omsAMGPU.compose`)**:
+  - Mengidentifikasi layer penyesuaian (`magnifybg`, `copybg`, `lift` dengan `fill=0`, `displacemap3`).
+  - Menyalin backdrop komposisi (`comp.tex`) ke buffer sumber (`source`) secara real-time.
+  - Menjalankan rantai efek asli AM (`tile`, `wavewarp2`) langsung di atas backdrop foto/video.
+  - Mendukung masking batas bentuk (`shape mask`) jika layer tidak berukuran layar penuh.
+  - Menyediakan fallback pada `WebGLRenderer.prototype.paintTexture` untuk jalur raster/2D.
+- **Pengujian Pixel-Level**: Diverifikasi di Electron headless; pixel tengah yang tadinya balok hijau `#cdfa43` (`[191, 243, 48, 255]`) berhasil berubah menjadi gambar latar terdistorsi wave warp (`[235, 235, 235, 255]`) dengan 0% warna hijau solid.
+- **Sinkronisasi**: Tersinkronisasi penuh ke `release/Alight-Motion-PC-win-x64/resources/app/`.
 
 ---
 
