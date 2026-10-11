@@ -735,29 +735,68 @@
       });
     }
 
-    // In Inspector Effect Stack: inject authentic thumbnail into .effectCardHead
-    const effectCards = document.querySelectorAll('.effectCard[data-effect-instance]:not([data-am-head-thumb])');
-    effectCards.forEach(card => {
-      card.setAttribute('data-am-head-thumb', 'true');
-      const head = card.querySelector('.effectCardHead');
-      const title = head?.querySelector('.effectCardTitle');
-      if (head && title) {
-        const instId = card.dataset.effectInstance;
-        const model = getModel();
-        const l = model?.selectedLayer?.();
-        const inst = (l?.effectStack || []).find(i => i.instanceId === instId);
-        const specId = inst?.specId || inst?.amEffect?.id;
-        const effectName = title.textContent?.trim();
-        const thumbPath = getEffectThumbnailPath(specId, effectName);
-        if (thumbPath) {
-          const img = document.createElement('img');
-          img.className = 'amEffectHeadThumb';
-          img.src = thumbPath;
-          img.alt = '';
-          head.insertBefore(img, title);
+    // In Inspector Effect Stack: inject authentic thumbnail into .effectCardHead (scoped directly inside drawer)
+    if (drawer && !drawer.classList.contains('hidden')) {
+      const effectCards = drawer.querySelectorAll('.effectCard[data-effect-instance]:not([data-am-head-thumb])');
+      effectCards.forEach(card => {
+        card.setAttribute('data-am-head-thumb', 'true');
+        const head = card.querySelector('.effectCardHead');
+        const title = head?.querySelector('.effectCardTitle');
+        if (head && title) {
+          const instId = card.dataset.effectInstance;
+          const model = getModel();
+          const l = model?.selectedLayer?.();
+          const inst = (l?.effectStack || []).find(i => i.instanceId === instId);
+          const specId = inst?.specId || inst?.amEffect?.id;
+          const effectName = title.textContent?.trim();
+          const thumbPath = getEffectThumbnailPath(specId, effectName);
+          if (thumbPath) {
+            const img = document.createElement('img');
+            img.className = 'amEffectHeadThumb';
+            img.src = thumbPath;
+            img.alt = '';
+            head.insertBefore(img, title);
+          }
         }
+      });
+    }
+  }
+
+  // 7. Desktop Timeline Mouse Wheel Navigation (Horizontal Scroll & Zoom)
+  function setupTimelineWheelNavigation() {
+    const scroller = document.getElementById('timelineScroll');
+    if (!scroller || scroller._amWheelBound) return;
+    scroller._amWheelBound = true;
+
+    scroller.addEventListener('wheel', (e) => {
+      // Don't intercept wheel events coming directly from the ruler band (which has native zoom)
+      if (e.target && e.target.closest && e.target.closest('#ruler')) return;
+
+      const absY = Math.abs(e.deltaY);
+      const absX = Math.abs(e.deltaX);
+
+      // If horizontal gesture is dominant (e.g. 2-finger trackpad pan), let native handle it
+      if (absX > absY) return;
+
+      // If user holds Ctrl / Meta: delegate to Open Motion native timeline.onZoomWheel(e)
+      if (e.ctrlKey || e.metaKey) {
+        const timeline = getTimeline();
+        if (timeline && typeof timeline.onZoomWheel === 'function') {
+          timeline.onZoomWheel(e);
+        }
+        return;
       }
-    });
+
+      // Vertical mouse wheel: pan timeline horizontally
+      if (absY > 0.01) {
+        e.preventDefault();
+        let delta = e.deltaY;
+        if (e.deltaMode === 1) delta *= 32;       // DOM_DELTA_LINE
+        else if (e.deltaMode === 2) delta *= 320; // DOM_DELTA_PAGE
+        const speed = e.shiftKey ? 2.5 : 1.2;
+        scroller.scrollLeft += delta * speed;
+      }
+    }, { passive: false });
   }
 
   // Periodic heartbeat to keep patches active
@@ -766,6 +805,7 @@
     disarmMouseLongPress();
     hookDrawerAndMulti();
     patchAdjustmentLayers();
+    setupTimelineWheelNavigation();
     decorateEffectThumbnails();
   };
 
