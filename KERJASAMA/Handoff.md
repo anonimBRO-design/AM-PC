@@ -1,4 +1,4 @@
-﻿# Handoff — State Terkini
+# Handoff — State Terkini
 
 > **File ini DITIMPA, bukan ditambahi.** Selalu cerminkan kondisi terkini.
 > Terakhir diperbarui: 11 Okt 2026 · oleh: Antigravity
@@ -32,7 +32,14 @@ Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
 
 ---
 
-### Update Terbaru (11 Okt 2026 20:30) — AM-PC Editor
+### Update Terbaru (11 Okt 2026 21:00) — AM-PC Editor
+- **Eliminasi Flash Branding & Pop-in Tombol Top Bar Saat Refresh (Commit b0fa0fd)**:
+  - Masalah teratasi: Saat reload halaman (Ctrl+R), Chromium sempat merender teks "Open Motion", logo lama, dan tombol INSTAL selama 50-200ms sebelum DOMContentLoaded berjalan, serta tombol AMFINDER & AMHUB terlambat muncul (pop-in).
+  - Solusi Frame-0:
+    1. Teks `.homeWordmark b`: Diatur `font-size: 0 !important; visibility: hidden !important;` dengan pseudo-element `::before { content: 'Alight Motion PC' !important; }` sehingga judul Alight Motion PC tampil instan di frame ke-0 tanpa menunggu JavaScript selesai mengeksekusi 34.000 baris script upstream.
+    2. Logo `.homeMark`: Elemen `img` lama disembunyikan permanen dengan `display: none !important;`, digantikan logo resmi `icons/test_prime_am.png` (serta base64 data URI pada early CSS) sehingga tidak ada delay I/O berkas.
+    3. Tombol AMFINDER & AMHUB: Dipasang melalui streaming `MutationObserver` dini di `preload.js` saat elemen `.homeTopActions` pertama kali masuk ke DOM tree (pada baris 4172 HTML), mendahului ribuan baris script upstream dan langsung dirender bersamaan pada first paint.
+    4. Tombol INSTAL PWA (`#homeInstallBtn`), tombol info lama (`#homeAMNoticeBtn`), dan modal notice (`#experimentalNotice`) disembunyikan permanen secara instan sejak awal.
 - **Sinkronisasi Upstream Resmi (PR #32 anonimBRO-design di-merge)**:
   - PR #32 (eat/project-thumbnails) resmi di-merge oleh Hada45 ke upstream/main (commit a12c5aa).
   - Berkas index.html lokal disinkronkan ke versi upstream terbaru (hash: e33d60e92a0a275af1c286df3aed262ab84e77f).

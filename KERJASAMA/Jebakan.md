@@ -1,4 +1,4 @@
-﻿# Jebakan
+# Jebakan
 
 Hal yang sudah pernah bikin rugi di proyek ini. **Baca sebelum mengubah kode.**
 Tambahkan entri baru di bawah, **jangan hapus yang lama.**
@@ -473,6 +473,19 @@ Ketika pengguna menghapus semua proyek, `parsed` bernilai `[]` (`length === 0`).
 **Sebab:** .timelineArea di index.html:429 menggunakan CSS Grid dengan 3 baris: grid-template-rows: 38px minmax(0,1fr) 0 !important;. Anak pertama (.transport) mendapat baris 38px, anak kedua (#timelineScroll) mendapat baris minmax(0, 1fr), dan anak ketiga (#drawer) mendapat baris 0px. Ketika skrip menyisipkan resizeBar sebagai firstChild, resizeBar mengambil baris 38px, .transport terdorong ke baris minmax(0, 1fr) (menjadi raksasa), dan #timelineScroll terlempar ke baris 0px (lenyap total). Selain itu, pemanggilan fitBtn.click() memicu class .fitCompositionLayout yang merusak kalkulasi zoom kanvas.
 **Perbaikan:** JANGAN PERNAH menyisipkan elemen anak baru ke dalam .timelineArea. Letakkan handle interaktif di luar .timelineArea (misalnya di .previewTools #editorSplitHandle). Untuk penyesuaian zoom kanvas, panggil ui.applyCompositionFitZoom() secara langsung, jangan memicu fitBtn.click().
 **Cara memverifikasi:** Buka proyek di Mode Asli dan Mode Studio; pastikan ruler (#ruler), daftar track (#tracks), dan playhead (#playhead) tetap terlihat sempurna dengan tinggi penuh.
+
+---
+
+## 28. Menunda manipulasi DOM ke DOMContentLoaded pada berkas HTML raksasa menyebabkan flash UI lama
+
+**Gejala:** Saat refresh (Ctrl+R), muncul sekilas (50–200ms) teks dan logo Open Motion, tombol INSTAL, serta tombol AMFINDER & AMHUB terlambat muncul (pop-in visual).
+**Kejadian:** 11 Oktober 2026, commit e033d33 (Antigravity); diperbaiki di b0fa0fd.
+**Sebab:** `index.html` upstream berukuran 3.4 MB dan memuat ~34.000 baris kode JavaScript mesin editor di bawah `#home`. Chromium mulai melakukan parsing dan rendering visual elemen HTML bilah atas (`.homeTop`, baris 4165) jauh sebelum event `DOMContentLoaded` ditembakkan. Karena `DOMContentLoaded` terblokir hingga 34.000 baris script selesai dieksekusi, manipulasi DOM di dalam listener `DOMContentLoaded` datang terlambat, sehingga Chromium sempat merender konten mentah HTML.
+**Perbaikan:** 
+1. Terapkan zero-flash typography di CSS: sembunyikan teks mentah dengan `font-size: 0 !important; visibility: hidden !important;` pada selector judul dan tampilkan teks pengganti lewat pseudo-element `::before { content: '...' !important; }`.
+2. Sembunyikan elemen `img` lama dengan `display: none !important;` dan gantikan logo via `background-image` (menggunakan data URI base64 di early CSS agar bebas latensi I/O).
+3. Gunakan streaming `MutationObserver` dini di `preload.js` untuk memasang tombol kustom (seperti AMFINDER dan AMHUB) begitu kontainer induknya muncul di DOM tree saat parsing, tanpa menunggu `DOMContentLoaded`.
+**Cara memverifikasi:** Uji headless reload via Electron: pastikan `markImgDisplay === "none"`, `wordmarkBBeforeContent === "\"Alight Motion PC\""`, dan `hasFinderBtn === true` seketika saat halaman selesai dimuat.
 
 ---
 

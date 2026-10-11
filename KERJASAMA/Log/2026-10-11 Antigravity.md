@@ -194,3 +194,35 @@
       - Di `css/desktop.css`:
         - Menambahkan aturan global permanen: `#experimentalNotice, #homeAMNoticeBtn { display: none !important; pointer-events: none !important; visibility: hidden !important; opacity: 0 !important; }`.
       - Menyinkronkan seluruh berkas ke direktori rilis `release/Alight-Motion-PC-win-x64/resources/app/`.
+
+14. **Eliminasi Flash Branding & Pop-in Tombol Top Bar Saat Refresh (Commit `b0fa0fd`)**:
+    - **Masalah yang Dilaporkan**:
+      - Pengguna melaporkan bahwa saat melakukan refresh (`Ctrl + R`), terlihat sekilas tulisan "Open Motion", ikon logo lama, tombol INSTAL, serta tombol AMFINDER & AMHUB belum muncul (pop-in terlambat).
+      - Pengguna mengonfirmasi: "kalo proyek gapapa sekilas kosong", sehingga fokus perbaikan adalah bilah atas (top bar).
+    - **Root Cause Analysis**:
+      - Berkas `index.html` upstream berukuran 3.4 MB dengan ~34.000 baris script mesin di bawah elemen `#home`.
+      - Chromium mulai merender elemen DOM bilah atas (baris 4165-4188) sebelum `DOMContentLoaded` ditembakkan, karena `DOMContentLoaded` harus menunggu seluruh 34.000 baris script selesai dieksekusi (~50-200ms).
+      - Sebelumnya, `updateBrand()` dan `mountActionButtons()` hanya dijalankan di dalam event `DOMContentLoaded`. Akibatnya, pada first paint, Chromium sempat merender teks asli HTML ("Open Motion"), logo base64 Open Motion, dan susunan tombol tanpa AMFINDER/AMHUB.
+    - **Solusi Arsitektur Frame-0**:
+      1. **Typography & Wordmark**:
+         - Di `css/desktop.css` dan early CSS, `.homeWordmark b` diatur dengan `font-size: 0 !important; visibility: hidden !important;`.
+         - Menggunakan pseudo-element `::before` dengan `content: 'Alight Motion PC' !important; font-size: 15px !important; font-weight: 800 !important; visibility: visible !important;` sehingga Chromium seketika merender "Alight Motion PC" di frame ke-0 tanpa menunggu JavaScript.
+      2. **Logo Resmi**:
+         - `.homeMark img` disembunyikan permanen dengan `display: none !important;`.
+         - Kontainer `.homeMark` diberi `background-image` logo Alight Motion squircle `icons/test_prime_am.png` (serta base64 data URI pada early CSS di `preload.js`).
+      3. **Streaming MutationObserver Dini untuk AMFINDER & AMHUB**:
+         - Di `preload.js`, streaming MutationObserver dijalankan langsung sejak skrip preload dievaluasi (sebelum DOM selesai). Begitu elemen `.homeTopActions` diparsing oleh Chromium (baris 4172), `#homeAMFinder` dan `#homeAMHub` langsung dipasang seketika, mendahului ribuan baris script upstream.
+      4. **Pembersihan Tombol Bawaan Web**:
+         - Tombol instal PWA (`#homeInstallBtn`), tombol info (`#homeAMNoticeBtn`), dan dialog `#experimentalNotice` disembunyikan permanen dengan `display: none !important;`.
+    - **Verifikasi**:
+      - Diuji dengan skrip simulasi reload headless `verify_topbar.js`:
+        - `markImgDisplay`: `"none"`
+        - `markContBg`: logo Alight Motion aktif
+        - `wordmarkTextContent`: `"Alight Motion PC"`
+        - `wordmarkBBeforeContent`: `"Alight Motion PC"`
+        - `hasFinderBtn`: `true`
+        - `hasHubBtn`: `true`
+        - `installBtnDisplay`: `"none"`
+        - `noticeDisplay`: `"none"`
+      - Screenshot visual `test_topbar_after_reload.png` mengonfirmasi bilah atas tampil sempurna dan bersih.
+      - Berkas disinkronkan ke direktori rilis `release/Alight-Motion-PC-win-x64/resources/app/`.
