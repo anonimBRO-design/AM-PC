@@ -334,6 +334,34 @@ Suntikkan script dan periksa apakah `window.__amDesktopEngineInitialized` bernil
 
 ---
 
+## 15. Blob URL `URL.createObjectURL` disimpan ke data proyek — mati saat aplikasi ditutup (AM-Native-Desktop)
+
+**Gejala:** media (foto/audio/video) yang tadinya tampil normal hilang setelah aplikasi ditutup dan dibuka lagi; renderer menampilkan placeholder abu-abu; konsol `Failed to fetch` untuk `blob:file:///...`.
+
+**Kejadian:** 2026-10-11, proyek "Negoro angin" (AM Link) di AM-Native-Desktop — 17 media `blob:` mati setelah restart. Ditemukan saat melanjutkan sesi Antigravity yang macet.
+
+**Sebab:** `am-link.ts` menyimpan `URL.createObjectURL(blob)` langsung ke `layer.mediaSrc` yang ikut tersimpan di localStorage. Blob URL hanya hidup selama sesi renderer yang membuatnya.
+
+**Perbaikan:** media ditulis ke disk (`userData/am_media/<sha1>.<ext>`) dan dipakai lewat skema `ammedia://` (protocol handler Electron, `electron/am-media.js`). Blob URL hanya fallback.
+
+**Cara memverifikasi:** `npx electron scripts/verify-text-media.js` lalu `--phase2` (restart) — FASE1 & FASE2 PASS dengan piksel identik; `mediaSrc` proyek tersimpan `ammedia://media/<sha1>.png`.
+
+---
+
+## 16. Layer `<text>` tanpa jalur render = quad fallback abu-abu menutupi seluruh kanvas (AM-Native-Desktop)
+
+**Gejala:** render "cuma grey" walau audio jalan; seluruh kanvas `RGBA(31,36,46,255)`; media di bawahnya tidak terlihat.
+
+**Kejadian:** 2026-10-11, proyek "Negoro angin" — dua layer text 1080×1920 tanpa fillColor.
+
+**Sebab:** `webgl2-renderer.ts` tidak punya cabang untuk `type === 'text'` → jatuh ke fallback `[0.12,0.14,0.18]` opaque. Bukti: `scripts/diag-grey2.js` → greyPct=100%, 9/9 sampel sama persis.
+
+**Perbaikan:** `src/engine/text-renderer.ts` (canvas2d → texImage2D) + parser mengekstrak properti text; teks kosong dilewati (tidak digambar).
+
+**Cara memverifikasi:** `verify-text-media.js` — glyph "T" putih terdeteksi (top > bottom), greyPct=0.
+
+---
+
 ## Cara menambah jebakan baru
 
 Kalau kamu menemukan hal yang bikin rugi, tambahkan di sini dengan format:
