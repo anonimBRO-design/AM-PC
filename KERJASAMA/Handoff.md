@@ -1,4 +1,4 @@
-# Handoff — State Terkini
+﻿# Handoff — State Terkini
 
 > **File ini DITIMPA, bukan ditambahi.** Selalu cerminkan kondisi terkini.
 > Terakhir diperbarui: 11 Okt 2026 · oleh: Antigravity
@@ -32,7 +32,13 @@ Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
 
 ---
 
-### Update Terbaru (11 Okt 2026 19:35) — AM-PC Editor
+### Update Terbaru (11 Okt 2026 20:15) — AM-PC Editor
+- **Penyempurnaan Widescreen Mode Studio & Resizer Tinggi Timeline (Commit b372cea)**:
+  - Preview Widescreen: Area preview memenuhi 100% lebar layar di Mode Studio saat drawer tertutup, kanvas berada tepat di tengah, dan ruang kosong hitam 664px telah hilang sepenuhnya.
+  - Auto-Dock Inspector: Saat drawer dibuka, dock kanan 400px muncul secara dinamis dan area preview menyesuaikan secara mulus.
+  - Resizer Tinggi Timeline Vertikal: Tersedia handle geser #amTimelineResizeBar dan #editorSplitHandle untuk menarik batas tinggi timeline secara vertikal (minimal 180px, tersimpan di localStorage).
+  - Auto-Fit Zoom Kanvas: Otomatis memanggil Fit to Viewport saat berganti mode atau mengubah ukuran tata letak agar kanvas selalu pas dan tidak terpotong.
+  - Proteksi Grid: Mencegat inline style upstream applySplit agar tidak merusak tata letak CSS Grid Studio.
 - **Dual Editor Layout Engine (Mode Studio vs Mode Asli) — FIX SELESAI**:
   - Tersedia 2 mode tata letak editor yang bisa di-toggle secara instan:
     1. **Mode Studio AM-PC**: Preview di atas, Timeline di bawah 280px, Inspector docked di kanan.
