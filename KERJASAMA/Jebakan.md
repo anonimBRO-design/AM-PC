@@ -390,6 +390,16 @@ Suntikkan script dan periksa apakah `window.__amDesktopEngineInitialized` bernil
 
 ---
 
+## 20. Kolom label timeline flex-shrink mengompres baris → label melenceng dari klip (AM-Native-Desktop)
+
+**Gejala:** baris label T1–T12 (~17px/baris) tidak sejajar dengan bar klip (~38px pitch); makin ke bawah makin geser (bar ke-5 melenceng ~5 baris). Playhead tetap benar.
+**Kejadian:** proyek 30 layer ("Negoro angin") — tampak di screenshot user.
+**Sebab:** `.track-headers` = `display:flex; flex-direction:column` **tanpa overflow handling**. Konten 30×38px = 1140px di container ~186px → default `flex-shrink:1` mengompres tiap `.track-header-item` ke min-content (~17px). `.timeline-track-row` di `#trackScroller` = block flow biasa → tetap 38px. Pitch beda → drift.
+**Perbaikan:** `flex-shrink:0` + `overflow-y:auto` (scrollbar disembunyikan) di kolom label; `.tracks-canvas-area` `overflow-y:auto`; `#trackScroller` `min-height:100%` (playhead setinggi konten); sinkron scroll dua arah label ↔ klip di `bindEvents`.
+**Cara memverifikasi:** `scratch/measure-timeline.js` — pitch 38/38px, `misalign [0,0,0,0,0,0]`, scroll sinkron 120→120 & 40→40, `misalignAfter=0`. Commit `e5ed4ff`.
+
+---
+
 ## Cara menambah jebakan baru
 
 Kalau kamu menemukan hal yang bikin rugi, tambahkan di sini dengan format:
