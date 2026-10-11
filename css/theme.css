@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 /* ============================================================
    Alight Motion PC (AM-PC) — Theme & Design Tokens
@@ -43,7 +43,7 @@
 }
 
 :root {
-  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
+  --font-main: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'Cascadia Code', 'Consolas', 'SF Mono', monospace;
 }
 
@@ -175,35 +175,96 @@ input, select, textarea {
   background: transparent !important;
 }
 
-.simpleHome .sectionKicker {
+.simpleHome .sectionKicker,
+#workspaceKicker {
   color: var(--accent) !important;
-  font-weight: 800;
-  letter-spacing: 0.12em;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 4px !important;
+  display: block !important;
 }
 
-.simpleHome .sectionRow h1 {
+.simpleHome .sectionRow h1,
+#workspaceTitle {
   color: #ffffff !important;
-  font-size: 24px !important;
+  font-size: 26px !important;
   font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
 }
 
-.simpleHome .projectCountBadge {
+.simpleHome .projectCountBadge,
+#projectCountBadge {
   border: 1px solid rgba(0, 230, 118, 0.4) !important;
   background: rgba(0, 230, 118, 0.12) !important;
   color: var(--accent) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  padding: 2px 9px !important;
+  border-radius: 999px !important;
 }
 
-.simpleHome .projectSort {
+.simpleHome .projectSort,
+#projectSortLabel {
   background: var(--panel) !important;
   border: 1px solid var(--line) !important;
   color: #a0a7b6 !important;
+  height: 38px !important;
+  padding: 0 12px !important;
+  border-radius: 10px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
 }
 
-.simpleHome .projectSort svg {
+.simpleHome .projectSort svg,
+#projectSortLabel svg {
   stroke: #a0a7b6 !important;
+  width: 15px !important;
+  height: 15px !important;
+  flex: 0 0 15px !important;
 }
 
-.simpleHome .projectSort select {
+.simpleHome .projectSort select,
+#projectSort {
+  color: #ffffff !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  max-width: 90px !important;
+  cursor: pointer !important;
+}
+
+/* Header Top Language Code ("ID") Button */
+.simpleHome .languageBtn,
+#homeLanguageBtn {
+  min-width: 52px !important;
+  height: 36px !important;
+  padding: 0 10px !important;
+  gap: 6px !important;
+  border-radius: 10px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: var(--panel) !important;
+  border: 1px solid var(--line) !important;
+}
+
+.simpleHome .languageBtn svg,
+#homeLanguageBtn svg {
+  width: 15px !important;
+  height: 15px !important;
+  stroke: var(--accent) !important;
+}
+
+.simpleHome .languageBtn .langCode,
+#homeLanguageCode {
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.04em !important;
   color: #ffffff !important;
 }
 

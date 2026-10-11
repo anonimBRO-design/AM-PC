@@ -2946,14 +2946,59 @@ button:active,
 }
 
 
-/* 4. Desktop "PROYEK BARU" Button Visibility Guarantee */
-@media (min-width: 900px) {
-  .simpleHome .sectionRowActions #newProjectFab {
-    display: inline-flex !important;
-    pointer-events: auto !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
+/* 4. Desktop "PROYEK BARU" Button Visibility & Typography Guarantee */
+.simpleHome .sectionRowActions #newProjectFab,
+#newProjectFab {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: static !important;
+  transform: none !important;
+  height: 38px !important;
+  min-width: 142px !important;
+  padding: 0 16px !important;
+  gap: 8px !important;
+  border-radius: 10px !important;
+  background: var(--accent) !important;
+  color: #061911 !important;
+  border: none !important;
+  box-shadow: 0 4px 16px var(--accent-glow) !important;
+  cursor: pointer !important;
+}
+
+.simpleHome .sectionRowActions #newProjectFab span,
+#newProjectFab span {
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  display: inline-block !important;
+  color: #061911 !important;
+}
+
+.simpleHome .sectionRowActions #newProjectFab b,
+#newProjectFab b,
+#newProjectFabLabel {
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  line-height: 1 !important;
+  color: #061911 !important;
+}
+
+.simpleHome .sectionRowActions #newProjectFab:hover,
+#newProjectFab:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 20px rgba(0, 230, 118, 0.5) !important;
+  filter: brightness(1.05) !important;
+}
+
+.simpleHome .sectionRowActions #newProjectFab:active,
+#newProjectFab:active {
+  transform: scale(0.97) !important;
 }
 
 /* 5. Modal dialog cards base styling polish */
