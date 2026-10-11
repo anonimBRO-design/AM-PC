@@ -416,6 +416,36 @@ Ketika pengguna menghapus semua proyek, `parsed` bernilai `[]` (`length === 0`).
 
 ---
 
+## 22. Foto terbalik — `UNPACK_FLIP_Y_WEBGL` diabaikan untuk sumber ImageBitmap (AM-Native-Desktop)
+
+**Gejala:** Foto tampil di kanvas tapi terbalik vertikal; teks justru benar. User: "foto nya muncul tapi terbalik".
+**Kejadian:** 11 Oktober 2026, Hermes.
+**Sebab:** `MediaManager` mengupload `entry.bitmap` (hasil `createImageBitmap`) dan mengandalkan `flipY=true` (`UNPACK_FLIP_Y_WEBGL`). Menurut spesifikasi WebGL, parameter `UNPACK_FLIP_Y_WEBGL` (dan PREMULTIPLY_ALPHA) **diabaikan untuk sumber ImageBitmap** — orientasi milik bitmap itu sendiri. Jalur teks (canvas) dan fallback img memakai flag yang sama, sehingga hanya jalur bitmap yang terbalik. Bukti: `scratch/test-render-issues.js` — gambar sintetis (atas MERAH, bawah BIRU) dirender jadi biru di atas = TERBALIK.
+**Perbaikan:** `createImageBitmap(img, { imageOrientation: 'flipY' })` — pre-flip saat pembuatan bitmap → konsisten dengan `flipY=true` di jalur lain.
+**Cara memverifikasi:** `scratch/test-fixes.js` — sintetis yang sama kini UPRIGHT (255,0,0 di atas, 0,0,255 di bawah). Commit `8a3cb54`.
+
+---
+
+## 23. Efek mati SENYAP — id duplikat katalog, shell v2 menimpa efek asli (AM-Native-Desktop)
+
+**Gejala:** Proyek impor "diem aja gak ada gerak" — 7 efek (fade, brightcont2, swing2, oscillate3, randomdisplace, shake2, pulsate2) tidak berefek walau `enabled: true`, TANPA pesan error.
+**Kejadian:** 11 Oktober 2026, Hermes.
+**Sebab:** `definitions.json` punya 13 id duplikat; 10 entri shell dari `v2-colorandlight -presets.xml` (`params:[]`, `shaderSource:null`) muncul SETELAH entri asli. `new Map(defs.map(d => [d.id, d]))` = last-wins → lookup renderer mengembalikan shell → `if (!def.shaderSource) continue` → di-skip senyap. Bukti probe `[fxdbg]`: `def= true srcLen= 0` untuk brightcont2 (padahal entri asli punya shader 862 char).
+**Perbaikan:** `AMEffectMap` dibangun manual dan memprioritaskan entri yang punya `shaderSource`; shell tidak menimpa efek asli. (Perbaikan di generator `bundle-effects.js` menyusul.)
+**Cara memverifikasi:** `scratch/test-fixes.js` C2 — brightcont2 statis `brightness=-1` → kanvas hitam (0,0,0); kanvas proyek asli berubah setelah fix (titik tengah 47,38,36 → 35,28,27 = efek yang dulu mati kini jalan). Commit `8a3cb54`.
+
+---
+
+## 24. Keyframe param efek dibuang parser XML → animasi efek hilang (AM-Native-Desktop)
+
+**Gejala:** Proyek impor tidak bergerak; param efek teranimasi jadi 0 statis (mis. swing2 `a1=0 a2=0` padahal di AM beranimasi).
+**Kejadian:** 11 Oktober 2026, Hermes.
+**Sebab:** Blok efek di `am-xml-parser.ts` hanya membaca attr `value` statis dari `<property>` — anak `<kf>` (keyframe AM) tidak diparsing, padahal properti layer (location/scale/rotation/opacity) sudah diparsing. Bukti: proyek tersimpan punya 44 keyframes, SEMUA di properti layer, 0 di param efek.
+**Perbaikan:** (a) parser membaca `<kf t v>` di property efek — waktu ternormalisasi `timeStart + t*(timeEnd-timeStart)` (pola sama dengan properti layer), `value` = kf pertama bila ada; (b) renderer mengevaluasi param ber-keyframes per `currentTime` via `Animator.evaluateProperty` (`isAnimated:true` disuntik karena `EffectParameter` tidak punya field itu).
+**Cara memverifikasi:** `__amParseXml` unit test (kf t=0/1 → time 0/2, value -1, contrast statis utuh) + render brightness -1→+1: t=0.15 = (255,57,57) vs t=1.85 = (255,255,255), Δsum=339. Commit `8a3cb54`. CATATAN: proyek lama harus **re-import** sekali agar keyframe param terbaca.
+
+---
+
 ## Cara menambah jebakan baru
 
 Kalau kamu menemukan hal yang bikin rugi, tambahkan di sini dengan format:
