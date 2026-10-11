@@ -1179,10 +1179,14 @@ window.addEventListener('DOMContentLoaded', () => {
   };
   initUniversalPopupEngine();
 
-  // Observer to maintain brand & drawer docking on view switches
+  // Observer to maintain brand & drawer docking on view switches (throttled to avoid per-frame playback stutter)
   const appContainer = document.querySelector('.app') || document.body;
   if (appContainer) {
-    const observer = new MutationObserver(() => {
+    let lastRun = 0;
+    let throttleTimeout = null;
+
+    const runObserverTasks = () => {
+      lastRun = Date.now();
       dockDrawer();
       updateBrand();
       updateNotice();
@@ -1190,6 +1194,24 @@ window.addEventListener('DOMContentLoaded', () => {
       injectThumbnailEngine();
       injectDesktopEngine();
       initUniversalPopupEngine();
+    };
+
+    const observer = new MutationObserver(() => {
+      const now = Date.now();
+      const elapsed = now - lastRun;
+
+      if (elapsed >= 250) {
+        if (throttleTimeout) {
+          clearTimeout(throttleTimeout);
+          throttleTimeout = null;
+        }
+        runObserverTasks();
+      } else if (!throttleTimeout) {
+        throttleTimeout = setTimeout(() => {
+          throttleTimeout = null;
+          runObserverTasks();
+        }, 250 - elapsed);
+      }
     });
     observer.observe(appContainer, { childList: true, subtree: true });
   }
