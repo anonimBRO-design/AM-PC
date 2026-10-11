@@ -304,6 +304,16 @@ Suntikkan script dan periksa apakah `window.__amDesktopEngineInitialized` bernil
 
 ---
 
+## 12. Param XML duplikat & tag param langka bikin shader fail senyap (AM-Native-Desktop)
+
+**Gejala:** 107 dari 269 shader gagal compile di batch test WebGL2 (`npm run verify:shaders`); error didominasi "redefinition" (uniform) & "undeclared identifier"; param efek (mis. warna hue/tint) hilang dari UI.
+**Kejadian:** 11 Okt 2026, ditemukan Hermes saat membuat batch test.
+**Sebab:** Dua bug di parser param `AM-Native-Desktop/scripts/bundle-effects.js`: (1) regex tag tidak mencakup `choice` (790×), `hue-disc` (13×), `float` (3×) → uniform tidak dideklarasikan; (2) XML yang sama mendeklarasikan id param dua kali (slider + spinner, 18 efek) → pipeline menulis `uniform float X;` dobel → "redefinition".
+**Perbaikan:** lengkapi tag→tipe GLSL (`choice→float`, `hue-disc→color`) + dedupe by id (pertahankan kemunculan pertama). Pack AM-PC (release) sudah tanpa duplikat — samakan.
+**Cara memverifikasi:** `npm run verify:shaders` → pass-rate naik 148→162/269; `colorhot` punya param `color`,`tint`; `brightcont` tidak ada id dobel.
+
+---
+
 ## Cara menambah jebakan baru
 
 Kalau kamu menemukan hal yang bikin rugi, tambahkan di sini dengan format:

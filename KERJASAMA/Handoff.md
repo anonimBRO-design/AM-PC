@@ -19,15 +19,17 @@ Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
   - Mengganti placeholder teks logo `<div class="am-logo-pill">AM</div>` dengan logo resmi Alight Motion (`test_prime_am.png` squircle swirl) di HomeScreen dan Editor Studio.
   - Memperbaiki entrypoint `main` di `package.json` ke `electron/main.js`.
   - Teruji live di Electron: 5 efek diterapkan sekaligus ke stack tanpa error/crash WebGL.
-- **Hermes (ANTRIAN / SEDANG BERJALAN)**:
-  - Porting `knownMap` dan normalizer snake-case ke `scripts/bundle-effects.js` (target: 185+ ikon WebP resolve).
-  - Implementasi `src/engine/media-manager.ts` untuk loader gambar/video ke WebGL texture `texImage2D`.
-  - Setup remote GitHub untuk `AM-Native-Desktop`.
+- **Hermes (SELESAI poin 1–3, poin 4 menunggu keputusan user)**:
+  - ✅ Ikon: `KNOWN_THUMB_MAP` (105 entri dari `commonMap` AM-PC) + normalizer snake-case → resolusi 55 → **276/328 (84,1%)**. Commit `d8f52c8`.
+  - ✅ Fix bug parser param `bundle-effects.js`: tag `choice`/`hue-disc`/`float` + dedupe id duplikat (18 efek) → shader pass-rate 148 → 162/269.
+  - ✅ `src/engine/media-manager.ts` (467 baris, texImage2D loader; `webgl2-renderer.ts` tidak disentuh — **butuh wiring dari Antigravity**). Commit `7373cb1`.
+  - ✅ Batch test shader: `npm run verify:shaders` → laporan `scratch/shader-batch-report.json`; sisa 107 gagal + resep fix ada di [[Log/2026-10-11 Hermes]].
+  - ⏳ Remote GitHub: usulan `anonimBRO-design/AM-Native-Desktop` — menunggu keputusan user.
 
 | Agent | Status | Fokus Area |
 |---|---|---|
 | **Antigravity** | ✅ Selesai Tahap 1 | WebGL2 Engine, Shader Pipeline, Environment Uniforms, UI Badging |
-| **Hermes** | ⏳ Sedang Berjalan | Ikon KnownMap, Media Loader (`texImage2D`), QA Suite, Git Remote |
+| **Hermes** | ✅ Poin 1–3 selesai · ⏳ Poin 4 (remote) | Ikon KnownMap, Media Loader (`texImage2D`), QA Suite, Git Remote |
 
 ---
 
