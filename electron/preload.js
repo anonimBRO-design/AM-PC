@@ -33,19 +33,85 @@ contextBridge.exposeInMainWorld('desktopAPI', {
   showItemInFolder: (filePath) => ipcRenderer.invoke('shell-show-item', filePath)
 });
 
-// Injeksi CSS dini: Hapus seketika FOUC (Flash of Unstyled Content) dan sembunyikan popup notice dari frame pertama
+// Injeksi CSS dini & Streaming Observer Dini:
+// Memastikan logo resmi, judul, AMFINDER, dan AMHUB aktif seketika pada frame 0 tanpa menunggu DOMContentLoaded
 (() => {
   try {
     const desktopCssPath = path.join(__dirname, '../css/desktop.css');
     const themeCssPath = path.join(__dirname, '../css/theme.css');
+    const primeLogoPath = path.join(__dirname, '../icons/test_prime_am.png');
+
+    let primeLogoDataUri = '';
+    if (fs.existsSync(primeLogoPath)) {
+      primeLogoDataUri = 'data:image/png;base64,' + fs.readFileSync(primeLogoPath).toString('base64');
+    }
 
     let combinedEarlyCss = `
       #experimentalNotice,
-      #homeAMNoticeBtn {
+      #homeAMNoticeBtn,
+      #homeInstallBtn {
         display: none !important;
         pointer-events: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
+      }
+
+      .homeMark img,
+      .simpleHome .homeMark img {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+      }
+
+      .homeMark,
+      .simpleHome .homeMark {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+        max-width: 34px !important;
+        flex: 0 0 34px !important;
+        border-radius: 9px !important;
+        background-color: transparent !important;
+        ${primeLogoDataUri ? `background-image: url('${primeLogoDataUri}') !important;` : "background-image: url('icons/test_prime_am.png') !important;"}
+        background-size: contain !important;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45) !important;
+        border: 0 !important;
+        filter: none !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      .homeWordmark b,
+      .simpleHome .homeWordmark b {
+        font-size: 0 !important;
+        line-height: 0 !important;
+        visibility: hidden !important;
+        display: inline-flex !important;
+        align-items: center !important;
+      }
+
+      .homeWordmark b::before,
+      .simpleHome .homeWordmark b::before {
+        content: 'Alight Motion PC' !important;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+        font-size: 15px !important;
+        font-weight: 800 !important;
+        color: #ffffff !important;
+        letter-spacing: -0.01em !important;
+        line-height: 1 !important;
+        visibility: visible !important;
+        display: inline-block !important;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6) !important;
+      }
+
+      .homeWordmark small {
+        display: none !important;
       }
     `;
 
@@ -68,16 +134,98 @@ contextBridge.exposeInMainWorld('desktopAPI', {
       return false;
     };
 
-    if (!injectTag()) {
-      const obs = new MutationObserver(() => {
-        if (injectTag()) {
-          obs.disconnect();
+    injectTag();
+
+    // Streaming DOM Observer: Mount tombol AMFINDER & AMHUB serta brand secepat mungkin saat elemen diparsing
+    const earlyMountActionButtons = () => {
+      const topActions = document.querySelector('.homeTopActions');
+      const amLinkBtn = document.getElementById('homeAMLink');
+      if (topActions && amLinkBtn) {
+        if (!document.getElementById('homeAMFinder')) {
+          const finderBtn = document.createElement('button');
+          finderBtn.id = 'homeAMFinder';
+          finderBtn.className = 'rightBtn';
+          finderBtn.type = 'button';
+          finderBtn.title = 'Buka AM Finder (amfinder.web.id)';
+          finderBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <span>AMFINDER</span>
+          `;
+          finderBtn.onclick = () => {
+            if (typeof window.openAmWebModal === 'function') window.openAmWebModal('finder');
+          };
+          topActions.insertBefore(finderBtn, amLinkBtn);
         }
-      });
-      obs.observe(document, { childList: true, subtree: true });
-    }
+
+        if (!document.getElementById('homeAMHub')) {
+          const hubBtn = document.createElement('button');
+          hubBtn.id = 'homeAMHub';
+          hubBtn.className = 'rightBtn';
+          hubBtn.type = 'button';
+          hubBtn.title = 'Buka AM Hub (amhub.anonimbro.my.id)';
+          hubBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            <span>AMHUB</span>
+          `;
+          hubBtn.onclick = () => {
+            if (typeof window.openAmWebModal === 'function') window.openAmWebModal('hub');
+          };
+          topActions.insertBefore(hubBtn, amLinkBtn);
+        }
+      }
+    };
+
+    const earlyBrandAndNotice = () => {
+      if (document.documentElement && !document.documentElement.classList.contains('is-electron')) {
+        document.documentElement.classList.add('is-electron');
+      }
+      if (document.body && !document.body.classList.contains('is-electron')) {
+        document.body.classList.add('is-electron');
+      }
+
+      const wordmarkB = document.querySelector('.homeWordmark b');
+      if (wordmarkB && wordmarkB.textContent.trim() !== 'Alight Motion PC') {
+        wordmarkB.textContent = 'Alight Motion PC';
+      }
+
+      const markImg = document.querySelector('.homeMark img');
+      if (markImg && (!markImg.src || !markImg.src.includes('test_prime_am.png'))) {
+        markImg.src = 'icons/test_prime_am.png';
+        markImg.alt = 'Alight Motion PC';
+      }
+
+      const notice = document.getElementById('experimentalNotice');
+      if (notice) {
+        notice.setAttribute('aria-hidden', 'true');
+        notice.style.setProperty('display', 'none', 'important');
+        notice.style.setProperty('pointer-events', 'none', 'important');
+      }
+
+      const noticeBtn = document.getElementById('homeAMNoticeBtn');
+      if (noticeBtn) noticeBtn.remove();
+
+      const installBtn = document.getElementById('homeInstallBtn');
+      if (installBtn) installBtn.style.setProperty('display', 'none', 'important');
+
+      window.__omsExperimentalNoticeAccepted = true;
+    };
+
+    const earlyObserver = new MutationObserver(() => {
+      injectTag();
+      earlyBrandAndNotice();
+      earlyMountActionButtons();
+    });
+
+    earlyObserver.observe(document, { childList: true, subtree: true });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      injectTag();
+      earlyBrandAndNotice();
+      earlyMountActionButtons();
+      earlyObserver.disconnect();
+    }, { once: true });
   } catch (err) {
-    console.error('[AM-PC] Early CSS injection failed:', err);
+    console.error('[AM-PC] Early setup failed:', err);
   }
 })();
 
@@ -116,7 +264,7 @@ window.addEventListener('DOMContentLoaded', () => {
   };
   updateBrand();
 
-  // 1b. Hapus/Sembunyikan dialog Experimental Notice permanen
+  // 1b. Hapus/Sembunyikan dialog Experimental Notice & Install Button permanen
   const updateNotice = () => {
     const notice = document.getElementById('experimentalNotice');
     if (notice) {
@@ -126,6 +274,8 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     const noticeBtn = document.getElementById('homeAMNoticeBtn');
     if (noticeBtn) noticeBtn.remove();
+    const installBtn = document.getElementById('homeInstallBtn');
+    if (installBtn) installBtn.style.setProperty('display', 'none', 'important');
     window.__omsExperimentalNoticeAccepted = true;
   };
   updateNotice();
@@ -472,8 +622,9 @@ window.addEventListener('DOMContentLoaded', () => {
     const amLinkBtn = document.getElementById('homeAMLink');
     const topActions = document.querySelector('.homeTopActions');
     if (topActions && amLinkBtn) {
-      if (!document.getElementById('homeAMFinder')) {
-        const finderBtn = document.createElement('button');
+      let finderBtn = document.getElementById('homeAMFinder');
+      if (!finderBtn) {
+        finderBtn = document.createElement('button');
         finderBtn.id = 'homeAMFinder';
         finderBtn.className = 'rightBtn';
         finderBtn.type = 'button';
@@ -482,12 +633,13 @@ window.addEventListener('DOMContentLoaded', () => {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           <span>AMFINDER</span>
         `;
-        finderBtn.onclick = () => window.openAmWebModal('finder');
         topActions.insertBefore(finderBtn, amLinkBtn);
       }
+      finderBtn.onclick = () => window.openAmWebModal('finder');
 
-      if (!document.getElementById('homeAMHub')) {
-        const hubBtn = document.createElement('button');
+      let hubBtn = document.getElementById('homeAMHub');
+      if (!hubBtn) {
+        hubBtn = document.createElement('button');
         hubBtn.id = 'homeAMHub';
         hubBtn.className = 'rightBtn';
         hubBtn.type = 'button';
@@ -496,12 +648,14 @@ window.addEventListener('DOMContentLoaded', () => {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
           <span>AMHUB</span>
         `;
-        hubBtn.onclick = () => window.openAmWebModal('hub');
         topActions.insertBefore(hubBtn, amLinkBtn);
       }
+      hubBtn.onclick = () => window.openAmWebModal('hub');
 
       const oldNoticeBtn = document.getElementById('homeAMNoticeBtn');
       if (oldNoticeBtn) oldNoticeBtn.remove();
+      const installBtn = document.getElementById('homeInstallBtn');
+      if (installBtn) installBtn.style.setProperty('display', 'none', 'important');
     }
   };
   mountActionButtons();

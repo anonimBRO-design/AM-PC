@@ -1,7 +1,8 @@
 
-/* Info & Experimental Notice Permanently Hidden */
+/* Info, Notice, & Install Button Permanently Hidden */
 #experimentalNotice,
-#homeAMNoticeBtn {
+#homeAMNoticeBtn,
+#homeInstallBtn {
   display: none !important;
   pointer-events: none !important;
   visibility: hidden !important;
@@ -1300,9 +1301,7 @@ body.is-electron #homeInstallBtn {
   gap: 8px !important;
 }
 
-.brandText,
-.homeWordmark b,
-.simpleHome .homeWordmark b {
+.brandText {
   display: inline-block !important;
   color: #ffffff !important;
   font-size: 15px !important;
@@ -1361,9 +1360,13 @@ html, body, .app, .home, .editor, button, input, select, textarea {
   max-width: 34px !important;
   flex: 0 0 34px !important;
   border-radius: 9px !important;
-  background: transparent !important;
+  background-color: transparent !important;
+  background-image: url('icons/test_prime_am.png'), url('../icons/test_prime_am.png') !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
   border: 0 !important;
-  box-shadow: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45) !important;
   filter: none !important;
   overflow: hidden !important;
   display: flex !important;
@@ -1375,14 +1378,9 @@ html, body, .app, .home, .editor, button, input, select, textarea {
 
 .homeMark img,
 .simpleHome .homeMark img {
-  width: 34px !important;
-  height: 34px !important;
-  min-width: 34px !important;
-  min-height: 34px !important;
-  border-radius: 9px !important;
-  object-fit: cover !important;
-  display: block !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45) !important;
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
 }
 
 .homeWordmark,
@@ -1394,12 +1392,29 @@ html, body, .app, .home, .editor, button, input, select, textarea {
 
 .homeWordmark b,
 .simpleHome .homeWordmark b {
+  font-size: 0 !important;
+  line-height: 0 !important;
+  visibility: hidden !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+.homeWordmark b::before,
+.simpleHome .homeWordmark b::before {
+  content: 'Alight Motion PC' !important;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
   color: #ffffff !important;
   font-size: 15px !important;
   font-weight: 800 !important;
   letter-spacing: -0.01em !important;
   line-height: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6) !important;
+}
+
+.homeWordmark small {
+  display: none !important;
 }
 
 /* ============================================================
@@ -1467,8 +1482,7 @@ html, body, .app, .home, .editor, button, input, select, textarea {
    AM Finder & AM Hub Top Bar Buttons
    ============================================================ */
 #homeAMFinder,
-#homeAMHub,
-#homeAMNoticeBtn {
+#homeAMHub {
   border: 1px solid #283042 !important;
   background: #1c202c !important;
   color: #c7cedd !important;
@@ -1497,16 +1511,8 @@ html, body, .app, .home, .editor, button, input, select, textarea {
   box-shadow: 0 0 10px rgba(0, 230, 118, 0.25) !important;
 }
 
-#homeAMNoticeBtn:hover {
-  background: #242c3d !important;
-  border-color: #6fe1bd !important;
-  color: #6fe1bd !important;
-  box-shadow: 0 0 10px rgba(111, 225, 189, 0.25) !important;
-}
-
 #homeAMFinder svg,
-#homeAMHub svg,
-#homeAMNoticeBtn svg {
+#homeAMHub svg {
   width: 14px !important;
   height: 14px !important;
 }
