@@ -32,7 +32,14 @@ Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
 
 ---
 
-### Update Terbaru (11 Okt 2026 21:00) — AM-PC Editor
+### Update Terbaru (11 Okt 2026 21:10) — AM-PC Editor
+- **Penyelarasan Tampilan Tombol Plus Mode Studio dengan Mode Asli (Commit a5a9ecc)**:
+  - Tombol tambah layer (+) pada Mode Studio disamakan 100% dengan Mode Asli:
+    - Lingkaran background gelap charcoal (#18221d).
+    - Border neon hijau mint 2px (solid var(--accent, #00e676)).
+    - Simbol plus neon mint dengan glow halus (box-shadow: 0 4px 18px rgba(0, 230, 118, 0.35)).
+    - Status open saat drawer terbuka bertransformasi rotasi 45 derajat dengan warna navy gelap #243047.
+  - Berkas css/desktop-studio.css disinkronkan ke direktori rilis dan diverifikasi visual dengan Electron headless (test_plus_studio.png vs test_plus_original.png).
 - **Eliminasi Flash Branding & Pop-in Tombol Top Bar Saat Refresh (Commit b0fa0fd)**:
   - Masalah teratasi: Saat reload halaman (Ctrl+R), Chromium sempat merender teks "Open Motion", logo lama, dan tombol INSTAL selama 50-200ms sebelum DOMContentLoaded berjalan, serta tombol AMFINDER & AMHUB terlambat muncul (pop-in).
   - Solusi Frame-0:

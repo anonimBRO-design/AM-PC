@@ -226,3 +226,28 @@
         - `noticeDisplay`: `"none"`
       - Screenshot visual `test_topbar_after_reload.png` mengonfirmasi bilah atas tampil sempurna dan bersih.
       - Berkas disinkronkan ke direktori rilis `release/Alight-Motion-PC-win-x64/resources/app/`.
+
+15. **Penyelarasan Tampilan Tombol Plus Mode Studio dengan Mode Asli (Commit `a5a9ecc`)**:
+    - **Permintaan Pengguna**:
+      - Pengguna melampirkan screenshot perbandingan tombol tambah layer (`+`) di Mode Asli (foto 1) dan Mode Studio (foto 2).
+      - Instruksi: "foto pertama mode asli foto kedua mode studio, ubah logo plus mode studio kaya logo plus mode asli".
+    - **Analisis**:
+      - Pada Mode Asli (bawaan tema AM), `.plusBtn` memiliki lingkaran berlatar gelap charcoal `#18221d`, border neon hijau mint 2px (`border: 2px solid var(--accent, #00e676)`), warna simbol plus neon mint (`color: var(--accent)`), serta efek glow `box-shadow: 0 4px 18px rgba(0, 230, 118, 0.35)`.
+      - Pada Mode Studio sebelumnya, `.timelineArea .plusBtn` dioverride dengan lingkaran gradien solid cyan-hijau (`linear-gradient(135deg, #00e676, #00b0ff)`), teks plus hitam tebal (`#0b0e14`), dan tanpa border (`border: 0`).
+    - **Tindakan**:
+      - Di `css/desktop-studio.css`:
+        - Mengubah `.timelineArea .plusBtn`:
+          - `background: #18221d !important;`
+          - `border: 2px solid var(--accent, #00e676) !important;`
+          - `color: var(--accent, #00e676) !important;`
+          - `font-size: 26px !important; font-weight: 600 !important;`
+          - `box-shadow: 0 4px 18px rgba(0, 230, 118, 0.35) !important;`
+          - Transisi `transition: transform 0.18s ease, background 0.18s ease, filter 0.15s ease !important;`
+        - Menambahkan status hover: `background: #1d2c25 !important; box-shadow: 0 6px 22px rgba(0, 230, 118, 0.45) !important;`
+        - Menangani status terbuka (`.timelineArea .plusBtn.open`): `transform: rotate(45deg) !important; background: #243047 !important; border-color: #5f7596 !important; color: #e2e8f0 !important;` saat drawer layer terbuka.
+      - Menyinkronkan berkas `css/desktop-studio.css` ke direktori rilis `release/Alight-Motion-PC-win-x64/resources/app/css/desktop-studio.css`.
+    - **Verifikasi**:
+      - Divalidasi computed styles secara headless di Electron:
+        - Mode Asli: `bg: rgb(24, 34, 29)`, `color: rgb(115, 226, 189)`, `border: 2px solid rgb(115, 226, 189)`, `boxShadow: rgba(0, 230, 118, 0.35) 0px 4px 18px 0px`.
+        - Mode Studio: `bg: rgb(24, 34, 29)`, `color: rgb(115, 226, 189)`, `border: 2px solid rgb(115, 226, 189)`, `boxShadow: rgba(0, 230, 118, 0.35) 0px 4px 18px 0px`.
+      - Screenshot bukti visual diambil: `test_plus_studio.png` dan `test_plus_original.png` membuktikan kedua mode identik 100%.
