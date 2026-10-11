@@ -1,4 +1,4 @@
-# Fakta Terverifikasi
+﻿# Fakta Terverifikasi
 
 > **File ini DITAMBAH, jangan dihapus.** Isinya fakta yang sudah dicek dengan
 > bukti, supaya agent berikutnya tidak perlu bongkar ulang — dan tidak salah

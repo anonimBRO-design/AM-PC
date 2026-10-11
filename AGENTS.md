@@ -1,4 +1,4 @@
-# AM-PC — Aturan Proyek
+﻿# AM-PC — Aturan Proyek
 
 Fork dari [Hada45/Open-Motion](https://github.com/Hada45/Open-Motion),
 dibungkus jadi aplikasi desktop Windows (Electron + portable `.exe`).
@@ -26,7 +26,7 @@ rusak karena tidak ada catatan. Folder itu yang menutup celahnya.
 
 ### 1. `index.html` sudah versi terbaru — jangan sync ulang
 
-Sudah diverifikasi 9 Okt 2026. Hash-nya identik dengan upstream.
+Sudah diverifikasi 11 Okt 2026. Hash-nya identik dengan upstream (be33d60e92a0a275af1c286df3aed262ab84e77f, setelah PR #32 anonimBRO-design di-merge).
 
 ```bash
 # Cek dulu sebelum percaya apa pun:

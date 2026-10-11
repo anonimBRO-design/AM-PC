@@ -32,7 +32,18 @@ Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
 
 ---
 
-### Update Terbaru (11 Okt 2026 20:15) — AM-PC Editor
+### Update Terbaru (11 Okt 2026 20:30) — AM-PC Editor
+- **Sinkronisasi Upstream Resmi (PR #32 anonimBRO-design di-merge)**:
+  - PR #32 (eat/project-thumbnails) resmi di-merge oleh Hada45 ke upstream/main (commit a12c5aa).
+  - Berkas index.html lokal disinkronkan ke versi upstream terbaru (hash: e33d60e92a0a275af1c286df3aed262ab84e77f).
+  - Fitur resmi captureProjectThumbnail dan render kartu proyek ber-thumbnail aktif di aplikasi lokal dan rilis.
+  - Fakta F-01 dan AGENTS.md diperbarui dengan hash terverifikasi baru.
+- **Penyempurnaan Widescreen Mode Studio & Resizer Tinggi Timeline (Commit b372cea & 6f7d468)**:
+  - Preview Widescreen: Area preview memenuhi 100% lebar layar di Mode Studio saat drawer tertutup, kanvas berada tepat di tengah, dan ruang kosong hitam 664px telah hilang sepenuhnya.
+  - Auto-Dock Inspector: Saat drawer dibuka, dock kanan 400px muncul secara dinamis dan area preview menyesuaikan secara mulus.
+  - Resizer Tinggi Timeline Vertikal: Tersedia handle geser #editorSplitHandle untuk menarik batas tinggi timeline secara vertikal (minimal 180px, tersimpan di localStorage).
+  - Auto-Fit Zoom Kanvas: Otomatis memanggil Fit to Viewport saat berganti mode atau mengubah ukuran tata letak agar kanvas selalu pas dan tidak terpotong.
+  - Proteksi Grid: Mencegat inline style upstream applySplit agar tidak merusak tata letak CSS Grid Studio.
 - **Penyempurnaan Widescreen Mode Studio & Resizer Tinggi Timeline (Commit b372cea)**:
   - Preview Widescreen: Area preview memenuhi 100% lebar layar di Mode Studio saat drawer tertutup, kanvas berada tepat di tengah, dan ruang kosong hitam 664px telah hilang sepenuhnya.
   - Auto-Dock Inspector: Saat drawer dibuka, dock kanan 400px muncul secara dinamis dan area preview menyesuaikan secara mulus.

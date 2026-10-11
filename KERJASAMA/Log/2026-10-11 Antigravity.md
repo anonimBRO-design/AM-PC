@@ -170,3 +170,17 @@
         - Tinggi timeline dinamis: variabel `--am-timeline-height` merespons perubahan ukuran.
         - Mode Asli: Grid minmax(420px, 1.2fr) minmax(520px, 1fr) kembali berfungsi 100% normal.
       - Seluruh berkas pembaruan disinkronkan ke direktori rilis `release/Alight-Motion-PC-win-x64/resources/app/`.
+
+12. **Sinkronisasi Upstream Resmi (PR #32 Project Thumbnails Di-merge oleh Hada45)**:
+    - **Peristiwa**:
+      - PR #32 dari branch `anonimBRO-design/feat/project-thumbnails` resmi di-merge oleh pemilik Open-Motion (Hada45) pada commit `a12c5aa` (`08acabe`).
+      - Akun `anonimBRO-design` sekarang resmi tercatat sebagai Kontributor ke-3 di repositori upstream `Hada45/Open-Motion`.
+    - **Koreksi Terhadap Temuan Agent Lain**:
+      - Agent Claude mengira commit `85e5555` adalah "fitur baru Hada yang belum dimiliki repo lokal".
+      - Faktanya, `85e5555:index.html` memiliki hash `8816e9f9...` yang sudah identik dengan `index.html` lokal sejak hari pertama fork dibuat (Jebakan #1: menyimpulkan ketinggalan dari git log).
+      - Satu-satunya perbedaan antara `HEAD:index.html` dan `upstream/main:index.html` adalah PR #32 milik anonimBRO-design sendiri (+22 / -6 baris pada `captureProjectThumbnail`).
+    - **Tindakan**:
+      - Menjalankan `git checkout upstream/main -- index.html`.
+      - Memverifikasi hash: `git hash-object index.html` menghasilkan `be33d60e92a0a275af1c286df3aed262ab84e77f` (identik 100% dengan upstream).
+      - Menyinkronkan `index.html` ke direktori rilis `release/Alight-Motion-PC-win-x64/resources/app/index.html`.
+      - Memperbarui dokumentasi `AGENTS.md`, `KERJASAMA/Fakta.md` (F-01), dan `KERJASAMA/Handoff.md`.
