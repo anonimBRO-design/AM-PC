@@ -506,6 +506,25 @@ Ketika pengguna menghapus semua proyek, `parsed` bernilai `[]` (`length === 0`).
 
 ---
 
+## 30. Akses variabel let/const di fungsi hoisted saat bootstrap memicu TDZ fatal dan membunuh script monolitik
+
+**Gejala:** Console melempar `Uncaught ReferenceError: can't access lexical declaration '...' before initialization` saat startup, disusul runtuhnya seluruh engine dengan `Project load failed: TypeError: this.markersForFocus is not a function`.
+**Kejadian:** 12 Oktober 2026 (Antigravity); diperbaiki pada commit `26f3e4b`.
+**Sebab:**
+1. `index.html` Open-Motion adalah berkas monolitik dengan tag `<script>` tunggal sebesar 3,6 MB.
+2. Saat halaman awal dimuat (baris ~34053), bootstrap memanggil `applyHomeLanguage()`.
+3. Di dalam `applyHomeLanguage()`, fungsi `renderShortcutsList()` dipanggil. Karena ia dideklarasikan dengan `function renderShortcutsList()` (hoisted), pemanggilannya berhasil melompat maju.
+4. Namun di dalam fungsi tersebut, ia membaca variabel `activeShortcuts` yang dideklarasikan dengan `let activeShortcuts` di baris ~34352. Variabel `let`/`const` berada dalam **Temporal Dead Zone (TDZ)** sampai baris deklarasinya dieksekusi secara berurutan oleh browser.
+5. Uncaught exception ini menghentikan total eksekusi `<script>` monolitik di baris ~34053. Akibatnya, seluruh ribuan baris di bawahnya (termasuk `TimelineController.prototype.markersForFocus = function(...)` pada baris ~36104) tidak pernah dieksekusi dan didaftarkan ke prototype.
+**Perbaikan:**
+1. Gunakan deklarasi `var` untuk variabel konfigurasi yang berpotensi tersentuh oleh fungsi hoisted, atau pastikan variabel didefinisikan sebelum fungsi pemanggilnya.
+2. Pasang initialization guard: `if (window.omsShortcutsInitialized && typeof renderShortcutsList === 'function') ...`.
+3. Pasang guard defensif di awal fungsi: `if (typeof activeShortcuts === 'undefined' || !activeShortcuts) return;`.
+4. Jalankan `window.omsShortcutsInitialized = true;` dan render pertama kali hanya setelah seluruh komponen siap.
+**Cara memverifikasi:** Buka halaman di browser / Node vm: pastikan console bersih dari `ReferenceError` saat bootstrap dan `typeof TimelineController.prototype.markersForFocus === 'function'`.
+
+---
+
 ## Cara menambah jebakan baru
 
 Kalau kamu menemukan hal yang bikin rugi, tambahkan di sini dengan format:
