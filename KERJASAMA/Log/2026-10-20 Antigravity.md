@@ -52,4 +52,29 @@
      - Tombol IMPOR & AM LINK: Gelap slate `#181d28`, border `#283042`, teks `#d1d8e6`, hover glow mint.
    - Verifikasi: Diuji di Electron runtime (`scratch/test_cards_color.js`), seluruh computed background kartu terbukti `#141822` (`rgb(20, 24, 34)`), teks `#ffffff`, tombol `#181d28` (0% putih), dan disinkronkan langsung ke `release/`.
 
+7. **Implementasi Tempel Gaya Selektif (1:1 Alight Motion) & Penggantian Media Jedag-Jedug Massal**:
+   - Latar Belakang & Wawasan Komunitas: Di Alight Motion mobile, editor mengganti foto/video/media secara massal (untuk preset jedag-jedug) melalui tombol `>` pada menu "Tempel Gaya" dengan hanya mencentang opsi "Warna & Isi".
+   - Di Open-Motion Upstream:
+     - Menu "Aksi Layer" hanya punya tombol datar "Tempel Gaya" tanpa tombol sub-opsi `>`.
+     - Saat mode multi-select aktif, `canPasteStyle` upstream bernilai false sehingga tombol "Tempel Gaya" terkunci (disabled) di popover.
+   - Solusi yang Diimplementasikan (di `electron/desktop-engine.js` & `css/desktop.css`):
+     - Tombol Chevron `>` (`#amPasteChevronBtn`): Diinjeksi ke baris "Tempel Gaya" di popover `#layerActionsPopup`. Klik teks baris menjalankan tempel cepat, klik `>` membuka modal opsi selektif.
+     - Multi-Select Support: Menambal `ui.layerActionsState` agar `canPasteStyle` tetap aktif saat beberapa layer dipilih.
+     - Dialog Opsi Selektif (`#amPasteStyleModal`):
+       - Grid 2×3 berisi 6 kartu atribut 1:1 Alight Motion:
+         1. **Warna & Isi** (Ganti foto, video, assetId, dataUrl, texture WebGL, dan warna solid/gradien).
+         2. **Efek** (Effect stack & effects dictionary).
+         3. **Campuran & Opasitas** (Opacity & blend mode).
+         4. **Transformasi** (Posisi, skala, rotasi, pivot, dan keyframe transform).
+         5. **Batas & Bayangan** (Stroke & shadow).
+         6. **Klip** (In/out time & speed).
+       - Semua opsi default aktif tercentang (1:1 AM mobile), dilengkapi bilah "Pilih Semua" & "Hapus Semua".
+       - Tombol aksi primer dinamis: "TEMPEL KE N LAYER".
+     - Engine Tempel Selektif: Mentransfer hanya properti yang dipilih, mengisolasi properti yang tidak dicentang (misal rotasi dan opasitas target tetap utuh saat hanya menempel Warna & Isi), serta meregenerasi runtime WebGL texture cache.
+   - Verifikasi Uji Coba:
+     - Diuji dengan suite headless Electron `scratch/test_selective_paste_style.js`.
+     - Hasil: Layer target sukses berganti menjadi tipe `image` dengan `dataUrl` baru dan warna `#00e676`, sementara rotasi tetap 0° dan opasitas tetap 1.0 (0 error console).
+     - Screenshot tersimpan di `scratch/screenshot_paste_style_modal.png` dan `scratch/screenshot_paste_style_result.png`.
+     - Perubahan disinkronkan ke folder `release/Alight-Motion-PC-win-x64/resources/app/`.
+
 

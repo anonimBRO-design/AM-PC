@@ -1,7 +1,7 @@
 # Handoff — State Terkini
 
 > **File ini DITIMPA, bukan ditambahi.** Selalu cerminkan kondisi terkini.
-> Terakhir diperbarui: 20 Okt 2026 · oleh: Antigravity (Sinkronisasi Upstream Open-Motion V5.285 di AM-PC)
+> Terakhir diperbarui: 20 Okt 2026 · oleh: Antigravity (Fitur Tempel Gaya Selektif 1:1 Alight Motion di AM-PC)
 
 Bagian dari [[README|protokol kerja bersama]].
 Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
@@ -32,7 +32,35 @@ Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
 
 ---
 
-### Update Terbaru (20 Okt 2026) — Sinkronisasi Upstream Open-Motion V5.285 (AM-PC)
+### Update Terbaru (20 Okt 2026 - Bagian 2) — Fitur Tempel Gaya Selektif 1:1 Alight Motion (AM-PC)
+- **Tombol Sub-Opsi Chevron `>` (`#amPasteChevronBtn`)**:
+  - Diinjeksi di sebelah kanan teks baris "Tempel Gaya" pada popover `#layerActionsPopup`.
+  - Klik baris teks: tempel cepat (perilaku asli).
+  - Klik tombol `>`: membuka modal opsi selektif `#amPasteStyleModal`.
+- **Dukungan Multi-Selection Penuh**:
+  - Menambal `ui.layerActionsState` agar `canPasteStyle` tetap bernilai `true` saat multi-select aktif (di upstream tombol ini terkunci saat memilih banyak layer).
+  - Mengizinkan penempelan gaya atau media serentak ke puluhan layer target sekaligus.
+- **Modal Opsi Selektif (`#amPasteStyleModal`)**:
+  - Grid 2×3 berlatar gelap kontras Alight Motion PC dengan 6 kategori kartu:
+    1. **Warna & Isi** (Ganti foto, video, media `dataUrl`, `assetId`, dan warna solid/gradien).
+    2. **Efek** (Effect stack & dictionary effects).
+    3. **Campuran & Opasitas** (Opacity & blend mode).
+    4. **Transformasi** (Posisi, skala, rotasi, pivot, dan keyframe transform).
+    5. **Batas & Bayangan** (Stroke & shadow).
+    6. **Klip** (In/out time & speed).
+  - Semua opsi default aktif tercentang (1:1 AM mobile) + quickbar "Pilih Semua" & "Hapus Semua".
+  - Tombol aksi primer adaptif: "TEMPEL KE N LAYER".
+- **Alur Kerja Penggantian Media Massal Jedag-Jedug**:
+  - Terbukti memungkinkan penggantian foto/video ke puluhan layer target hanya dengan memilih opsi "Warna & Isi", tanpa merusak rotasi, skala, opasitas, atau efek layer target.
+- **Verifikasi & Status**:
+  - Lolos pengujian runtime Electron `scratch/test_selective_paste_style.js` (0 error console).
+  - Bukti tersimpan: `scratch/screenshot_paste_style_modal.png` dan `scratch/screenshot_paste_style_result.png`.
+  - Disinkronkan ke folder rilis portable `release/Alight-Motion-PC-win-x64/resources/app/`.
+  - Kode diimplementasikan di `electron/desktop-engine.js` dan `css/desktop.css` (berkas `index.html` tetap 100% identik dengan upstream `4df41ae4374054cd5177170c6110918e4f8b59e9`).
+
+---
+
+### Update Sebelumnya (20 Okt 2026) — Sinkronisasi Upstream Open-Motion V5.285 (AM-PC)
 - **Pembaruan Upstream V5.285 (Hada45/Open-Motion)**:
   - Hash blob `index.html`: `4df41ae4374054cd5177170c6110918e4f8b59e9` (100% identik upstream).
   - Sinkronisasi bersih `index.html` dan `CHANGELOG.md` via `git checkout upstream/main -- index.html CHANGELOG.md`.

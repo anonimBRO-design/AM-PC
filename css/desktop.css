@@ -3198,3 +3198,358 @@ body.is-electron .simpleHome .rightBtn svg,
   height: 14px !important;
   stroke: currentColor !important;
 }
+
+/* ============================================================
+   Alight Motion PC (AM-PC) — Tempel Gaya Selektif (1:1 Alight Motion)
+   ============================================================ */
+
+/* Penyesuaian Baris Tempel Gaya di Popover Aksi Layer */
+.layerActionRow.am-paste-row {
+  display: grid !important;
+  grid-template-columns: 46px minmax(0, 1fr) 36px !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 6px 8px !important;
+}
+
+.am-paste-chevron-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #aab3c6 !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.am-paste-chevron-btn:hover {
+  background: rgba(0, 230, 118, 0.15) !important;
+  border-color: #00e676 !important;
+  color: #00e676 !important;
+  box-shadow: 0 0 10px rgba(0, 230, 118, 0.3) !important;
+  transform: scale(1.05) !important;
+}
+
+.am-paste-chevron-btn:active {
+  transform: scale(0.95) !important;
+}
+
+.layerActionRow:disabled .am-paste-chevron-btn {
+  opacity: 0.3 !important;
+  pointer-events: none !important;
+}
+
+/* Modal Tempel Gaya Selektif */
+#amPasteStyleModal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 1000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px !important;
+}
+
+#amPasteStyleModal.hidden {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+.amPasteStyleBackdrop {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+  background: rgba(6, 9, 14, 0.82) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+.amPasteStyleCard {
+  position: relative !important;
+  z-index: 10 !important;
+  width: min(440px, calc(100vw - 32px)) !important;
+  max-height: min(620px, calc(100vh - 32px)) !important;
+  background: linear-gradient(180deg, #161e2a 0%, #10151f 100%) !important;
+  border: 1px solid #28364c !important;
+  border-radius: 18px !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(0, 230, 118, 0.1) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  color: #eef2fb !important;
+  animation: amModalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.amPasteStyleHead {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 16px 20px 14px !important;
+  border-bottom: 1px solid #202b3d !important;
+}
+
+.amPasteStyleTitleGroup {
+  min-width: 0 !important;
+}
+
+.amPasteStyleTitle {
+  margin: 0 !important;
+  font-size: 17px !important;
+  font-weight: 750 !important;
+  color: #f1f5f9 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.amPasteStyleBadge {
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.05em !important;
+  padding: 2px 7px !important;
+  border-radius: 6px !important;
+  background: rgba(0, 230, 118, 0.15) !important;
+  color: #00e676 !important;
+  border: 1px solid rgba(0, 230, 118, 0.3) !important;
+}
+
+.amPasteStyleSubtitle {
+  margin: 4px 0 0 !important;
+  font-size: 11.5px !important;
+  color: #8fa0ba !important;
+}
+
+.amPasteStyleCloseBtn {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 9px !important;
+  border: 1px solid #233044 !important;
+  background: #141b26 !important;
+  color: #94a3b8 !important;
+  font-size: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.amPasteStyleCloseBtn:hover {
+  background: #202c3e !important;
+  color: #fff !important;
+  border-color: #3b4e6b !important;
+}
+
+.amPasteStyleBody {
+  padding: 16px 20px !important;
+  overflow-y: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+}
+
+.amPasteStyleGrid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 10px !important;
+}
+
+.amStyleTile {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  padding: 12px 14px !important;
+  border-radius: 12px !important;
+  background: #121822 !important;
+  border: 1.5px solid #202b3c !important;
+  cursor: pointer !important;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  text-align: left !important;
+  user-select: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.amStyleTile:hover {
+  background: #17202e !important;
+  border-color: #2f3e57 !important;
+}
+
+.amStyleTile.is-active {
+  background: rgba(0, 230, 118, 0.08) !important;
+  border-color: #00e676 !important;
+  box-shadow: 0 0 16px rgba(0, 230, 118, 0.15) !important;
+}
+
+.amTileCheck {
+  position: absolute !important;
+  top: 10px !important;
+  right: 10px !important;
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 5px !important;
+  border: 1.5px solid #33435c !important;
+  background: #0f151e !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  color: transparent !important;
+  transition: all 0.15s ease !important;
+}
+
+.amStyleTile.is-active .amTileCheck {
+  background: #00e676 !important;
+  border-color: #00e676 !important;
+  color: #0a1118 !important;
+  box-shadow: 0 0 8px rgba(0, 230, 118, 0.4) !important;
+}
+
+.amTileIcon {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+  background: #192231 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #8fa0ba !important;
+  margin-bottom: 8px !important;
+  transition: all 0.15s ease !important;
+}
+
+.amStyleTile.is-active .amTileIcon {
+  background: rgba(0, 230, 118, 0.15) !important;
+  color: #00e676 !important;
+}
+
+.amTileIcon svg {
+  width: 18px !important;
+  height: 18px !important;
+  stroke: currentColor !important;
+}
+
+.amTileLabel {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #e2e8f0 !important;
+  line-height: 1.2 !important;
+  margin-bottom: 3px !important;
+}
+
+.amStyleTile.is-active .amTileLabel {
+  color: #fff !important;
+}
+
+.amTileHint {
+  font-size: 10.5px !important;
+  color: #64748b !important;
+  line-height: 1.2 !important;
+}
+
+.amStyleTile.is-active .amTileHint {
+  color: #94a3b8 !important;
+}
+
+.amPasteStyleQuickbar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  padding-top: 2px !important;
+}
+
+.amQuickLink {
+  background: transparent !important;
+  border: none !important;
+  color: #8fa0ba !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  padding: 2px 4px !important;
+  transition: color 0.15s ease !important;
+}
+
+.amQuickLink:hover {
+  color: #00e676 !important;
+  text-decoration: underline !important;
+}
+
+.amQuickDivider {
+  color: #334155 !important;
+  font-size: 10px !important;
+}
+
+.amPasteStyleFooter {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  padding: 14px 20px 16px !important;
+  border-top: 1px solid #202b3d !important;
+  background: #111722 !important;
+}
+
+.amBtnSecondary {
+  height: 38px !important;
+  padding: 0 16px !important;
+  border-radius: 10px !important;
+  background: #192230 !important;
+  border: 1px solid #2a384e !important;
+  color: #cbd5e1 !important;
+  font-size: 12px !important;
+  font-weight: 650 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.amBtnSecondary:hover {
+  background: #233044 !important;
+  color: #fff !important;
+  border-color: #3b4e6b !important;
+}
+
+.amBtnPrimary {
+  height: 38px !important;
+  padding: 0 20px !important;
+  border-radius: 10px !important;
+  background: #00e676 !important;
+  border: 1px solid #00e676 !important;
+  color: #071018 !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.04em !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  box-shadow: 0 4px 14px rgba(0, 230, 118, 0.35) !important;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.amBtnPrimary:hover {
+  background: #10f084 !important;
+  box-shadow: 0 6px 20px rgba(0, 230, 118, 0.5) !important;
+  transform: translateY(-1px) !important;
+}
+
+.amBtnPrimary:active {
+  transform: translateY(1px) !important;
+}
+
+/* Guard .hidden at end of stylesheet */
+.hidden, [hidden], #amPasteStyleModal.hidden {
+  display: none !important;
+}
+

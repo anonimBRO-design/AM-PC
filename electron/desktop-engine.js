@@ -12,6 +12,7 @@
   const getModel = () => window.omsTimelinePreRender?.model || window.model;
   const getTimeline = () => window.omsTimelinePreRender?.timeline || window.timeline;
   const getUI = () => window.omsAppBackRouter?.ui || window.ui;
+  const getRenderer = () => window.omsTimelinePreRender?.renderer || window.renderer;
 
   // Track pointer type and modifier keys
   window._amLastPointerType = 'mouse';
@@ -31,8 +32,15 @@
     const activeTag = document.activeElement?.tagName;
     const isEditingText = ['INPUT', 'TEXTAREA', 'SELECT'].includes(activeTag) || document.activeElement?.isContentEditable;
 
-    // Global Escape to exit shortcuts modal or multi-select mode
+    // Global Escape to exit shortcuts modal, paste style modal, or multi-select mode
     if (e.key === 'Escape') {
+      const pasteModal = document.getElementById('amPasteStyleModal');
+      if (pasteModal && !pasteModal.classList.contains('hidden')) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.closeSelectivePasteModal?.();
+        return;
+      }
       const shortcutsModal = document.getElementById('amShortcutsModal');
       if (shortcutsModal && !shortcutsModal.classList.contains('hidden')) {
         e.preventDefault();
@@ -1487,6 +1495,484 @@
     }
   };
 
+  // 10. Selective Paste Style (Tempel Gaya Selektif 1:1 Alight Motion)
+  function getPasteTargetLayers() {
+    const ui = getUI();
+    const model = getModel();
+    if (!ui || !model) return [];
+    if (ui.layerMultiSelectedIds && ui.layerMultiSelectedIds.size > 0) {
+      const list = [...ui.layerMultiSelectedIds]
+        .map(id => (model.layers || []).find(l => l.id === id))
+        .filter(Boolean);
+      if (list.length > 0) return list;
+    }
+    const single = typeof ui.singleSelectedLayer === 'function' ? ui.singleSelectedLayer() : (model.selectedLayer?.() || null);
+    return single ? [single] : [];
+  }
+
+  function renewKeyIds(kf) {
+    if (!kf) return {};
+    const next = JSON.parse(JSON.stringify(kf));
+    for (const arr of Object.values(next)) {
+      if (Array.isArray(arr)) {
+        for (const key of arr) {
+          if (key && typeof key === 'object') {
+            key.id = 'kf_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+          }
+        }
+      }
+    }
+    return next;
+  }
+
+  async function applySelectiveStyle(targets, options) {
+    const ui = getUI();
+    const model = getModel();
+    const renderer = getRenderer();
+    const clipboard = ui?.layerActionClipboard;
+
+    if (!clipboard || !clipboard.payload) {
+      if (typeof window.toast === 'function') window.toast('Salin layer terlebih dahulu sebelum menempel gaya');
+      return false;
+    }
+
+    const src = clipboard.payload.layer;
+    const srcStyle = clipboard.payload.style || {};
+    const mediaSource = clipboard.payload.mediaSource;
+    if (!src) return false;
+
+    if (typeof window.history?.push === 'function') {
+      window.history.push();
+    }
+
+    let appliedCount = 0;
+    for (const target of targets) {
+      if (!target) continue;
+
+      // 1. Warna & Isi (Color & Fill / Media Image-Video)
+      if (options.colorAndFill) {
+        const hasMedia = (src.type === 'image' || src.type === 'video') && (mediaSource || src.assetId || src.dataUrl);
+        if (hasMedia) {
+          const mediaUrl = mediaSource || src.dataUrl;
+          const assetId = src.assetId || ('asset_' + Date.now().toString(36));
+
+          if (model?.disposeLayerRuntime) {
+            try { model.disposeLayerRuntime(target); } catch(e) {}
+          }
+
+          target.assetId = assetId;
+          target.dataUrl = mediaUrl;
+          target.type = src.type;
+
+          if (src.type === 'image') {
+            const img = new Image();
+            img.src = mediaUrl;
+            target.img = img;
+          } else if (src.type === 'video') {
+            const v = document.createElement('video');
+            v.src = mediaUrl;
+            v.muted = !!target.amSilentVideo;
+            v.playsInline = true;
+            v.preload = 'auto';
+            target.video = v;
+          }
+
+          if (src.mediaWidth) target.mediaWidth = src.mediaWidth;
+          if (src.mediaHeight) target.mediaHeight = src.mediaHeight;
+          if (src.mediaDuration) target.mediaDuration = src.mediaDuration;
+
+          if (renderer?.textures) {
+            renderer.textures.delete(target.id);
+            const entry = renderer.textures.get(target.id);
+            if (entry) entry.signature = null;
+          }
+          if (model?.hydrateLayer) {
+            try { model.hydrateLayer(target); } catch(e) {}
+          }
+          if (window.media?.probe) {
+            try { await window.media.probe(target); } catch(e) {}
+          }
+        }
+
+        if (src.color !== undefined) target.color = src.color;
+        if (src.fillColor !== undefined) target.fillColor = src.fillColor;
+        if (src.fillMode !== undefined) target.fillMode = src.fillMode;
+        if (src.gradient !== undefined) target.gradient = JSON.parse(JSON.stringify(src.gradient));
+
+        if (src.kf) {
+          if (!target.kf) target.kf = {};
+          if (src.kf.color) target.kf.color = renewKeyIds(src.kf.color);
+          if (src.kf.fillColor) target.kf.fillColor = renewKeyIds(src.kf.fillColor);
+        }
+      }
+
+      // 2. Efek (Effects)
+      if (options.effects) {
+        const effects = src.effects || srcStyle.effects || {};
+        let effectStack = src.effectStack || srcStyle.effectStack;
+        if (!effectStack && typeof window.omsLegacyEffectsToStack === 'function') {
+          effectStack = window.omsLegacyEffectsToStack(src);
+        }
+        target.effects = JSON.parse(JSON.stringify(effects));
+        target.effectStack = JSON.parse(JSON.stringify(effectStack || []));
+        if (Array.isArray(target.effectStack)) {
+          target.effectStack.forEach(fx => {
+            if (fx) fx.id = 'fx_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+          });
+        }
+        if (typeof window.omsEnsureEffectStack === 'function') {
+          window.omsEnsureEffectStack(target);
+        }
+      }
+
+      // 3. Campuran & Opasitas (Blending & Opacity)
+      if (options.blend) {
+        if (src.opacity !== undefined) target.opacity = src.opacity;
+        if (src.blend !== undefined) target.blend = src.blend;
+        if (src.blending !== undefined) target.blending = src.blending;
+        if (src.blendMode !== undefined) target.blendMode = src.blendMode;
+        if (src.compositionBlendMode !== undefined) target.compositionBlendMode = src.compositionBlendMode;
+
+        if (src.kf?.opacity) {
+          if (!target.kf) target.kf = {};
+          target.kf.opacity = renewKeyIds(src.kf.opacity);
+        }
+      }
+
+      // 4. Transformasi (Move & Transform)
+      if (options.transform) {
+        const tProps = ['x', 'y', 'z', 'scaleX', 'scaleY', 'scaleZ', 'rotation', 'rotX', 'rotY', 'rotZ', 'skewX', 'skewY', 'pivotX', 'pivotY', 'origin'];
+        if (!target.kf) target.kf = {};
+        for (const p of tProps) {
+          if (src[p] !== undefined) {
+            target[p] = (typeof src[p] === 'object' && src[p] !== null) ? JSON.parse(JSON.stringify(src[p])) : src[p];
+          }
+          if (src.kf?.[p]) {
+            target.kf[p] = renewKeyIds(src.kf[p]);
+          }
+        }
+      }
+
+      // 5. Batas & Bayangan (Border & Shadow)
+      if (options.border) {
+        const bProps = ['stroke', 'strokeWidth', 'strokeColor', 'strokePosition', 'shadowColor', 'shadowBlur', 'shadowDistance', 'shadowAngle', 'shadow', 'border', 'borders'];
+        for (const p of bProps) {
+          if (src[p] !== undefined) {
+            target[p] = (typeof src[p] === 'object' && src[p] !== null) ? JSON.parse(JSON.stringify(src[p])) : src[p];
+          }
+        }
+      }
+
+      // 6. Klip (Timing & Speed)
+      if (options.clip) {
+        if (src.inTime !== undefined) target.inTime = src.inTime;
+        if (src.outTime !== undefined) target.outTime = src.outTime;
+        if (src.speed !== undefined) target.speed = src.speed;
+      }
+
+      appliedCount++;
+    }
+
+    try {
+      window.omsTimelinePreRender?.clear?.();
+      const timeline = getTimeline();
+      if (timeline?.rebuild) timeline.rebuild();
+      if (renderer?.render) renderer.render();
+      if (window.bus?.emit) window.bus.emit('model:changed');
+      if (window.autosave?.flush) await window.autosave.flush(true);
+    } catch (e) {
+      console.error('Error refreshing after paste style:', e);
+    }
+
+    if (typeof window.toast === 'function') {
+      window.toast(`Gaya ditempel ke ${appliedCount} layer!`);
+    }
+
+    return true;
+  }
+
+  function setupSelectivePasteStyle() {
+    const ui = getUI();
+    if (!ui) return;
+
+    // Patch ui.layerActionsState so paste-style is enabled during multi-selection
+    if (!ui._amPasteStyleStatePatched && ui.layerActionsState) {
+      ui._amPasteStyleStatePatched = true;
+      const origLayerActionsState = ui.layerActionsState.bind(ui);
+      ui.layerActionsState = function() {
+        const state = origLayerActionsState();
+        const clipboard = this.layerActionClipboard?.hasLayer();
+        const targets = getPasteTargetLayers();
+        if (clipboard && targets.length > 0) {
+          state.canPasteStyle = true;
+        }
+        return state;
+      };
+    }
+
+    // Decorate "Tempel Gaya" row in #layerActionsPopup
+    const popup = document.getElementById('layerActionsPopup');
+    if (popup) {
+      const pasteRow = popup.querySelector('[data-layer-action="paste-style"]');
+      if (pasteRow) {
+        const clipboard = ui.layerActionClipboard?.hasLayer();
+        const targets = getPasteTargetLayers();
+        if (clipboard && targets.length > 0) {
+          pasteRow.disabled = false;
+          pasteRow.setAttribute('aria-disabled', 'false');
+        }
+
+        if (!pasteRow.classList.contains('am-paste-row')) {
+          pasteRow.classList.add('am-paste-row');
+          const chevron = document.createElement('button');
+          chevron.type = 'button';
+          chevron.id = 'amPasteChevronBtn';
+          chevron.className = 'am-paste-chevron-btn';
+          chevron.title = 'Opsi Tempel Gaya (1:1 Alight Motion)';
+          chevron.setAttribute('aria-label', 'Buka Opsi Tempel Gaya');
+          chevron.innerHTML = '›';
+          chevron.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.openSelectivePasteModal?.();
+          };
+          pasteRow.appendChild(chevron);
+
+          // Fast-paste click listener for multi-selection
+          pasteRow.addEventListener('click', (e) => {
+            if (e.target.closest('#amPasteChevronBtn')) return;
+            const curTargets = getPasteTargetLayers();
+            if (curTargets.length > 1) {
+              e.preventDefault();
+              e.stopPropagation();
+              applySelectiveStyle(curTargets, {
+                colorAndFill: true,
+                effects: true,
+                blend: true,
+                transform: true,
+                border: true,
+                clip: true
+              });
+              ui.closeLayerActions?.();
+            }
+          }, true);
+        }
+      }
+    }
+
+    // Create Modal #amPasteStyleModal if missing
+    let modal = document.getElementById('amPasteStyleModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'amPasteStyleModal';
+      modal.className = 'hidden';
+      modal.setAttribute('role', 'dialog');
+      modal.setAttribute('aria-modal', 'true');
+      modal.setAttribute('aria-labelledby', 'amPasteStyleTitle');
+
+      modal.innerHTML = `
+        <div class="amPasteStyleBackdrop" id="amPasteStyleBackdrop"></div>
+        <div class="amPasteStyleCard">
+          <div class="amPasteStyleHead">
+            <div class="amPasteStyleTitleGroup">
+              <h3 id="amPasteStyleTitle" class="amPasteStyleTitle">
+                <span>Tempel Gaya</span>
+                <span class="amPasteStyleBadge">ALIGHT MOTION</span>
+              </h3>
+              <p id="amPasteStyleSubtitle" class="amPasteStyleSubtitle">Pilih atribut yang ingin ditempelkan</p>
+            </div>
+            <button id="amPasteStyleCloseBtn" class="amPasteStyleCloseBtn" type="button" aria-label="Tutup">✕</button>
+          </div>
+          <div class="amPasteStyleBody">
+            <div class="amPasteStyleGrid">
+              <!-- Tile 1: Warna & Isi -->
+              <button type="button" class="amStyleTile is-active" data-style-key="colorAndFill">
+                <div class="amTileCheck">✓</div>
+                <div class="amTileIcon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 11l-8-8-8.5 8.5a5 5 0 0 0 7 7L18 10"/><path d="M5 2l5 5"/><path d="M2 12h20"/><circle cx="12" cy="18" r="3"/></svg>
+                </div>
+                <div class="amTileLabel">Warna & Isi</div>
+                <div class="amTileHint">Foto, video & warna</div>
+              </button>
+
+              <!-- Tile 2: Efek -->
+              <button type="button" class="amStyleTile is-active" data-style-key="effects">
+                <div class="amTileCheck">✓</div>
+                <div class="amTileIcon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 4V2"/><path d="M15 16v-2"/><path d="M8 9h2"/><path d="M20 9h2"/><path d="M17.8 11.8L19 13"/><path d="M15 9h0"/><path d="M17.8 6.2L19 5"/><path d="M3 21l9-9"/></svg>
+                </div>
+                <div class="amTileLabel">Efek</div>
+                <div class="amTileHint">Semua efek visual</div>
+              </button>
+
+              <!-- Tile 3: Campuran & Opasitas -->
+              <button type="button" class="amStyleTile is-active" data-style-key="blend">
+                <div class="amTileCheck">✓</div>
+                <div class="amTileIcon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg>
+                </div>
+                <div class="amTileLabel">Campuran & Opasitas</div>
+                <div class="amTileHint">Blending & transparansi</div>
+              </button>
+
+              <!-- Tile 4: Transformasi -->
+              <button type="button" class="amStyleTile is-active" data-style-key="transform">
+                <div class="amTileCheck">✓</div>
+                <div class="amTileIcon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+                </div>
+                <div class="amTileLabel">Transformasi</div>
+                <div class="amTileHint">Posisi, skala, rotasi</div>
+              </button>
+
+              <!-- Tile 5: Batas & Bayangan -->
+              <button type="button" class="amStyleTile is-active" data-style-key="border">
+                <div class="amTileCheck">✓</div>
+                <div class="amTileIcon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M7 21h12a2 2 0 0 0 2-2V7"/></svg>
+                </div>
+                <div class="amTileLabel">Batas & Bayangan</div>
+                <div class="amTileHint">Stroke & bayangan</div>
+              </button>
+
+              <!-- Tile 6: Klip -->
+              <button type="button" class="amStyleTile is-active" data-style-key="clip">
+                <div class="amTileCheck">✓</div>
+                <div class="amTileIcon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+                </div>
+                <div class="amTileLabel">Klip</div>
+                <div class="amTileHint">In/out time & speed</div>
+              </button>
+            </div>
+
+            <div class="amPasteStyleQuickbar">
+              <button type="button" class="amQuickLink" id="amSelectAllStylesBtn">Pilih Semua</button>
+              <span class="amQuickDivider">•</span>
+              <button type="button" class="amQuickLink" id="amDeselectAllStylesBtn">Hapus Semua</button>
+            </div>
+          </div>
+          <div class="amPasteStyleFooter">
+            <button type="button" class="amBtnSecondary" id="amPasteStyleCancelBtn">Batal</button>
+            <button type="button" class="amBtnPrimary" id="amPasteStyleApplyBtn">
+              <span class="amBtnIcon">✓</span>
+              <span id="amPasteStyleApplyText">TEMPEL GAYA</span>
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+
+      // Event Listeners for Tiles
+      modal.querySelectorAll('.amStyleTile').forEach(tile => {
+        tile.onclick = () => {
+          tile.classList.toggle('is-active');
+        };
+      });
+
+      // Quickbar Buttons
+      const selectAllBtn = modal.querySelector('#amSelectAllStylesBtn');
+      if (selectAllBtn) {
+        selectAllBtn.onclick = () => {
+          modal.querySelectorAll('.amStyleTile').forEach(t => t.classList.add('is-active'));
+        };
+      }
+      const deselectAllBtn = modal.querySelector('#amDeselectAllStylesBtn');
+      if (deselectAllBtn) {
+        deselectAllBtn.onclick = () => {
+          modal.querySelectorAll('.amStyleTile').forEach(t => t.classList.remove('is-active'));
+        };
+      }
+
+      // Close & Cancel Buttons
+      const closeBtn = modal.querySelector('#amPasteStyleCloseBtn');
+      if (closeBtn) closeBtn.onclick = () => window.closeSelectivePasteModal?.();
+      const cancelBtn = modal.querySelector('#amPasteStyleCancelBtn');
+      if (cancelBtn) cancelBtn.onclick = () => window.closeSelectivePasteModal?.();
+      const backdrop = modal.querySelector('#amPasteStyleBackdrop');
+      if (backdrop) backdrop.onclick = () => window.closeSelectivePasteModal?.();
+
+      // Apply Button
+      const applyBtn = modal.querySelector('#amPasteStyleApplyBtn');
+      if (applyBtn) {
+        applyBtn.onclick = async () => {
+          const targets = (window._amActivePasteTargets && window._amActivePasteTargets.length)
+            ? window._amActivePasteTargets
+            : getPasteTargetLayers();
+          if (!targets.length) {
+            if (typeof window.toast === 'function') window.toast('Tidak ada layer target yang dipilih');
+            window.closeSelectivePasteModal?.();
+            return;
+          }
+
+          const options = {
+            colorAndFill: modal.querySelector('[data-style-key="colorAndFill"]')?.classList.contains('is-active') ?? false,
+            effects: modal.querySelector('[data-style-key="effects"]')?.classList.contains('is-active') ?? false,
+            blend: modal.querySelector('[data-style-key="blend"]')?.classList.contains('is-active') ?? false,
+            transform: modal.querySelector('[data-style-key="transform"]')?.classList.contains('is-active') ?? false,
+            border: modal.querySelector('[data-style-key="border"]')?.classList.contains('is-active') ?? false,
+            clip: modal.querySelector('[data-style-key="clip"]')?.classList.contains('is-active') ?? false
+          };
+
+          const hasAny = Object.values(options).some(Boolean);
+          if (!hasAny) {
+            if (typeof window.toast === 'function') window.toast('Pilih minimal satu atribut gaya untuk ditempel');
+            return;
+          }
+
+          applyBtn.disabled = true;
+          try {
+            await applySelectiveStyle(targets, options);
+          } finally {
+            applyBtn.disabled = false;
+            window.closeSelectivePasteModal?.();
+          }
+        };
+      }
+    }
+
+    window.openSelectivePasteModal = function() {
+      const targets = getPasteTargetLayers();
+      if (!targets.length) {
+        if (typeof window.toast === 'function') window.toast('Pilih minimal satu layer target terlebih dahulu');
+        return;
+      }
+      window._amActivePasteTargets = targets;
+
+      const clipboard = ui.layerActionClipboard;
+      if (!clipboard || !clipboard.hasLayer()) {
+        if (typeof window.toast === 'function') window.toast('Salin layer terlebih dahulu sebelum menempel gaya');
+        return;
+      }
+
+      ui.closeLayerActions?.();
+
+      const modalEl = document.getElementById('amPasteStyleModal');
+      if (!modalEl) return;
+
+      const sub = modalEl.querySelector('#amPasteStyleSubtitle');
+      if (sub) {
+        sub.textContent = targets.length > 1 ? `${targets.length} layer target sedang dipilih` : `Target: ${targets[0].name || 'Layer'}`;
+      }
+
+      const applyTxt = modalEl.querySelector('#amPasteStyleApplyText');
+      if (applyTxt) {
+        applyTxt.textContent = targets.length > 1 ? `TEMPEL KE ${targets.length} LAYER` : 'TEMPEL GAYA';
+      }
+
+      // Default: ensure all active on open
+      modalEl.querySelectorAll('.amStyleTile').forEach(t => t.classList.add('is-active'));
+
+      modalEl.classList.remove('hidden');
+    };
+
+    window.closeSelectivePasteModal = function() {
+      const modalEl = document.getElementById('amPasteStyleModal');
+      if (modalEl) modalEl.classList.add('hidden');
+    };
+  }
+
   // Periodic heartbeat to keep patches active
   const runPatches = () => {
     disarmFocusSession();
@@ -1499,6 +1985,7 @@
     decorateEffectThumbnails();
     setupKeyboardShortcutsModal();
     setupNativeExportOption();
+    setupSelectivePasteStyle();
   };
 
   runPatches();
