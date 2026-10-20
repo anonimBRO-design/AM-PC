@@ -1,7 +1,7 @@
 # Handoff — State Terkini
 
 > **File ini DITIMPA, bukan ditambahi.** Selalu cerminkan kondisi terkini.
-> Terakhir diperbarui: 11 Okt 2026 · oleh: Antigravity
+> Terakhir diperbarui: 20 Okt 2026 · oleh: Antigravity (Sinkronisasi Upstream Open-Motion V5.285 di AM-PC)
 
 Bagian dari [[README|protokol kerja bersama]].
 Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
@@ -32,7 +32,44 @@ Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
 
 ---
 
-### Update Terbaru (11 Okt 2026 23:25) — Sinkronisasi Upstream Open-Motion V5.238
+### Update Terbaru (20 Okt 2026) — Sinkronisasi Upstream Open-Motion V5.285 (AM-PC)
+- **Pembaruan Upstream V5.285 (Hada45/Open-Motion)**:
+  - Hash blob `index.html`: `4df41ae4374054cd5177170c6110918e4f8b59e9` (100% identik upstream).
+  - Sinkronisasi bersih `index.html` dan `CHANGELOG.md` via `git checkout upstream/main -- index.html CHANGELOG.md`.
+  - Integrasi resmi fitur-fitur baru:
+    1. **V5.283**: PR #33 (remap keyboard shortcut kita) di-merge resmi upstream; dedicated group timelines, breadcrumbs, ordinary/mask/exclude groups, border/shadow controls, audio spectrum.
+    2. **V5.284**: Drawer Add Object (`+`) 1:1 Alight Motion v5.0.273 (5 tab: Shapes, Elements, Media, Audio, Templates + quick-add rail kanan), bentuk vektor parametrik baru (plus, heart, pie, crescent), ekspor hingga 240 FPS.
+    3. **V5.285**: Animasi tutup drawer halus (`.drawerClosing`), penekanan modal eksperimen ("Jangan tampilkan lagi" / `localStorage`), high-contrast dark theme empty state.
+- **Pengujian Kompatibilitas Multi-Suite Lolos 100%**:
+  - Test 1 (`scratch/check_finder.js`): Tombol `AMFINDER` dan `AMHUB` terpasang rapi di top bar frame 0.
+  - Test 2 (`scratch/verify_shortcuts.js`): Modal shortcut #amShortcutsModal dark theme #121820 terpasang sempurna.
+  - Test 3 (`scratch/test_ffmpeg_export.js`): Ekspor native FFmpeg MP4 30 frame valid via ffprobe (51.391 bytes).
+  - Test 4 (`scratch/verify_v5285_ui.js`): Editor widescreen studio, Add Object drawer 5 tab, 0 console error.
+- **Build Portable Sukses**:
+  - `node scripts/build-portable.js` mengompilasi `release/Alight-Motion-PC-win-x64/Alight Motion PC.exe` versi V5.285.
+
+### Update Sebelumnya (16 Okt 2026) — Paritas Penuh AM-Native-Desktop terhadap Standar Emas AM-PC V5.238
+- **Cabang 1 (Engine Render WebGL2 & Paritas Visual)**:
+  - Backdrop Capture Adjustment Layer (`magnifybg`, `copybg`, `lift` dengan `fill<=0.001`, `displacemap3` + masking bentuk layer via `maskProgram`).
+  - Compositor GLSL ES 3.00 dengan **24 Blend Mode** + **4 Track Matte Mode** (`alpha`, `alpha-inverted`, `luma`, `luma-inverted`, serta `blending="mask"`/`"exclude"`).
+  - Hierarki rotasi/skala parent rekursif & pivot `layer.origin` di `computeWorldTransform` + `computeLayerMatrix`, serta perluasan parser XML untuk semua jenis bentuk, `<border>`, `inTime`, dan keyframe `<size>`/`<pivot>`/`<fillColor>`.
+  - Fitur V5.238: **Text Animator** (per-huruf/kata/baris + 5 preset), **2D Motion Tracker → Null layer**, dan **Impor/Ekspor Preset Efek JSON (`.amfx.json`)**.
+- **Cabang 2 (UI/UX & Tata Letak Editor)**:
+  - **Dual Editor Layout Engine (`F8` & `#btnLayoutMode`)**: Mode Studio Widescreen vs Mode Asli Side-by-Side (`.side-by-side-layout`).
+  - **Hitbox Seleksi Cyan Otentik (`#00e5ff`)** yang disinkronkan langsung dengan `WebGL2Renderer.getLayerWorldBox(layer, time)`.
+  - **UX Timeline Desktop**: `Shift+Wheel` pan horizontal, `Wheel` di penggaris waktu untuk zoom, `Ctrl/Shift+Click` multi-select mouse (tanpa false-positive long-press 420ms), serta proteksi seleksi multi-layer saat menggeser timeline kosong.
+  - **Identitas Visual AM-PC**: Tombol `+` Tambah Layer Neon Mint (`.am-add-layer-fab`: `#18221d`, border `2px solid #00e676`, glow, rotasi 45° saat `.is-open`), Android Touch Ripple + Micro-Press, dan Container Transform Modal Morphing.
+- **Cabang 3 (Alur Kerja, Home Screen, & Produktivitas)**:
+  - **Panel Multi-Select di Inspector Kanan (`#amPanel`)** dengan tombol Kelompokkan, Grup Masking, Hapus, dan kartu **Tautkan Ulang Media ("Ganti Semua Sekaligus (N Media)")** yang menyimpan media secara persisten via `ammedia://`.
+  - **Auto-Capture Thumbnail Proyek WebGL (`project.thumb` WebP)** di Home Screen + dropdown pengurutan (**Terbaru**, **Terlama**, **Nama A–Z**).
+  - **Impor Terpadu (`.xml`, `.amproj`, `.zip`)** + **Split View 50:50** antara Daftar Proyek dan AM Finder / AM Hub.
+  - **Modal Pintasan Keyboard (`?` / `F1`) Bebas Blur** (`z-index: 10` di atas backdrop `z-index: 1`) + pemetaan ulang tombol interaktif (`localStorage`) + navigasi frame presisi (`ArrowLeft`/`ArrowRight` ±1f, `Shift+Arrow` ±10f, `Home`/`End`).
+- **Cabang 4 (Performa Playback, Ekspor Native FFmpeg, & Portable Build)**:
+  - **Offline Audio Mixer (`OfflineAudioContext`)** merender seluruh track audio ke WAV PCM 16-bit (`<100ms`) dan menggabungkannya dengan video ekspor.
+  - **Sinkronisasi Frame Video Deterministik (`seekAllAndWait`)** + resolusi FFmpeg tangguh (`AM_FFMPEG_PATH` → `ffmpeg` → `ffmpeg-static`) + guard dimensi genap H.264 (`-vf scale=trunc(iw/2)*2:trunc(ih/2)*2`) + default format **MP4 (H.264)**.
+  - **Verifikasi & Build Portable**: `tsc --noEmit` (0 error), `verify:shaders` (286/286 = 100%), `verify:scripts` (38/38 = 100%), `verify:ui` (lulus), dan `npm run build:portable` menghasilkan `release/Alight-Motion-Native-win-x64/Alight Motion Native.exe`.
+
+### Update Sebelumnya (11 Okt 2026 23:25) — Sinkronisasi Upstream Open-Motion V5.238
 - **Pembaruan Inti Upstream V5.238 (Hada45/Open-Motion)**:
   - Fitur Motion Tracking 2D (Point, Two Points, Planar, Corner Pin, Stabilizer) dan Camera 3D Tracking dengan keyframe serta pembuatan Null layer.
   - Fitur Text Animator: Targeting karakter/kata/baris/seluruh teks, selector range, kontrol 3D, dan 130 preset bawaan.
@@ -140,7 +177,7 @@ dibungkus jadi aplikasi desktop Windows.
 | Aspek | State |
 |---|---|
 | `index.html` | ✅ Sama persis dengan upstream (lihat [[Fakta]] F-01) |
-| Versi | Open Motion **V5.238** |
+| Versi | Open Motion **V5.285** |
 | Nama & Judul | ✅ **Alight Motion PC** (teks 'Single HTML' & 'Open Motion V5.209' dihapus dari title/brand) |
 | Brand Logo | ✅ Logo resmi Alight Motion (presisi pas squircle `test_prime_am.png`, tanpa offset border) |
 | Dialog Notice | ✅ Muncul pada startup, teks di-rebrand ke **Alight Motion PC**, tombol `INFO` di top bar permanen dan aktif dengan Container Transform Morphing |

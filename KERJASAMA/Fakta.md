@@ -48,16 +48,16 @@ tulis di [[Handoff]] sebagai "belum pasti".
 
 ## AM-PC
 
-### F-01 · `index.html` sudah versi terbaru (V5.238)
+### F-01 · `index.html` sudah versi terbaru (V5.285)
 
-- **Fakta:** `index.html` di repo ini sama persis dengan upstream `Hada45/Open-Motion` versi V5.238 (fitur Motion 2D/3D Tracking, Text Animator 130 presets, dan thumbnail proyek).
+- **Fakta:** `index.html` di repo ini sama persis dengan upstream `Hada45/Open-Motion` versi V5.285 (fitur Motion 2D/3D Tracking, Text Animator 130 presets, thumbnail proyek, configurable shortcuts PR #33, group timelines & mask/exclude, Add Object drawer 1:1 Alight Motion v5.0.273, dan smooth drawer animations).
 - **Bukti:**
   ```
-  git rev-parse HEAD:index.html          → 5c602db41fe5cde3ba39d9363f1e3a1ece9a14e5
-  git rev-parse upstream/main:index.html → 5c602db41fe5cde3ba39d9363f1e3a1ece9a14e5
+  git rev-parse HEAD:index.html          → 4df41ae4374054cd5177170c6110918e4f8b59e9
+  git rev-parse upstream/main:index.html → 4df41ae4374054cd5177170c6110918e4f8b59e9
   ```
-- **Diperiksa:** 11 Okt 2026 23:20, Antigravity
-- **Akibat:** **JANGAN sync ulang.** Sudah versi rilis terbaru V5.238. Kalau ada yang bilang
+- **Diperiksa:** 20 Okt 2026 13:10, Antigravity
+- **Akibat:** **JANGAN sync ulang.** Sudah versi rilis terbaru V5.285. Kalau ada yang bilang
   "ketinggalan", cek hash dulu.
 
 ### F-02 · Modif Antigravity sengaja dipisah dari `index.html`
@@ -302,3 +302,19 @@ mengulangi cara berpikir yang sama.
 - **Akibat:** Tampilan antarmuka efek di AM-PC kini otentik dan identik dengan visual Alight Motion mobile.
 
 
+### F-20 · Paritas Penuh AM-Native-Desktop terhadap Standar Emas AM-PC (V5.238)
+
+- **Fakta:**
+  1. Engine WebGL2 di `AM-Native-Desktop` (`src/engine/webgl2-renderer.ts` & `src/engine/shader-pipeline.ts`) kini mengimplementasikan:
+     - **Backdrop Capture Adjustment Layer** (`magnifybg`, `copybg`, `lift` dengan `fill <= 0.001`, `displacemap3`) yang menyalin komposisi di bawah layer ke `backdropFBO` dan melakukan masking bentuk layer (`maskProgram`), sama persis dengan perilaku Fakta F-18 di `AM-PC`.
+     - **Compositor 24 Blend Mode + 4 Track Matte Mode** (`alpha`, `alpha-inverted`, `luma`, `luma-inverted`) serta grup masking (`blending="mask"` / `"exclude"`).
+     - **Hierarki Transformasi Parent & Pivot (`layer.origin`)** serta metoda `getLayerWorldBox(layer, time)` untuk sinkronisasi kotak seleksi cyan `#00e5ff` dengan geometri WebGL2.
+  2. Fitur V5.238 (`Text Animator` per-huruf/kata/baris dengan 5 preset, `2D Motion Tracker → Null layer`, dan `Impor/Ekspor Preset Efek .amfx.json`) telah terintegrasi di `text-renderer.ts` dan `inspector-panel.ts`.
+  3. Pipeline ekspor di `AM-Native-Desktop` (`src/engine/media-manager.ts`, `src/ui/export-sheet.ts`, `electron/main.js`) menggabungkan `OfflineAudioContext` mixer (`mixProjectAudioWav`), sinkronisasi frame video deterministik (`seekAllAndWait`), dan encoder FFmpeg dengan guard dimensi genap (`scale=trunc(iw/2)*2:trunc(ih/2)*2`).
+- **Bukti:**
+  - `npx tsc --noEmit` → 0 error.
+  - `npm run verify:shaders` → 286/286 program pass (100%).
+  - `npm run verify:scripts` → 38/38 efek script pass + render E2E pass.
+  - `npm run build:portable` → `release/Alight-Motion-Native-win-x64/Alight Motion Native.exe`.
+- **Diperiksa:** 16 Okt 2026, Antigravity
+- **Akibat:** `AM-Native-Desktop` kini memiliki paritas fitur, visual, alur kerja, dan ekspor yang setara dengan `AM-PC` V5.238.
