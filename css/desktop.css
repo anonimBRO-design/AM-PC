@@ -3100,8 +3100,101 @@ button:active,
 #appSplashScreen .iosBlade {
   background-color: #00e676 !important;
 }
-  opacity: 0.65 !important;
-  cursor: not-allowed !important;
-  pointer-events: none !important;
+
+/* ============================================================
+   Alight Motion PC — Dark Theme Project Cards & Top Actions
+   ============================================================ */
+body.is-electron .simpleHome .projectCard,
+body.is-electron #home .projectCard,
+#home.simpleHome .projectCard,
+.simpleHome #projectList .projectCard,
+.simpleHome .projectCard {
+  background: #141822 !important;
+  border: 1px solid #232b3a !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+  color: #ffffff !important;
 }
 
+body.is-electron .simpleHome .projectCard:hover,
+body.is-electron #home .projectCard:hover,
+#home.simpleHome .projectCard:hover,
+.simpleHome #projectList .projectCard:hover,
+.simpleHome .projectCard:hover {
+  background: #1a202d !important;
+  border-color: rgba(0, 230, 118, 0.45) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
+}
+
+body.is-electron .simpleHome .projectCard .projectMeta b,
+body.is-electron #home .projectCard .projectMeta b,
+#home.simpleHome .projectCard .projectMeta b,
+.simpleHome .projectCard .projectMeta b {
+  color: #ffffff !important;
+}
+
+body.is-electron .simpleHome .projectCard .projectMeta span,
+body.is-electron #home .projectCard .projectMeta span,
+#home.simpleHome .projectCard .projectMeta span,
+.simpleHome .projectCard .projectMeta span {
+  color: #8c98ad !important;
+}
+
+body.is-electron .simpleHome .projectCard .projectArrow,
+body.is-electron #home .projectCard .projectArrow,
+#home.simpleHome .projectCard .projectArrow,
+.simpleHome .projectCard .projectArrow {
+  color: #00e676 !important;
+}
+
+body.is-electron .simpleHome .projectThumb,
+body.is-electron #home .projectThumb,
+#home.simpleHome .projectThumb,
+.simpleHome .projectThumb {
+  background: #0c0f14 !important;
+  border: 1px solid #242c3d !important;
+  border-radius: 10px !important;
+}
+
+/* Dark Theme Top Actions Buttons (IMPOR, AM LINK, rightBtn) */
+body.is-electron .simpleHome .homeTopActions .rightBtn,
+body.is-electron .simpleHome .rightBtn,
+#home .homeTopActions .rightBtn,
+#homeImportMain,
+#homeAMLink {
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 12px !important;
+  border-radius: 9px !important;
+  font-size: 11px !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.04em !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  border: 1px solid #283042 !important;
+  background: #181d28 !important;
+  color: #d1d8e6 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.15s ease !important;
+}
+
+body.is-electron .simpleHome .homeTopActions .rightBtn:hover,
+body.is-electron .simpleHome .rightBtn:hover,
+#home .homeTopActions .rightBtn:hover,
+#homeImportMain:hover,
+#homeAMLink:hover {
+  background: #222a3a !important;
+  border-color: #00e676 !important;
+  color: #00e676 !important;
+  box-shadow: 0 0 10px rgba(0, 230, 118, 0.25) !important;
+}
+
+body.is-electron .simpleHome .homeTopActions .rightBtn svg,
+body.is-electron .simpleHome .rightBtn svg,
+#homeImportMain svg,
+#homeAMLink svg {
+  width: 14px !important;
+  height: 14px !important;
+  stroke: currentColor !important;
+}

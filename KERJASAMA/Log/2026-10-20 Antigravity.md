@@ -42,3 +42,14 @@
      - Spinner: Indikator iOS spinner dengan bilah hijau mint neon `#00e676`.
    - Verifikasi: Berhasil diuji coba via `scratch/test_splash_screen.js` dan screenshot `scratch/screenshot_splash_screen.png`.
 
+6. **Perbaikan Warna Putih Kartu Proyek & Tombol Header Beranda**:
+   - Masalah: Upstream V5.285 menambahkan `.simpleHome .projectCard { background: #ffffff !important; }` dan `.simpleHome .rightBtn { background: #ffffff !important; }` di baris 6935–7125 `index.html`. Akibatnya seluruh kartu proyek dan tombol IMPOR & AM LINK menjadi putih terang di atas latar belakang gelap.
+   - Solusi: Di-override di `css/desktop.css` dan `css/desktop-studio.css` dengan selektor ber-spesifisitas tinggi (`body.is-electron .simpleHome .projectCard`, `.simpleHome .homeTopActions .rightBtn`, dll.):
+     - Background kartu: Deep charcoal navy `#141822`.
+     - Border kartu: `#232b3a` (halus 1px).
+     - Hover kartu: `#1a202d` dengan border neon hijau mint `#00e676`.
+     - Judul proyek: `#ffffff` (putih bersih) dan meta info: `#8c98ad`.
+     - Tombol IMPOR & AM LINK: Gelap slate `#181d28`, border `#283042`, teks `#d1d8e6`, hover glow mint.
+   - Verifikasi: Diuji di Electron runtime (`scratch/test_cards_color.js`), seluruh computed background kartu terbukti `#141822` (`rgb(20, 24, 34)`), teks `#ffffff`, tombol `#181d28` (0% putih), dan disinkronkan langsung ke `release/`.
+
+

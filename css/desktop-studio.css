@@ -939,6 +939,79 @@
     min-height: 84px !important;
     padding: 12px !important;
     grid-template-columns: 68px minmax(0, 1fr) !important;
+    background: #141822 !important;
+    border: 1px solid #232b3a !important;
+    border-radius: 14px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+    color: #ffffff !important;
+  }
+
+  .simpleHome .projectCard:hover {
+    background: #1a202d !important;
+    border-color: rgba(0, 230, 118, 0.45) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
+  }
+
+  .simpleHome .projectCard .projectMeta b {
+    color: #ffffff !important;
+  }
+
+  .simpleHome .projectCard .projectMeta span {
+    color: #8c98ad !important;
+  }
+
+  .simpleHome .projectCard .projectArrow {
+    color: #00e676 !important;
+  }
+
+  .simpleHome .projectThumb {
+    width: 68px !important;
+    height: 68px !important;
+    background: #0c0f14 !important;
+    border: 1px solid #242c3d !important;
+    border-radius: 10px !important;
+  }
+
+  /* Dark Theme Top Actions Buttons (IMPOR, AM LINK, rightBtn) */
+  .simpleHome .homeTopActions .rightBtn,
+  .simpleHome .rightBtn,
+  #homeImportMain,
+  #homeAMLink {
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 12px !important;
+    border-radius: 9px !important;
+    font-size: 11px !important;
+    font-weight: 750 !important;
+    letter-spacing: 0.04em !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    border: 1px solid #283042 !important;
+    background: #181d28 !important;
+    color: #d1d8e6 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.15s ease !important;
+  }
+
+  .simpleHome .homeTopActions .rightBtn:hover,
+  .simpleHome .rightBtn:hover,
+  #homeImportMain:hover,
+  #homeAMLink:hover {
+    background: #222a3a !important;
+    border-color: #00e676 !important;
+    color: #00e676 !important;
+    box-shadow: 0 0 10px rgba(0, 230, 118, 0.25) !important;
+  }
+
+  .simpleHome .homeTopActions .rightBtn svg,
+  .simpleHome .rightBtn svg,
+  #homeImportMain svg,
+  #homeAMLink svg {
+    width: 14px !important;
+    height: 14px !important;
+    stroke: currentColor !important;
+  }
   }
 
   .simpleHome .projectThumb {
