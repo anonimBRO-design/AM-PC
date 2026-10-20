@@ -113,6 +113,94 @@ contextBridge.exposeInMainWorld('desktopAPI', {
       .homeWordmark small {
         display: none !important;
       }
+
+      /* Authentic Alight Motion PC Splash Screen */
+      .appSplashScreen,
+      #appSplashScreen {
+        background-color: #0c0f14 !important;
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 9999999 !important;
+      }
+
+      .appSplashScreen .splashContainer,
+      #appSplashScreen .splashContainer {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 18px !important;
+      }
+
+      .appSplashScreen .splashImage,
+      #appSplashScreen .splashImage {
+        width: 130px !important;
+        height: 130px !important;
+        max-width: 130px !important;
+        max-height: 130px !important;
+        border-radius: 30px !important;
+        object-fit: cover !important;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+        filter: drop-shadow(0 4px 18px rgba(0, 230, 118, 0.2)) !important;
+        transition: opacity 0.2s ease, transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1) !important;
+      }
+
+      #appSplashScreen .splashImage:not(.am-splash-ready) {
+        opacity: 0 !important;
+        visibility: hidden !important;
+      }
+
+      #appSplashScreen .splashImage.am-splash-ready {
+        opacity: 1 !important;
+        visibility: visible !important;
+      }
+
+      .appSplashScreen .splashBrand,
+      #appSplashScreen .splashBrand {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important;
+        text-align: center !important;
+      }
+
+      .appSplashScreen .splashBrandTitle,
+      #appSplashScreen .splashBrandTitle {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        font-size: 24px !important;
+        font-weight: 800 !important;
+        color: #ffffff !important;
+        letter-spacing: -0.02em !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7) !important;
+      }
+
+      .appSplashScreen .splashBrandSubtitle,
+      #appSplashScreen .splashBrandSubtitle {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        color: #00e676 !important;
+        letter-spacing: 0.12em !important;
+        text-transform: uppercase !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        opacity: 0.95 !important;
+      }
+
+      .appSplashScreen .iosSpinner,
+      #appSplashScreen .iosSpinner {
+        margin-top: 14px !important;
+      }
+
+      .appSplashScreen .iosBlade,
+      #appSplashScreen .iosBlade {
+        background-color: #00e676 !important;
+      }
+        display: none !important;
+      }
     `;
 
     if (fs.existsSync(themeCssPath)) {
@@ -206,6 +294,39 @@ contextBridge.exposeInMainWorld('desktopAPI', {
 
       const installBtn = document.getElementById('homeInstallBtn');
       if (installBtn) installBtn.style.setProperty('display', 'none', 'important');
+
+      // Branding Splash Screen Alight Motion PC
+      const splashScreen = document.getElementById('appSplashScreen');
+      if (splashScreen) {
+        splashScreen.setAttribute('aria-label', 'Memuat Alight Motion PC...');
+        const splashImg = splashScreen.querySelector('.splashImage');
+        if (splashImg) {
+          if (primeLogoDataUri && splashImg.src !== primeLogoDataUri) {
+            splashImg.src = primeLogoDataUri;
+          }
+          if (splashImg.alt !== 'Alight Motion PC') {
+            splashImg.alt = 'Alight Motion PC';
+          }
+          if (!splashImg.classList.contains('am-splash-ready')) {
+            splashImg.classList.add('am-splash-ready');
+          }
+        }
+        const splashContainer = splashScreen.querySelector('.splashContainer');
+        if (splashContainer && !splashContainer.querySelector('.splashBrand')) {
+          const brandDiv = document.createElement('div');
+          brandDiv.className = 'splashBrand';
+          brandDiv.innerHTML = `
+            <h1 class="splashBrandTitle">Alight Motion PC</h1>
+            <span class="splashBrandSubtitle">Motion Graphics & Visual Effects</span>
+          `;
+          const spinner = splashContainer.querySelector('.iosSpinner');
+          if (spinner) {
+            splashContainer.insertBefore(brandDiv, spinner);
+          } else {
+            splashContainer.appendChild(brandDiv);
+          }
+        }
+      }
 
       window.__omsExperimentalNoticeAccepted = true;
     };
@@ -1282,7 +1403,40 @@ window.addEventListener('DOMContentLoaded', () => {
             popup.setAttribute('aria-hidden', 'true');
             if (popup.id === 'experimentalNotice') {
               sessionStorage.setItem('am_notice_dismissed_session', 'true');
-              window.__omsExperimentalNoticeAccepted = true;
+              // Branding Splash Screen Alight Motion PC
+      const splashScreen = document.getElementById('appSplashScreen');
+      if (splashScreen) {
+        splashScreen.setAttribute('aria-label', 'Memuat Alight Motion PC...');
+        const splashImg = splashScreen.querySelector('.splashImage');
+        if (splashImg) {
+          if (primeLogoDataUri && splashImg.src !== primeLogoDataUri) {
+            splashImg.src = primeLogoDataUri;
+          }
+          if (splashImg.alt !== 'Alight Motion PC') {
+            splashImg.alt = 'Alight Motion PC';
+          }
+          if (!splashImg.classList.contains('am-splash-ready')) {
+            splashImg.classList.add('am-splash-ready');
+          }
+        }
+        const splashContainer = splashScreen.querySelector('.splashContainer');
+        if (splashContainer && !splashContainer.querySelector('.splashBrand')) {
+          const brandDiv = document.createElement('div');
+          brandDiv.className = 'splashBrand';
+          brandDiv.innerHTML = `
+            <h1 class="splashBrandTitle">Alight Motion PC</h1>
+            <span class="splashBrandSubtitle">Motion Graphics & Visual Effects</span>
+          `;
+          const spinner = splashContainer.querySelector('.iosSpinner');
+          if (spinner) {
+            splashContainer.insertBefore(brandDiv, spinner);
+          } else {
+            splashContainer.appendChild(brandDiv);
+          }
+        }
+      }
+
+      window.__omsExperimentalNoticeAccepted = true;
               try {
                 window.dispatchEvent(new CustomEvent('oms:experimental-notice-accepted'));
               } catch (e) {}

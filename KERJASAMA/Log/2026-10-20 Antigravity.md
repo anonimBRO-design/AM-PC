@@ -32,3 +32,13 @@
 4. **Kompilasi Standalone Portable Exe**:
    - Berhasil menjalankan `node scripts/build-portable.js`.
    - Menghasilkan rilis terbaru: `release/Alight-Motion-PC-win-x64/Alight Motion PC.exe` versi V5.285 dengan metadata dan icon resmi Alight Motion tersemat.
+
+5. **Rebranding Splash Screen Alight Motion PC (Frame-0)**:
+   - Masalah: Upstream V5.285 menambahkan splash screen `#appSplashScreen` dengan logo Open Motion dan background ungu `#1e2239`.
+   - Solusi: Diinjeksi di `electron/preload.js` dan `css/desktop.css` tanpa mengubah `index.html`.
+     - Background: Gelap modern Alight Motion PC `#0c0f14`.
+     - Logo: Ikon resmi Alight Motion squircle (`icons/test_prime_am.png`) ukuran 130×130px, border-radius 30px, shadow halus, dan proteksi anti-flash `am-splash-ready`.
+     - Teks: Judul "Alight Motion PC" (24px Inter bold) + Subtitle "Motion Graphics & Visual Effects" (12px neon mint `#00e676`).
+     - Spinner: Indikator iOS spinner dengan bilah hijau mint neon `#00e676`.
+   - Verifikasi: Berhasil diuji coba via `scratch/test_splash_screen.js` dan screenshot `scratch/screenshot_splash_screen.png`.
+

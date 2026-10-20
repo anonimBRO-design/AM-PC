@@ -45,6 +45,7 @@ Aturan kerja: [[Aturan]] · Jebakan: [[Jebakan]] · Fakta: [[Fakta]]
   - Test 2 (`scratch/verify_shortcuts.js`): Modal shortcut #amShortcutsModal dark theme #121820 terpasang sempurna.
   - Test 3 (`scratch/test_ffmpeg_export.js`): Ekspor native FFmpeg MP4 30 frame valid via ffprobe (51.391 bytes).
   - Test 4 (`scratch/verify_v5285_ui.js`): Editor widescreen studio, Add Object drawer 5 tab, 0 console error.
+  - Test 5 (`scratch/test_splash_screen.js`): Splash screen rebrand Alight Motion PC (icon squircle 130×130, judul "Alight Motion PC", subtitle neon mint, spinner #00e676, bg #0c0f14) lolos 100%.
 - **Build Portable Sukses**:
   - `node scripts/build-portable.js` mengompilasi `release/Alight-Motion-PC-win-x64/Alight Motion PC.exe` versi V5.285.
 
